@@ -51,7 +51,7 @@ publish:
   stage: publish
   script:
     - helm package ${CHART_NAME}
-    - helm repo add --username ${CI_REGISTRY_USER} --password ${CI_REGISTRY_PASSWORD} ${CHART_NAME} ${CI_PROJECT_URL}/packages/helm/stable
+    - helm repo add --username ${CI_REGISTRY_USER} --password ${CI_REGISTRY_PASSWORD} ${CHART_NAME} https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/helm/stable
     - helm cm-push *.tgz ${CHART_NAME}
   only:
     - main
