@@ -53,6 +53,8 @@ publish:
     - helm package ${CHART_NAME}
     - helm repo add --username ${CI_REGISTRY_USER} --password ${CI_REGISTRY_PASSWORD} ${CHART_NAME} ${CI_PROJECT_URL}/packages/helm/stable
     - helm cm-push *.tgz ${CHART_NAME}
+  only:
+    - main
 
 
 cleanup:
