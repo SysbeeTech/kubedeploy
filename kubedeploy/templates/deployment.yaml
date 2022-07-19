@@ -1,3 +1,5 @@
+{{- if eq (toString .Values.deploymentMode) "Deployment" }}
+{{- $fullName := include "kubedeploy.fullname" . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,6 +47,11 @@ spec:
             httpGet:
               path: /
               port: http
+          {{- if and (.Values.persistency.enabled) (lt (int .Values.replicaCount) 2) }}
+          volumeMounts:
+            - mountPath: {{ .Values.persistency.mountPath }}
+              name: {{ $fullName }}-vol
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -59,3 +66,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if and (.Values.persistency.enabled) (lt (int .Values.replicaCount) 2) }}
+      volumes:
+        - name: {{ $fullName }}-vol
+          persistentVolumeClaim:
+            claimName: {{ $fullName }}-claim
+      {{- end }}
+{{- end }}

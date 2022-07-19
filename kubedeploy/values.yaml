@@ -4,6 +4,11 @@
 
 replicaCount: 1
 
+# available deployment modes currently supported: 
+# - Deployment
+# Need to extend the chart to support Daemonsets and Statefull sets (define PV handling)
+deploymentMode: Deployment
+
 image:
   repository: nginx
   pullPolicy: IfNotPresent
@@ -55,6 +60,16 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+persistency:
+  # storageClassName: default
+  enabled: false
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  # define where the persistent volume will be mounted in container
+  mountPath: "/data"
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
