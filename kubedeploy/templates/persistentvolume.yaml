@@ -1,0 +1,37 @@
+{{- if and (.Values.persistency.enabled) (eq (toString .Values.deploymentMode) "Deployment") (lt (int .Values.replicaCount) 2) -}}
+{{- $fullName := include "kubedeploy.fullname" . -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $fullName }}-vol
+  labels:
+    {{- include "kubedeploy.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.persistency.storageClassName }}
+  storageClassName: {{ .Values.persistency.storageClassName }}
+  {{- end }}
+  capacity:
+    storage: {{ .Values.persistency.capacity.storage }}
+  accessModes:
+    {{- range .Values.persistency.accessModes }}
+      - {{ . }}
+    {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $fullName }}-claim
+  labels:
+    {{- include "kubedeploy.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.persistency.storageClassName }}
+  storageClassName: {{ .Values.persistency.storageClassName }}
+  {{- end }}
+  accessModes:
+    {{- range .Values.persistency.accessModes }}
+      - {{ . }}
+    {{- end }}
+  resources:
+    requests:
+      storage:  {{ .Values.persistency.capacity.storage }}
+{{- end }}
