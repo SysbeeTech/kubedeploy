@@ -6,7 +6,7 @@ replicaCount: 1
 
 # available deployment modes currently supported: 
 # - Deployment
-# Need to extend the chart to support Daemonsets and Statefull sets (define PV handling)
+
 deploymentMode: Deployment
 
 image:
@@ -60,6 +60,9 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+# Enable support for persistent volumes on deployments.
+# Currently supported only in deploymentMode Deployment with replicaCount = 1
 
 persistency:
   # storageClassName: default
