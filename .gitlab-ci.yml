@@ -10,3 +10,19 @@ deploychart:
     - kind export kubeconfig --name ${CI_COMMIT_SHORT_SHA}
     - helm upgrade --install ${RELEASE_NAME} ${CHART_NAME} --set image.repository=nginx --set image.tag=1.16.0 --wait --timeout 300s
 
+publish_docs:
+  tags:
+    - docker-runner
+  image: pandoc/core
+  extends: .runner
+  before_script:
+    - apk add aws-cli
+  script:
+    - pandoc -t html5 -f markdown -s --toc --toc-depth 3 --template pandoc/github.html5 --css pandoc/github.css kubedeploy/README.md -o index.html
+    - aws s3 cp index.html s3://${S3_BUCKET}/${CHART_NAME}/index.html
+  only:
+    refs:
+      - main
+      - tags
+    variables:
+      - $PUBLIC_CHART == "true"
