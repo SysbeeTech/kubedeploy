@@ -2,15 +2,7 @@
 
 Generic Helm template for deploying containers in Kubernetes cluster
 
-## Getting started
+To publish helm chart create a git tag identical to Chart.yaml version
 
-## Add your files
-
-## Integrate with your tools
-
-## Collaborate with your team
-
-## Test and Deploy
-
-# Editing this README
-
+git tag -a 0.2.1 -m "version 0.2.1"
+git push origin --tags
