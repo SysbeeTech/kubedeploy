@@ -1,32 +1,7 @@
 ---
-stages:
-  - lint
-  - cluster-init
-  - deploy
-  - verify
-  - publish
-  - cleanup
-
-variables:
-  CHART_NAME: ${CI_PROJECT_NAME}
-  RELEASE_NAME: testing
-
-.runner:
-  tags:
-    - docker
-    - kind
-
-helmlint:
-  extends: .runner
-  stage: lint
-  script:
-    - helm lint ${CHART_NAME}
-
-clusterinit:
-  extends: .runner
-  stage: cluster-init
-  script:
-    - kind create cluster --name ${CI_COMMIT_SHORT_SHA}
+include:
+  - project: helm/charts
+    file: '/ci-template/.gitlab-ci.yml'
 
 deploychart:
   extends: .runner
@@ -34,33 +9,4 @@ deploychart:
   script:
     - kind export kubeconfig --name ${CI_COMMIT_SHORT_SHA}
     - helm upgrade --install ${RELEASE_NAME} ${CHART_NAME} --set image.repository=nginx --set image.tag=1.16.0 --wait --timeout 300s
-
-verify:
-  extends: .runner
-  stage: verify
-  script:
-    - kind export kubeconfig --name ${CI_COMMIT_SHORT_SHA}
-    - kubectl wait --for=condition=available --timeout=300s deployment/${RELEASE_NAME}-${CHART_NAME}
-    - kubectl get deployment ${RELEASE_NAME}-${CHART_NAME} -n default -o=jsonpath='{.status.replicas}' |grep 1
-
-publish:
-  tags:
-    - docker-runner
-  image: sysbee/kubeci:latest
-  extends: .runner
-  stage: publish
-  script:
-    - helm package ${CHART_NAME}
-    - helm repo add --username ${CI_REGISTRY_USER} --password ${CI_REGISTRY_PASSWORD} ${CHART_NAME} https://${CI_SERVER_HOST}/api/v4/projects/238/packages/helm/stable
-    - helm cm-push *.tgz ${CHART_NAME}
-  only:
-    - main
-
-
-cleanup:
-  extends: .runner
-  stage: cleanup
-  script:
-    - kind delete cluster --name ${CI_COMMIT_SHORT_SHA}
-  when: always
 
