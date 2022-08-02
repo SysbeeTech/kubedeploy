@@ -14,7 +14,9 @@ publish_docs:
   stage: publish
   tags:
     - docker-runner
-  image: pandoc/core
+  image:
+    name: pandoc/core
+    entrypoint: ["/bin/sh", "-c"]
   extends: .runner
   before_script:
     - apk add aws-cli
