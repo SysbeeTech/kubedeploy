@@ -1,0 +1,37 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude: README.md
+      - id: check-added-large-files
+      - id: detect-aws-credentials
+        args: ['--allow-missing-credentials']
+      - id: detect-private-key
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.1.0
+    hooks:
+      - id: codespell
+        name: codespell
+        description: Checks for common misspellings in text files.
+        entry: codespell
+        language: python
+        types: [text]
+
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.2.0
+    hooks:
+      - id: helm-docs
+        files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
+        args:
+          # Make the tool search for charts only under the `example-charts` directory
+          - --chart-search-root=./
+          # The `./` makes it relative to the chart-search-root set above
+          - --template-files=./_templates.gotmpl
+          # Repeating the flag adds this to the list, now [./_templates.gotmpl, README.md.gotmpl]
+          # A base filename makes it relative to each chart directory found
+          - --template-files=README.md.gotmpl
