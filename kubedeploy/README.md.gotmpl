@@ -1,0 +1,48 @@
+{{ template "chart.header" . }}
+{{ template "chart.description" . }}
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+## Additional Information
+
+This is a simple chart created to deploy any generic containerized application to kubernetes cluster.
+
+Idea behind this is having a framework for deploying built docker images by changing charts
+**image.repository** and **image.tag** values.
+
+This chart supports modifying following values:
+ - creating Deployment
+ - defining persistent volumes (only if replica 1) and it's mount point
+ - single container within pod
+ - defining custom container ports
+ - defining service ports
+ - defining container env variables
+ - autoscaling configuration
+ - pod disruption budgets
+ - node selector
+ - toleratoins
+ - affinity
+ - configuring resources
+ - ingress
+ - pod annotatoins
+ - image pull secrets
+ - name override
+
+## Installing the Chart
+
+To install the chart with the release name `my-release`:
+
+```console
+$ helm repo add sysbee https://charts.sysbee.io/stable/sysbee
+$ helm install my-release sysbee/{{ template "chart.name" . }}
+```
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "helm-docs.versionFooter" . }}
+
+## Changelog
+
+{{ .Files.Get "CHANGELOG.md" }}
