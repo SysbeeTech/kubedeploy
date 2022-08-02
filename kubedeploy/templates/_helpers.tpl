@@ -23,6 +23,20 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+{{/* Get Policy API Version */}}
+{{- define "kubedeploy.pdb.apiVersion" -}}
+  {{- if and (.Capabilities.APIVersions.Has "policy/v1") (semverCompare ">= 1.21-0" (include "kubedeploy.kubeVersion" .)) -}}
+      {{- print "policy/v1" -}}
+  {{- else -}}
+    {{- print "policy/v1beta1" -}}
+  {{- end -}}
+  {{- end -}}
+
+{{/* Allow KubeVersion to be overridden. */}}
+{{- define "kubedeploy.kubeVersion" -}}
+  {{- default .Capabilities.KubeVersion.Version .Values.kubeVersionOverride -}}
+{{- end -}}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}

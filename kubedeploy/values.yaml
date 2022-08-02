@@ -2,32 +2,40 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- (int) Number of pods to load balance across
 replicaCount: 1
 
-# available deployment modes currently supported: 
-# - Deployment
-
+# -- available deployment modes currently supported:
+# Deployment
 deploymentMode: Deployment
 
-image:
-  repository: nginx
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+# -- Allow override of kubernetes version
+# by default this will be automatically detected and requires no modification
+kubeVersionOverride: ""
 
+image:
+  # -- define container repositor
+  repository: nginx
+  # -- default container pull policy
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+# -- define [ImagePullSecrets](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podspec-v1-core)
 imagePullSecrets: []
+
 nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
+  # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+# -- define pod [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
 podAnnotations: {}
 
 podSecurityContext: {}
@@ -41,10 +49,40 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+# -- Define ports that container will listen on
+# see: [containerport](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core)
+ports:
+  - name: http
+    containerPort: 80
+    protocol: TCP
+  # - name: prometheus
+  #   containerPort: 9000
+  #   protocol: TCP
+
+# -- Define environment variables for container
+# see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core)
+env: []
+  # - name: ENV1
+  #   value: Env-value
+  #   # see: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envfromsource-v1-core
+  # - name: fromvalue
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: secret-name
+  #       key: key-name
+
 service:
   type: ClusterIP
-  port: 80
 
+  # -- define port for service
+  # see: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core
+  ports:
+    - port: 80  # this is a service port
+      targetPort: http  # this is a named pod port that will be the target
+      protocol: TCP  # default if omitted
+      name: http  # name of the service port, this should match container port name
+
+# -- define [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object
 ingress:
   enabled: false
   className: ""
@@ -56,27 +94,28 @@ ingress:
     - host: chart-example.local
       paths:
         - path: /
-        
+
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
 
-# Enable support for persistent volumes on deployments.
-# Currently supported only in deploymentMode Deployment with replicaCount = 1
-
 persistency:
   # storageClassName: default
+
+  # -- Enable support for persistent volumes on deployments.
+  # Currently supported only in deploymentMode Deployment with replicaCount = 1
   enabled: false
   capacity:
+    # -- define storage capacity
     storage: 5Gi
   accessModes:
     - ReadWriteOnce
-  # define where the persistent volume will be mounted in container
+  # -- where will the persistent volume will be mounted in container
   mountPath: "/data"
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
+  # -- We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
@@ -88,14 +127,28 @@ resources: {}
   #   memory: 128Mi
 
 autoscaling:
+  # -- enable autoscaling
   enabled: false
+  # -- number of minimum replicas for autoscaling
   minReplicas: 1
-  maxReplicas: 100
+  # -- number of max replicas for autoscaling
+  maxReplicas: 10
+  # -- target cpu utilization as percentage of resource.requests.cpu
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+# -- define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
 nodeSelector: {}
 
+# -- define pod [tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
 tolerations: []
 
+# -- define pod [affinity](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/)
 affinity: {}
+
+podDisruptionBudget:
+  # -- enable and define pod disruption budget default (off)
+  # see: [podDisruptionBudget](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
+  enabled: false
+  minAvailable: 1
+  # maxUnavailable: 1
