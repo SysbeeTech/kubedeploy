@@ -11,6 +11,7 @@ deploychart:
     - helm upgrade --install ${RELEASE_NAME} ${CHART_NAME} --set image.repository=nginx --set image.tag=1.16.0 --wait --timeout 300s
 
 publish_docs:
+  stage: publish
   tags:
     - docker-runner
   image: pandoc/core
