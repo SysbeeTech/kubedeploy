@@ -373,6 +373,7 @@ pre {
   font-size: 16px;
   line-height: 1.6;
   word-wrap: break-word;
+  max-width: 90%;
 }
 
 .markdown-body>*:first-child {
