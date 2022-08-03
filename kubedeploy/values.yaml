@@ -20,10 +20,13 @@ image:
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
   tag: ""
+
 # -- define [ImagePullSecrets](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podspec-v1-core)
 imagePullSecrets: []
 
+# -- Override release name used in calculated "releasename-chartname" naming
 nameOverride: ""
+# -- Override full resource names instead of using calculated "releasename-chartname" naming
 fullnameOverride: ""
 
 serviceAccount:
@@ -50,7 +53,7 @@ securityContext: {}
   # runAsUser: 1000
 
 # -- Define ports that container will listen on
-# see: [containerport](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core)
+# see: [containerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core)
 ports:
   - name: http
     containerPort: 80
@@ -75,33 +78,40 @@ service:
   type: ClusterIP
 
   # -- define port for service
-  # see: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core
+  # see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core)
   ports:
     - port: 80  # this is a service port
       targetPort: http  # this is a named pod port that will be the target
       protocol: TCP  # default if omitted
       name: http  # name of the service port, this should match container port name
 
-# -- define [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object
 ingress:
+  # -- define [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object
   enabled: false
+  # -- ingress class name
   className: ""
+  # -- default ingress pathType
   pathType: ImplementationSpecific
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # -- additional ingress annotations
+  annotations:
+    kubernetes.io/ingress.class: haproxy
+    cert-manager.io/cluster-issuer: letsencrypt
   hosts:
+    # -- ingress hosts with paths
     - host: chart-example.local
       paths:
         - path: /
-
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  tls:
+    # -- define secret name and host per ingress.hosts for ssl support
+    - secretName: chart-example-tls
+      hosts:
+        - chart-example.local
 
 persistency:
-  # storageClassName: default
+
+  # -- (string) define custom name for persistent storage class name
+  # @default - uses cluster default storageClassName
+  storageClassName:
 
   # -- Enable support for persistent volumes on deployments.
   # Currently supported only in deploymentMode Deployment with replicaCount = 1
@@ -114,10 +124,12 @@ persistency:
   # -- where will the persistent volume will be mounted in container
   mountPath: "/data"
 
+# -- We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. See [resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+# for syntax
 resources: {}
-  # -- We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   # limits:
   #   cpu: 100m
@@ -127,7 +139,7 @@ resources: {}
   #   memory: 128Mi
 
 autoscaling:
-  # -- enable autoscaling
+  # -- enable deployment autoscaling feature
   enabled: false
   # -- number of minimum replicas for autoscaling
   minReplicas: 1
@@ -135,7 +147,8 @@ autoscaling:
   maxReplicas: 10
   # -- target cpu utilization as percentage of resource.requests.cpu
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  # -- (int) target memory utilization as percentage of resource.requests.mem
+  targetMemoryUtilizationPercentage:
 
 # -- define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
 nodeSelector: {}
@@ -150,5 +163,7 @@ podDisruptionBudget:
   # -- enable and define pod disruption budget default (off)
   # see: [podDisruptionBudget](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   enabled: false
+  # -- minimum available replicas
   minAvailable: 1
-  # maxUnavailable: 1
+  # -- (int) maximum unavailable replicas
+  maxUnavailable:
