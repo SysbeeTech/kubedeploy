@@ -43,34 +43,42 @@ $ helm install my-release sysbee/kubedeploy
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | define pod [affinity](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/) |
-| autoscaling.enabled | bool | `false` | enable autoscaling |
+| autoscaling.enabled | bool | `false` | enable deployment autoscaling feature |
 | autoscaling.maxReplicas | int | `10` | number of max replicas for autoscaling |
 | autoscaling.minReplicas | int | `1` | number of minimum replicas for autoscaling |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | target cpu utilization as percentage of resource.requests.cpu |
+| autoscaling.targetMemoryUtilizationPercentage | int | `nil` | target memory utilization as percentage of resource.requests.mem |
 | deploymentMode | string | `"Deployment"` | available deployment modes currently supported: Deployment |
 | env | list | `[]` | Define environment variables for container see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core) |
-| fullnameOverride | string | `""` |  |
+| fullnameOverride | string | `""` | Override full resource names instead of using calculated "releasename-chartname" naming |
 | image.pullPolicy | string | `"IfNotPresent"` | default container pull policy |
 | image.repository | string | `"nginx"` | define container repositor |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` | define [ImagePullSecrets](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podspec-v1-core) |
-| ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/"}]}],"pathType":"ImplementationSpecific","tls":[]}` | define [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object |
+| ingress.annotations | object | `{"cert-manager.io/cluster-issuer":"letsencrypt","kubernetes.io/ingress.class":"haproxy"}` | additional ingress annotations |
+| ingress.className | string | `""` | ingress class name |
+| ingress.enabled | bool | `false` | define [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object |
+| ingress.hosts[0] | object | `{"host":"chart-example.local","paths":[{"path":"/"}]}` | ingress hosts with paths |
+| ingress.pathType | string | `"ImplementationSpecific"` | default ingress pathType |
+| ingress.tls[0] | object | `{"hosts":["chart-example.local"],"secretName":"chart-example-tls"}` | define secret name and host per ingress.hosts for ssl support |
 | kubeVersionOverride | string | `""` | Allow override of kubernetes version by default this will be automatically detected and requires no modification |
-| nameOverride | string | `""` |  |
+| nameOverride | string | `""` | Override release name used in calculated "releasename-chartname" naming |
 | nodeSelector | object | `{}` | define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
 | persistency.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | persistency.capacity.storage | string | `"5Gi"` | define storage capacity |
 | persistency.enabled | bool | `false` | Enable support for persistent volumes on deployments. Currently supported only in deploymentMode Deployment with replicaCount = 1 |
 | persistency.mountPath | string | `"/data"` | where will the persistent volume will be mounted in container |
+| persistency.storageClassName | string | `nil` | define custom name for persistent storage class name @default - uses cluster default storageClassName |
 | podAnnotations | object | `{}` | define pod [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
 | podDisruptionBudget.enabled | bool | `false` | enable and define pod disruption budget default (off) see: [podDisruptionBudget](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
-| podDisruptionBudget.minAvailable | int | `1` |  |
+| podDisruptionBudget.maxUnavailable | int | `nil` | maximum unavailable replicas |
+| podDisruptionBudget.minAvailable | int | `1` | minimum available replicas |
 | podSecurityContext | object | `{}` |  |
-| ports | list | `[{"containerPort":80,"name":"http","protocol":"TCP"}]` | Define ports that container will listen on see: [containerport](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core) |
+| ports | list | `[{"containerPort":80,"name":"http","protocol":"TCP"}]` | Define ports that container will listen on see: [containerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core) |
 | replicaCount | int | `1` | Number of pods to load balance across |
-| resources | object | `{}` |  |
+| resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. See [resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for syntax |
 | securityContext | object | `{}` |  |
-| service.ports | list | `[{"name":"http","port":80,"protocol":"TCP","targetPort":"http"}]` | define port for service see: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core |
+| service.ports | list | `[{"name":"http","port":80,"protocol":"TCP","targetPort":"http"}]` | define port for service see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core) |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
