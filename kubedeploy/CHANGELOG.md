@@ -1,3 +1,6 @@
+### 0.4.1
+- added support for image commands
+
 ### 0.4.0
 - added support for job workloads
 - added support for statefulset workloads
