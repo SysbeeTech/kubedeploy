@@ -43,12 +43,12 @@ $ helm install my-release sysbee/kubedeploy
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | define pod [affinity](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/) |
-| autoscaling.enabled | bool | `false` | enable deployment autoscaling feature |
+| autoscaling.enabled | bool | `false` | enable deployment autoscaling feature, available only with Deployment deploymentMode |
 | autoscaling.maxReplicas | int | `10` | number of max replicas for autoscaling |
 | autoscaling.minReplicas | int | `1` | number of minimum replicas for autoscaling |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | target cpu utilization as percentage of resource.requests.cpu |
 | autoscaling.targetMemoryUtilizationPercentage | int | `nil` | target memory utilization as percentage of resource.requests.mem |
-| deploymentMode | string | `"Deployment"` | available deployment modes currently supported: Deployment Job |
+| deploymentMode | string | `"Deployment"` | available deployment modes currently supported: Deployment Job Statefulset |
 | env | list | `[]` | Define environment variables for container see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core) |
 | fullnameOverride | string | `""` | Override full resource names instead of using calculated "releasename-chartname" naming |
 | image.pullPolicy | string | `"IfNotPresent"` | default container pull policy |
@@ -70,7 +70,7 @@ $ helm install my-release sysbee/kubedeploy
 | nodeSelector | object | `{}` | define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
 | persistency.accessModes[0] | string | `"ReadWriteOnce"` |  |
 | persistency.capacity.storage | string | `"5Gi"` | define storage capacity |
-| persistency.enabled | bool | `false` | Enable support for persistent volumes on deployments. Currently supported only in deploymentMode Deployment with replicaCount = 1 |
+| persistency.enabled | bool | `false` | Enable support for persistent volumes on deployments. Currently supported only in deploymentMode Deployment with replicaCount = 1 Or in Statefulset deploymentMode with any number of replicas |
 | persistency.mountPath | string | `"/data"` | where will the persistent volume will be mounted in container |
 | persistency.storageClassName | string | `nil` | define custom name for persistent storage class name @default - uses cluster default storageClassName |
 | podAnnotations | object | `{}` | define pod [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
