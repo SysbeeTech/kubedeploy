@@ -48,7 +48,7 @@ $ helm install my-release sysbee/kubedeploy
 | autoscaling.minReplicas | int | `1` | number of minimum replicas for autoscaling |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | target cpu utilization as percentage of resource.requests.cpu |
 | autoscaling.targetMemoryUtilizationPercentage | int | `nil` | target memory utilization as percentage of resource.requests.mem |
-| deploymentMode | string | `"Deployment"` | available deployment modes currently supported: Deployment |
+| deploymentMode | string | `"Deployment"` | available deployment modes currently supported: Deployment Job |
 | env | list | `[]` | Define environment variables for container see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core) |
 | fullnameOverride | string | `""` | Override full resource names instead of using calculated "releasename-chartname" naming |
 | image.pullPolicy | string | `"IfNotPresent"` | default container pull policy |
@@ -61,6 +61,7 @@ $ helm install my-release sysbee/kubedeploy
 | ingress.hosts[0] | object | `{"host":"chart-example.local","paths":[{"path":"/"}]}` | ingress hosts with paths |
 | ingress.pathType | string | `"ImplementationSpecific"` | default ingress pathType |
 | ingress.tls[0] | object | `{"hosts":["chart-example.local"],"secretName":"chart-example-tls"}` | define secret name and host per ingress.hosts for ssl support |
+| jobspec.restartPolicy | string | `"OnFailure"` | define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures |
 | kubeVersionOverride | string | `""` | Allow override of kubernetes version by default this will be automatically detected and requires no modification |
 | nameOverride | string | `""` | Override release name used in calculated "releasename-chartname" naming |
 | nodeSelector | object | `{}` | define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
@@ -78,6 +79,7 @@ $ helm install my-release sysbee/kubedeploy
 | replicaCount | int | `1` | Number of pods to load balance across |
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. See [resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for syntax |
 | securityContext | object | `{}` |  |
+| service.enabled | bool | `true` | controls if the service object should be deployed to cluster |
 | service.ports | list | `[{"name":"http","port":80,"protocol":"TCP","targetPort":"http"}]` | define port for service see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core) |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
