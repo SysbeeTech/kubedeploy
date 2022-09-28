@@ -1,3 +1,8 @@
+### 0.4.0
+- added support for job workloads
+- added support for statefulset workloads
+- minor bug fixes
+
 ### 0.3.2
 - fixed container name to full name instead of chart name
 
