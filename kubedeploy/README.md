@@ -61,6 +61,9 @@ $ helm install my-release sysbee/kubedeploy
 | ingress.hosts[0] | object | `{"host":"chart-example.local","paths":[{"path":"/"}]}` | ingress hosts with paths |
 | ingress.pathType | string | `"ImplementationSpecific"` | default ingress pathType |
 | ingress.tls[0] | object | `{"hosts":["chart-example.local"],"secretName":"chart-example-tls"}` | define secret name and host per ingress.hosts for ssl support |
+| jobspec.backoffLimit | int | `3` | define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy |
+| jobspec.command | list | `[]` | define command for job |
+| jobspec.parallelism | int | `1` | define job paralelisam see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism |
 | jobspec.restartPolicy | string | `"OnFailure"` | define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures |
 | kubeVersionOverride | string | `""` | Allow override of kubernetes version by default this will be automatically detected and requires no modification |
 | nameOverride | string | `""` | Override release name used in calculated "releasename-chartname" naming |
