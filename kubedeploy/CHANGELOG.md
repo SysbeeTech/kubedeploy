@@ -1,3 +1,6 @@
+### 0.3.2
+- fixed container name to full name instead of chart name
+
 ### 0.3.1
 - added public docs and chart home url
 
