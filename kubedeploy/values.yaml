@@ -7,11 +7,22 @@ replicaCount: 1
 
 # -- available deployment modes currently supported:
 # Deployment
+# Job
 deploymentMode: Deployment
 
 # -- Allow override of kubernetes version
 # by default this will be automatically detected and requires no modification
 kubeVersionOverride: ""
+
+jobspec:
+  # -- define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures
+  restartPolicy: OnFailure
+  # -- define command for job
+  command: []
+  # -- define job paralelisam see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism
+  parallelism: 1
+  # -- define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
+  backoffLimit: 3
 
 image:
   # -- define container repositor
@@ -76,7 +87,8 @@ env: []
 
 service:
   type: ClusterIP
-
+  # -- controls if the service object should be deployed to cluster
+  enabled: true
   # -- define port for service
   # see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core)
   ports:

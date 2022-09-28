@@ -1,22 +1,14 @@
-{{- if eq (toString .Values.deploymentMode) "Deployment" }}
+{{- if eq (toString .Values.deploymentMode) "Job" }}
 {{- $fullName := include "kubedeploy.fullname" . -}}
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: {{ include "kubedeploy.fullname" . }}
   labels:
     {{- include "kubedeploy.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
-  {{- if and (.Values.persistency.enabled) (lt (int .Values.replicaCount) 2) }}
-  strategy:
-    type: Recreate
-  {{- end }}
-  selector:
-    matchLabels:
-      {{- include "kubedeploy.selectorLabels" . | nindent 6 }}
+  backoffLimit: {{ .Values.jobspec.backoffLimit }}
+  parallelism: {{ .Values.jobspec.parallelism }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -33,32 +25,18 @@ spec:
       serviceAccountName: {{ include "kubedeploy.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      restartPolicy: {{ .Values.jobspec.restartPolicy }}
       containers:
         - name: {{ include "kubedeploy.fullname" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command:
+            {{- toYaml .Values.jobspec.command |nindent 12 }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.env }}
           env:
             {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.ports }}
-          ports:
-             {{- toYaml . | nindent 12 }}
-          {{- end }}
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          {{- if and (.Values.persistency.enabled) (lt (int .Values.replicaCount) 2) }}
-          volumeMounts:
-            - mountPath: {{ .Values.persistency.mountPath }}
-              name: {{ $fullName }}-vol
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -73,11 +51,5 @@ spec:
       {{- with .Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if and (.Values.persistency.enabled) (lt (int .Values.replicaCount) 2) }}
-      volumes:
-        - name: {{ $fullName }}-vol
-          persistentVolumeClaim:
-            claimName: {{ $fullName }}-claim
       {{- end }}
 {{- end }}
