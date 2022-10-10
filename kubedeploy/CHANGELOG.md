@@ -1,3 +1,6 @@
+### 0.4.2
+- fixed wrongly nested command option in deployment and statefulset
+
 ### 0.4.1
 - added support for image commands
 
