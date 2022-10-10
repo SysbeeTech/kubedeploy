@@ -1,6 +1,10 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "kubedeploy.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
+{{- /*
+We intentionally get fist port from service ports to route ingress traffic to
+TODO: define port per path
+*/}}
+{{- $svcPort := get (.Values.service.ports | first) "port" -}}
 {{- $pathType := .Values.ingress.pathType | default "ImplementationSpecific" }}
 {{- $routePrefix := list "/" }}
 {{- $paths := .Values.ingress.paths | default $routePrefix -}}
