@@ -1,3 +1,6 @@
+### 0.4.3
+- fix ingress backend port targeting
+
 ### 0.4.2
 - fixed wrongly nested command option in deployment and statefulset
 
