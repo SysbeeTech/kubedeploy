@@ -1,3 +1,7 @@
+### 0.4.4
+- don't set port 80 on containers by default
+- deploy liveness and readiness probes only when http port name is defined
+
 ### 0.4.3
 - fix ingress backend port targeting
 

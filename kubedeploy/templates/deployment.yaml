@@ -49,6 +49,8 @@ spec:
           ports:
              {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- range .Values.ports }}
+          {{- if eq (toString .name) "http" }}
           livenessProbe:
             httpGet:
               path: /
@@ -57,6 +59,8 @@ spec:
             httpGet:
               path: /
               port: http
+          {{- end }}
+          {{- end }}
           {{- if and (.Values.persistency.enabled) (lt (int .Values.replicaCount) 2) }}
           volumeMounts:
             - mountPath: {{ .Values.persistency.mountPath }}
