@@ -68,10 +68,10 @@ securityContext: {}
 
 # -- Define ports that container will listen on
 # see: [containerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core)
-ports:
-  - name: http
-    containerPort: 80
-    protocol: TCP
+ports: []
+  #- name: http
+  #  containerPort: 80
+  #  protocol: TCP
   # - name: prometheus
   #   containerPort: 9000
   #   protocol: TCP
