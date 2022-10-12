@@ -36,6 +36,8 @@ spec:
           image: "{{ required "Please define valid init container repository" .repository }}:{{ .tag | default "latest" }}"
           command:
             {{- toYaml .command |nindent 12 }}
+          args:
+            {{- toYaml .args |nindent 12 }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
           imagePullPolicy: {{ $.Values.initContainers.pullPolicy }}
@@ -61,6 +63,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             {{- toYaml .Values.image.command |nindent 12 }}
+          args:
+            {{- toYaml .Values.image.args |nindent 12 }}
           {{- with .Values.env }}
           env:
             {{- toYaml . | nindent 12 }}

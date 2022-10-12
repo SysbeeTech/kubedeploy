@@ -51,6 +51,7 @@ $ helm install my-release sysbee/kubedeploy
 | deploymentMode | string | `"Deployment"` | available deployment modes currently supported: Deployment Job Statefulset |
 | env | list | `[]` | Define environment variables for container see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core) |
 | fullnameOverride | string | `""` | Override full resource names instead of using calculated "releasename-chartname" naming |
+| image.args | list | `[]` | Define custom command for image to run |
 | image.command | list | `[]` | Define custom command for image to run |
 | image.pullPolicy | string | `"IfNotPresent"` | default container pull policy |
 | image.repository | string | `"nginx"` | define container repositor |
@@ -62,13 +63,15 @@ $ helm install my-release sysbee/kubedeploy
 | ingress.hosts[0] | object | `{"host":"chart-example.local","paths":[{"path":"/"}]}` | ingress hosts with paths |
 | ingress.pathType | string | `"ImplementationSpecific"` | default ingress pathType |
 | ingress.tls[0] | object | `{"hosts":["chart-example.local"],"secretName":"chart-example-tls"}` | define secret name and host per ingress.hosts for ssl support |
-| initContainers.containers[0] | required | `{"command":["exit","0"],"name":"busybox-init","repository":"busybox","tag":"latest"}` | define init container name |
+| initContainers.containers[0] | required | `{"args":[],"command":["exit","0"],"name":"busybox-init","repository":"busybox","tag":"latest"}` | define init container name |
+| initContainers.containers[0].args | list | `[]` | Define custom arguments for initContainer |
 | initContainers.containers[0].command | list | `["exit","0"]` | Define custom command for initContainer to run |
 | initContainers.containers[0].repository | required | `"busybox"` | define initContainer repository |
 | initContainers.containers[0].tag | string | `"latest"` | Overrides the image tag whose default is latest |
 | initContainers.enabled | bool | `false` | define if we should deploy init container within a pod see https://kubernetes.io/docs/concepts/workloads/pods/init-containers/ |
 | initContainers.pullPolicy | string | `"IfNotPresent"` | default initContainers pull policy |
 | initContainers.resources | object | `{}` | Define init containers resources |
+| jobspec.args | list | `[]` | define args for job |
 | jobspec.backoffLimit | int | `3` | define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy |
 | jobspec.command | list | `[]` | define command for job |
 | jobspec.parallelism | int | `1` | define job paralelisam see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism |
