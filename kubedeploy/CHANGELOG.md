@@ -1,3 +1,6 @@
+### 0.5.0
+- added support for init container in Job, Deployment and Statefulset deployment mode
+
 ### 0.4.4
 - don't set port 80 on containers by default
 - deploy liveness and readiness probes only when http port name is defined
