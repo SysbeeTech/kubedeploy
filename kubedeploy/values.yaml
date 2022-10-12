@@ -25,6 +25,29 @@ jobspec:
   # -- define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
   backoffLimit: 3
 
+
+initContainer:
+  # -- define if we should deploy init container within a pod
+  enabled: false
+  # -- define initContainer repository
+  repository: busybox
+  # -- default initContainer pull policy
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+  # -- Define custom command for initContainer to run
+  command: ["exit", "0"]
+  # -- Define init container resources
+  resources: {}
+    # If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
 image:
   # -- define container repositor
   repository: nginx
