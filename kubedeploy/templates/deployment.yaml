@@ -33,6 +33,27 @@ spec:
       serviceAccountName: {{ include "kubedeploy.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.initContainer.enabled }}
+      initContainers:
+        - name: {{ include "kubedeploy.fullname" . }}-init
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.initContainer.repository }}:{{ .Values.initContainer.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.initContainer.pullPolicy }}
+          command:
+            {{- toYaml .Values.initContainer.command |nindent 12 }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if and (.Values.persistency.enabled) (lt (int .Values.replicaCount) 2) }}
+          volumeMounts:
+            - mountPath: {{ .Values.persistency.mountPath }}
+              name: {{ $fullName }}-vol
+          {{- end }}
+          resources:
+            {{- toYaml .Values.initContainer.resources | nindent 12 }}
+      {{- end }}
       containers:
         - name: {{ include "kubedeploy.fullname" . }}
           securityContext:
