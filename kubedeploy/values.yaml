@@ -26,18 +26,13 @@ jobspec:
   backoffLimit: 3
 
 
-initContainer:
+initContainers:
   # -- define if we should deploy init container within a pod
+  # see https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
   enabled: false
-  # -- define initContainer repository
-  repository: busybox
-  # -- default initContainer pull policy
+  # -- default initContainers pull policy
   pullPolicy: IfNotPresent
-  # -- Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-  # -- Define custom command for initContainer to run
-  command: ["exit", "0"]
-  # -- Define init container resources
+  # -- Define init containers resources
   resources: {}
     # If you do want to specify resources, uncomment the following
     # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
@@ -47,6 +42,17 @@ initContainer:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+
+  ## -- sequential list of init containers. Each init container must complete successfully before the next one starts
+  containers:
+    # -- (required) define init container name
+    - name: "busybox-init"
+      # -- (required) define initContainer repository
+      repository: busybox
+      # -- Overrides the image tag whose default is latest
+      tag: "latest"
+      # -- Define custom command for initContainer to run
+      command: ["exit", "0"]
 
 image:
   # -- define container repositor
