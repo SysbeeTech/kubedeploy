@@ -1,3 +1,6 @@
+### 0.6.0
+- added support for overriding healthcheck probes
+
 ### 0.5.1
 - added support for multiple init containers in Job, Deployment and Statefulset deployment mode
 

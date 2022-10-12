@@ -58,6 +58,15 @@ initContainers:
       # -- Define custom arguments for initContainer
       args: []
 
+healthcheck:
+  # -- define custom healthcheck probes for container, otherwise try to use automatic http probes if http port detected
+  enabled: false
+  probes:
+    # -- define livenessProbe
+    livenessProbe: {}
+    # -- define readinessProbe
+    readinessProbe: {}
+
 image:
   # -- define container repositor
   repository: nginx
