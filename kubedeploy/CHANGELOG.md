@@ -1,3 +1,6 @@
+### 0.5.1
+- added support for multiple init containers in Job, Deployment and Statefulset deployment mode
+
 ### 0.5.0
 - added support for init container in Job, Deployment and Statefulset deployment mode
 
