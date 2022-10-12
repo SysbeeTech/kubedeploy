@@ -20,6 +20,8 @@ jobspec:
   restartPolicy: OnFailure
   # -- define command for job
   command: []
+  # -- define args for job
+  args: []
   # -- define job paralelisam see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism
   parallelism: 1
   # -- define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
@@ -53,6 +55,8 @@ initContainers:
       tag: "latest"
       # -- Define custom command for initContainer to run
       command: ["exit", "0"]
+      # -- Define custom arguments for initContainer
+      args: []
 
 image:
   # -- define container repositor
@@ -63,6 +67,8 @@ image:
   tag: ""
   # -- Define custom command for image to run
   command: []
+  # -- Define custom command for image to run
+  args: []
 
 # -- define [ImagePullSecrets](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podspec-v1-core)
 imagePullSecrets: []
