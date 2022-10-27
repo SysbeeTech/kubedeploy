@@ -184,7 +184,7 @@ ingress:
   # @default -- see ingress.tls[0] values
   tls:
     # ingress.tls[0].secretName -- (string, required) Name of the secret to use for storing ssl certificate
-    # @ default -- chart-example-tls
+    # @default -- chart-example-tls
     - secretName: chart-example-tls
       # -- (list) List of TLS enabled Ingress hosts
       hosts:
@@ -193,7 +193,7 @@ ingress:
 persistency:
 
   # -- (string) Define custom name for persistent storage class name
-  # @default - uses cluster default storageClassName
+  # @default -- uses cluster default storageClassName
   storageClassName:
 
   # -- Enable support for persistent volumes.
