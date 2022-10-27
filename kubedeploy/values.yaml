@@ -184,7 +184,7 @@ ingress:
   # @default -- see ingress.tls[0] values
   tls:
     # ingress.tls[0].secretName -- (string, required) Name of the secret to use for storing ssl certificate
-    # @ default -- chart-example-tls
+    # @default -- chart-example-tls
     - secretName: chart-example-tls
       # -- (list) List of TLS enabled Ingress hosts
       hosts:
@@ -193,7 +193,7 @@ ingress:
 persistency:
 
   # -- (string) Define custom name for persistent storage class name
-  # @default - uses cluster default storageClassName
+  # @default -- uses cluster default storageClassName
   storageClassName:
 
   # -- Enable support for persistent volumes.
@@ -257,7 +257,7 @@ podDisruptionBudget:
 # -- Parameters for the Prometheus [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.ServiceMonitor) or [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.PodMonitor) objects.
 # @default -- see below
 monitoring:
-  # -- Enable Monitoring if service is enabled it will default to ServiceMonitor otherwise PodMonitor will be used
+  # -- Enable monitoring. If service.enabled is true chart will generate ServiceMonitor object, otherwise PodMonitor will be used.
   enabled: false
   # -- Provide additional labels to the ServiceMonitor metadata
   labels: {}

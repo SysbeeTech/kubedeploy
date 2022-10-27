@@ -87,7 +87,7 @@ $ helm install my-release sysbee/kubedeploy
 | ingress.pathType | string | `"ImplementationSpecific"` | Default Ingress pathType |
 | ingress.tls | list | see ingress.tls[0] values | Ingress TLS list |
 | ingress.tls[0].hosts | list | `["chart-example.local"]` | List of TLS enabled Ingress hosts |
-| ingress.tls[0].secretName | string, required | `"chart-example-tls"` | Name of the secret to use for storing ssl certificate @ default -- chart-example-tls |
+| ingress.tls[0].secretName | string, required | chart-example-tls | Name of the secret to use for storing ssl certificate |
 | initContainers.containers | list | see below | sequential list of init containers. Each init container must complete successfully before the next one starts |
 | initContainers.containers[0].args | list | `[]` | Define custom arguments for initContainer |
 | initContainers.containers[0].command | list | `["exit","0"]` | Define custom command for initContainer to run |
@@ -104,7 +104,7 @@ $ helm install my-release sysbee/kubedeploy
 | jobspec.restartPolicy | string | `"OnFailure"` | define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures |
 | kubeVersionOverride | string | `""` | Allow override of kubernetes version by default this will be automatically detected and requires no modification |
 | monitoring | object | see below | Parameters for the Prometheus [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.ServiceMonitor) or [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.PodMonitor) objects. |
-| monitoring.enabled | bool | `false` | Enable Monitoring if service is enabled it will default to ServiceMonitor otherwise PodMonitor will be used |
+| monitoring.enabled | bool | `false` | Enable monitoring. If service.enabled is true chart will generate ServiceMonitor object, otherwise PodMonitor will be used. |
 | monitoring.labels | object | `{}` | Provide additional labels to the ServiceMonitor metadata |
 | monitoring.metricRelabelings | list | `[]` | Provide additional metricRelabelings to apply to samples before ingestion. |
 | monitoring.relabelings | list | `[]` | Provide additional relabelings to apply to samples before scraping |
@@ -121,7 +121,7 @@ $ helm install my-release sysbee/kubedeploy
 | persistency.capacity.storage | string | `"5Gi"` | Define storage capacity |
 | persistency.enabled | bool | `false` | Enable support for persistent volumes. Currently supported only in deploymentMode **Deployment** with **replicaCount = 1** Or in Statefulset deploymentMode with any number of replicas |
 | persistency.mountPath | string | `"/data"` | Define path where persistent volume will be mounted in container |
-| persistency.storageClassName | string | `nil` | Define custom name for persistent storage class name @default - uses cluster default storageClassName |
+| persistency.storageClassName | string | uses cluster default storageClassName | Define custom name for persistent storage class name |
 | podAnnotations | object | `{}` | Define pod's [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
 | podDisruptionBudget.enabled | bool | `false` | Enable and define pod disruption budget default (off) see: [podDisruptionBudget](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | podDisruptionBudget.maxUnavailable | int | `nil` | Maximum unavailable replicas |
