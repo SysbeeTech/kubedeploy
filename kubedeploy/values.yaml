@@ -45,9 +45,11 @@ initContainers:
     #   cpu: 100m
     #   memory: 128Mi
 
-  ## -- sequential list of init containers. Each init container must complete successfully before the next one starts
+  # -- (list) sequential list of init containers. Each init container must complete successfully before the next one starts
+  # @default -- see below
   containers:
-    # -- (required) define init container name
+      # initContainers.containers[0].name -- (required) define init container name
+      # @default -- busybox-init
     - name: "busybox-init"
       # -- (required) define initContainer repository
       repository: busybox
@@ -133,36 +135,54 @@ env: []
   #       key: key-name
 
 service:
+  # -- Service type see [Reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
   type: ClusterIP
   # -- controls if the service object should be deployed to cluster
   enabled: true
-  # -- define port for service
+  # -- (list) define port for service
   # see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core)
+  # @default -- see list values
   ports:
-    - port: 80  # this is a service port
-      targetPort: http  # this is a named pod port that will be the target
-      protocol: TCP  # default if omitted
-      name: http  # name of the service port, this should match container port name
+      # service.ports[0].port (int, required) -- Define port on which service will run
+      # @default -- 80
+    - port: 80
+      # -- (string, required) Define name of the port exposed by the container
+      targetPort: http
+      # -- (required) Define service protocol. [Supported protocols](https://kubernetes.io/docs/concepts/services-networking/service/#protocol-support)
+      protocol: TCP
+      # -- (string, required) Name of the service port, should match container port name
+      name: http
 
+# -- define [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object
+# @default -- see object values
 ingress:
-  # -- define [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object
+  # -- enable ingres for deployment
   enabled: false
   # -- ingress class name
   className: ""
   # -- default ingress pathType
   pathType: ImplementationSpecific
   # -- additional ingress annotations
+  # @default -- defaults to haproxy ingress and letsencrypt issuer
   annotations:
     kubernetes.io/ingress.class: haproxy
     cert-manager.io/cluster-issuer: letsencrypt
+  # -- (list) Ingress host list.
+  # @default -- see list values
   hosts:
-    # -- ingress hosts with paths
+      # ingress.hosts[0].host -- (string, required) define ingress hostname
+      # @default -- chart-example.local
     - host: chart-example.local
+      # -- (list) ingress host paths
       paths:
         - path: /
+  # -- (list) Ingress TLS list
+  # @default -- see list values
   tls:
-    # -- define secret name and host per ingress.hosts for ssl support
+    # ingress.tls[0].secretName -- (string, required) name of the secret to use for storing ssl certificate
+    # @ default -- chart-example-tls
     - secretName: chart-example-tls
+      # -- (list) list of TLS enabled ingress hosts
       hosts:
         - chart-example.local
 
@@ -231,6 +251,7 @@ podDisruptionBudget:
 ## Monitoring
 
 # -- Parameters for the Prometheus [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.ServiceMonitor) or [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.PodMonitor) objects.
+# @default -- see below
 monitoring:
   # -- Enable Monitoring if service is enabled it will default to ServiceMonitor otherwise PodMonitor will be used
   enabled: false
