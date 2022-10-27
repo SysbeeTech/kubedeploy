@@ -6,9 +6,9 @@
 replicaCount: 1
 
 # -- available deployment modes currently supported:
-# Deployment
-# Job
-# Statefulset
+#   <ul><li>**Deployment**</li>
+#   <li>**Job**</li>
+#   <li>**Statefulset**</li></ul>
 deploymentMode: Deployment
 
 # -- Allow override of kubernetes version
@@ -61,32 +61,33 @@ initContainers:
       args: []
 
 healthcheck:
-  # -- define custom healthcheck probes for container, otherwise try to use automatic http probes if http port detected
+  # -- Define custom healthcheck probes for container, otherwise try to use automatic http probes if http port detected
   enabled: false
   probes:
-    # -- define livenessProbe
+    # -- Define [livenessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
     livenessProbe: {}
-    # -- define readinessProbe
+    # -- Define [readinessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
     readinessProbe: {}
 
 image:
-  # -- define container repositor
+  # -- Define container repository
   repository: nginx
-  # -- default container pull policy
+  # -- Default container pull policy
   pullPolicy: IfNotPresent
-  # -- Overrides the image tag whose default is the chart appVersion.
+  # -- Define the image tag whose default is the chart appVersion.
   tag: ""
-  # -- Define custom command for image to run
+  # -- Define custom command for image to run. [Reference](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/)
   command: []
-  # -- Define custom command for image to run
+  # -- Define custom arguments for image to run. [Reference](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/)
   args: []
 
-# -- define [ImagePullSecrets](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podspec-v1-core)
+# -- Define [ImagePullSecrets](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podspec-v1-core)
 imagePullSecrets: []
 
-# -- Override release name used in calculated "releasename-chartname" naming
+# -- Override release name used in calculated "releasename-chartname" default naming convention
 nameOverride: ""
-# -- Override full resource names instead of using calculated "releasename-chartname" naming
+
+# -- Override full resource names instead of using calculated "releasename-chartname" default naming convention
 fullnameOverride: ""
 
 serviceAccount:
@@ -98,12 +99,14 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-# -- define pod [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+# -- Define pod's [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
 podAnnotations: {}
 
+# -- Define pod's [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
 podSecurityContext: {}
   # fsGroup: 2000
 
+# -- Define container's [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
 securityContext: {}
   # capabilities:
   #   drop:
@@ -112,7 +115,7 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-# -- Define ports that container will listen on
+# -- Define container ports that will be exposed
 # see: [containerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core)
 ports: []
   #- name: http
@@ -122,8 +125,9 @@ ports: []
   #   containerPort: 9000
   #   protocol: TCP
 
-# -- Define environment variables for container
-# see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core)
+# -- Define environment variables for containers
+# for reference see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core).
+# Environment variables set will be exposed both to main container and all of the initContainers
 env: []
   # - name: ENV1
   #   value: Env-value
@@ -135,79 +139,79 @@ env: []
   #       key: key-name
 
 service:
-  # -- Service type see [Reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
+  # -- Service type see [Reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) for available options.
   type: ClusterIP
-  # -- controls if the service object should be deployed to cluster
+  # -- Controls if the service should be deployed for this release
   enabled: true
-  # -- (list) define port for service
+  # -- (list) Define listening port for service
   # see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core)
-  # @default -- see list values
+  # @default -- see service.ports[]
   ports:
-      # service.ports[0].port (int, required) -- Define port on which service will run
+      # service.ports[0].port (int, required) -- Define port number on which service will listen
       # @default -- 80
     - port: 80
-      # -- (string, required) Define name of the port exposed by the container
+      # -- (string, required) Define name for the exposed container port that the service will target.
       targetPort: http
       # -- (required) Define service protocol. [Supported protocols](https://kubernetes.io/docs/concepts/services-networking/service/#protocol-support)
       protocol: TCP
-      # -- (string, required) Name of the service port, should match container port name
+      # -- (string, required) Name of the service port. This should match container's port name
       name: http
 
-# -- define [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object
-# @default -- see object values
+# -- Define [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object
+# @default -- see ingress object values
 ingress:
-  # -- enable ingres for deployment
+  # -- Enable Ingres for release
   enabled: false
-  # -- ingress class name
+  # -- Ingress class name
   className: ""
-  # -- default ingress pathType
+  # -- Default Ingress pathType
   pathType: ImplementationSpecific
-  # -- additional ingress annotations
+  # -- Additional Ingress annotations
   # @default -- defaults to haproxy ingress and letsencrypt issuer
   annotations:
     kubernetes.io/ingress.class: haproxy
     cert-manager.io/cluster-issuer: letsencrypt
   # -- (list) Ingress host list.
-  # @default -- see list values
+  # @default -- see ingress.hosts[0] values
   hosts:
-      # ingress.hosts[0].host -- (string, required) define ingress hostname
+      # ingress.hosts[0].host -- (string, required) Define Ingress hostname
       # @default -- chart-example.local
     - host: chart-example.local
-      # -- (list) ingress host paths
+      # -- (list) Ingress host paths
       paths:
         - path: /
   # -- (list) Ingress TLS list
-  # @default -- see list values
+  # @default -- see ingress.tls[0] values
   tls:
-    # ingress.tls[0].secretName -- (string, required) name of the secret to use for storing ssl certificate
+    # ingress.tls[0].secretName -- (string, required) Name of the secret to use for storing ssl certificate
     # @ default -- chart-example-tls
     - secretName: chart-example-tls
-      # -- (list) list of TLS enabled ingress hosts
+      # -- (list) List of TLS enabled Ingress hosts
       hosts:
         - chart-example.local
 
 persistency:
 
-  # -- (string) define custom name for persistent storage class name
+  # -- (string) Define custom name for persistent storage class name
   # @default - uses cluster default storageClassName
   storageClassName:
 
-  # -- Enable support for persistent volumes on deployments.
-  # Currently supported only in deploymentMode Deployment with replicaCount = 1
+  # -- Enable support for persistent volumes.
+  # Currently supported only in deploymentMode **Deployment** with **replicaCount = 1**
   # Or in Statefulset deploymentMode with any number of replicas
   enabled: false
   capacity:
-    # -- define storage capacity
+    # -- Define storage capacity
     storage: 5Gi
+  # -- Define storage [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes). Must be supported by available storageClass
   accessModes:
     - ReadWriteOnce
-  # -- where will the persistent volume will be mounted in container
+  # -- Define path where persistent volume will be mounted in container
   mountPath: "/data"
 
 # -- We usually recommend not to specify default resources and to leave this as a conscious
 # choice for the user. This also increases chances charts run on environments with little
-# resources, such as Minikube. See [resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-# for syntax
+# resources, such as Minikube. See [resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for syntax
 resources: {}
   # If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
@@ -219,33 +223,33 @@ resources: {}
   #   memory: 128Mi
 
 autoscaling:
-  # -- enable deployment autoscaling feature, available only with Deployment deploymentMode
+  # -- Enable autoscaling feature. This will only work when deploymentMode is set to **Deployment**
   enabled: false
-  # -- number of minimum replicas for autoscaling
+  # -- Number of minimum replicas for autoscaling
   minReplicas: 1
-  # -- number of max replicas for autoscaling
+  # -- Number of max replicas for autoscaling
   maxReplicas: 10
-  # -- target cpu utilization as percentage of resource.requests.cpu
+  # -- (int) Target cpu utilization as percentage of resources.requests.cpu
   targetCPUUtilizationPercentage: 80
-  # -- (int) target memory utilization as percentage of resource.requests.mem
+  # -- (int) Target memory utilization as percentage of resources.requests.mem
   targetMemoryUtilizationPercentage:
 
-# -- define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+# -- Define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
 nodeSelector: {}
 
-# -- define pod [tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+# -- Define pod [tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
 tolerations: []
 
-# -- define pod [affinity](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/)
+# -- Define pod [affinity](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/)
 affinity: {}
 
 podDisruptionBudget:
-  # -- enable and define pod disruption budget default (off)
+  # -- Enable and define pod disruption budget default (off)
   # see: [podDisruptionBudget](https://kubernetes.io/docs/tasks/run-application/configure-pdb/)
   enabled: false
-  # -- minimum available replicas
+  # -- Minimum available replicas
   minAvailable: 1
-  # -- (int) maximum unavailable replicas
+  # -- (int) Maximum unavailable replicas
   maxUnavailable:
 
 ## Monitoring

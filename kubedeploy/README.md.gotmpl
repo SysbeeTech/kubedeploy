@@ -1,37 +1,46 @@
 {{ template "chart.header" . }}
+
 {{ template "chart.description" . }}
 
 {{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
 
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
 ## Additional Information
 
-This is a simple chart created to deploy any generic containerized application to kubernetes cluster.
+This simple chart is created to deploy any generic containerized application to kubernetes cluster.
+Main idea behind this chart is having a simple framework for deploying docker images by changing just few charts values, like
+**image.repository** and **image.tag**. Chart is generalized as it aims to be compatible with as many possible deployment scenarios.
+As such it might not be the perfect fit for every workload, however it will allow you to run most of generic applications.
 
-Idea behind this is having a framework for deploying built docker images by changing charts
-**image.repository** and **image.tag** values.
+If you have multiple different containers it is recommended to install each container in its own release.
+Using [helmfile](https://github.com/roboll/helmfile) is strongly encouraged in such scenarios.
 
-This chart supports modifying following values:
- - creating Deployment, Statefulset, Job
- - defining replica counts
- - defining persistent volumes and it's mount point
- - defining a container within pod
- - defining multiple initContainers
- - defining custom container ports
- - defining custom health checks for container ports
- - default health check for container ports named http
- - defining service ports
- - defining container env variables
- - defining autoscaling configuration
- - defining pod disruption budgets
- - defining node selector
- - defining toleratoins
- - defining affinity
- - defining custom pod resource requirements
- - enabling ingress
- - defining custom pod annotatoins
- - defining image pull secrets
- - name override
- - enabling service and pod monitoring
+List of currently available features:
+
+ * creating Deployment, Statefulset, Job releases
+ * defining custom replica count in release
+ * defining single persistent volume per release and defining its  mount point
+ * defining a single custom container image within a pod
+ * defining multiple custom independent initContainers images with their resource policy
+ * defining arbitrary container ports
+ * default http liveness and readiness probes for container ports named http
+ * defining custom liveness and readiness probes for specific port or overriding the default one
+ * defining multiple service ports
+ * defining multiple container env variables (shared with initContainers)
+ * defining deployment auto scaling configuration
+ * defining deployment pod disruption budgets
+ * defining node selector
+ * defining tolerations
+ * defining affinity
+ * defining custom pod resource requirements
+ * enabling ingress
+ * defining custom pod annotations
+ * defining image pull secrets
+ * name override
+ * enabling service and pod monitoring
 
 ## Installing the Chart
 
