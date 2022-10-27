@@ -227,3 +227,30 @@ podDisruptionBudget:
   minAvailable: 1
   # -- (int) maximum unavailable replicas
   maxUnavailable:
+
+## Monitoring
+
+# -- Parameters for the Prometheus [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.ServiceMonitor) or [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.PodMonitor) objects.
+monitoring:
+  # -- Enable Monitoring if service is enabled it will default to ServiceMonitor otherwise PodMonitor will be used
+  enabled: false
+  # -- Provide additional labels to the ServiceMonitor metadata
+  labels: {}
+  # -- Additional metric labels
+  targetLabels: []
+  # -- Provide named service port used for scraping
+  scrapePort: metrics
+  # -- Provide HTTP path to scrape for metrics.
+  scrapePath: /metrics
+  # -- Provide interval at which metrics should be scraped
+  scrapeInterval: 20s
+  # -- Timeout after which the scrape is ended If not specified
+  scrapeTimeout: 30s
+  # -- HTTP scheme to use for scraping.
+  scheme: http
+  # -- TLS configuration to use when scraping the endpoint
+  tlsConfig: {}
+  # -- Provide additional metricRelabelings to apply to samples before ingestion.
+  metricRelabelings: []
+  # -- Provide additional relabelings to apply to samples before scraping
+  relabelings: []

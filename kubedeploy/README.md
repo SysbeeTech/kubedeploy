@@ -80,6 +80,18 @@ $ helm install my-release sysbee/kubedeploy
 | jobspec.parallelism | int | `1` | define job paralelisam see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism |
 | jobspec.restartPolicy | string | `"OnFailure"` | define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures |
 | kubeVersionOverride | string | `""` | Allow override of kubernetes version by default this will be automatically detected and requires no modification |
+| monitoring | object | `{"enabled":false,"labels":{},"metricRelabelings":[],"relabelings":[],"scheme":"http","scrapeInterval":"20s","scrapePath":"/metrics","scrapePort":"metrics","scrapeTimeout":"30s","targetLabels":[],"tlsConfig":{}}` | Parameters for the Prometheus [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.ServiceMonitor) or [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.PodMonitor) objects. |
+| monitoring.enabled | bool | `false` | Enable Monitoring if service is enabled it will default to ServiceMonitor otherwise PodMonitor will be used |
+| monitoring.labels | object | `{}` | Provide additional labels to the ServiceMonitor metadata |
+| monitoring.metricRelabelings | list | `[]` | Provide additional metricRelabelings to apply to samples before ingestion. |
+| monitoring.relabelings | list | `[]` | Provide additional relabelings to apply to samples before scraping |
+| monitoring.scheme | string | `"http"` | HTTP scheme to use for scraping. |
+| monitoring.scrapeInterval | string | `"20s"` | Provide interval at which metrics should be scraped |
+| monitoring.scrapePath | string | `"/metrics"` | Provide HTTP path to scrape for metrics. |
+| monitoring.scrapePort | string | `"metrics"` | Provide named service port used for scraping |
+| monitoring.scrapeTimeout | string | `"30s"` | Timeout after which the scrape is ended If not specified |
+| monitoring.targetLabels | list | `[]` | Additional metric labels |
+| monitoring.tlsConfig | object | `{}` | TLS configuration to use when scraping the endpoint |
 | nameOverride | string | `""` | Override release name used in calculated "releasename-chartname" naming |
 | nodeSelector | object | `{}` | define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
 | persistency.accessModes[0] | string | `"ReadWriteOnce"` |  |
