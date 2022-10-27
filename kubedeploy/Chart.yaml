@@ -1,21 +1,22 @@
 apiVersion: v2
 name: kubedeploy
-description: Generalized chart for deploying single containerized application into k8s clusters
+description: Generalized chart for deploying single containerized application into Kubernetes clusters
 
 # A chart can be either an 'application' or a 'library' chart.`
 type: application
+
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
 version: 0.7.0
 
 # This is the version number of the application being deployed.
-# As this chart doesn't ship any application this is mostly for compatibility
+# As this chart doesn't ship any application this is declared mostly for compatibility
 appVersion: "1.0.0"
 
 home: https://charts.sysbee.io/kubedeploy/
 
-maintainer:
+maintainers:
   - name: Branko Toic
     email: branko@sysbee.net
     url: https://www.sysbee.net

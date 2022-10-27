@@ -4,6 +4,7 @@ Generic Helm template for deploying containers in Kubernetes cluster
 
 ## Chart options
 You can find chart options and documentation in chart [README.md](kubedeploy/README.md)
+Or here: https://charts.sysbee.io/kubedeploy/
 
 ## publishing new version
 
