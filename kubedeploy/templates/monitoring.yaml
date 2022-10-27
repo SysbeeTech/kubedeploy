@@ -1,0 +1,88 @@
+{{- if .Values.monitoring.enabled }}
+{{- if .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" -}}
+{{- if .Values.service.enabled -}}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "kubedeploy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- if .Values.monitoring.labels }}
+      {{- toYaml .Values.monitoring.labels | nindent 4 }}
+  {{- else }}
+    release: prometheus
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "kubedeploy.selectorLabels" . | nindent 4 }}
+  {{- with .Values.monitoring.targetLabels }}
+  targetLabels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  endpoints:
+    - port: {{ .Values.monitoring.scrapePort }}
+      scheme: {{ .Values.monitoring.scheme }}
+      path: {{ .Values.monitoring.scrapePath }}
+      interval: {{ .Values.monitoring.scrapeInterval }}
+      scrapeTimeout: {{ .Values.monitoring.scrapeTimeout }}
+      {{- with .Values.monitoring.relabelings }}
+      relabelings:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.monitoring.metricRelabelings }}
+      metricRelabelings:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.monitoring.tlsConfig }}
+      tlsConfig:
+      {{- toYaml .Values.monitoring.tlsConfig | nindent 8 }}
+      {{- end }}
+{{- else }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ include "kubedeploy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- if .Values.monitoring.labels }}
+      {{- toYaml .Values.monitoring.labels | nindent 4 }}
+  {{- else }}
+    release: prometheus
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "kubedeploy.selectorLabels" . | nindent 4 }}
+  {{- with .Values.monitoring.targetLabels }}
+  targetLabels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  podMetricsEndpoints:
+    - port: {{ .Values.monitoring.scrapePort }}
+      scheme: {{ .Values.monitoring.scheme }}
+      path: {{ .Values.monitoring.scrapePath }}
+      interval: {{ .Values.monitoring.scrapeInterval }}
+      scrapeTimeout: {{ .Values.monitoring.scrapeTimeout }}
+      {{- with .Values.monitoring.relabelings }}
+      relabelings:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.monitoring.metricRelabelings }}
+      metricRelabelings:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.monitoring.tlsConfig }}
+      tlsConfig:
+      {{- toYaml .Values.monitoring.tlsConfig | nindent 8 }}
+      {{- end }}
+
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,3 +1,7 @@
+### 0.7.0
+- added support for enabling monitoring via prometheus operator.
+- cleaned up helmchart documentation for easier readability
+
 ### 0.6.0
 - added support for overriding healthcheck probes
 

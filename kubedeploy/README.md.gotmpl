@@ -11,22 +11,27 @@ Idea behind this is having a framework for deploying built docker images by chan
 **image.repository** and **image.tag** values.
 
 This chart supports modifying following values:
- - creating Deployment
- - defining persistent volumes (only if replica 1) and it's mount point
- - single container within pod
+ - creating Deployment, Statefulset, Job
+ - defining replica counts
+ - defining persistent volumes and it's mount point
+ - defining a container within pod
+ - defining multiple initContainers
  - defining custom container ports
+ - defining custom health checks for container ports
+ - default health check for container ports named http
  - defining service ports
  - defining container env variables
- - autoscaling configuration
- - pod disruption budgets
- - node selector
- - toleratoins
- - affinity
- - configuring resources
- - ingress
- - pod annotatoins
- - image pull secrets
+ - defining autoscaling configuration
+ - defining pod disruption budgets
+ - defining node selector
+ - defining toleratoins
+ - defining affinity
+ - defining custom pod resource requirements
+ - enabling ingress
+ - defining custom pod annotatoins
+ - defining image pull secrets
  - name override
+ - enabling service and pod monitoring
 
 ## Installing the Chart
 

@@ -2,7 +2,7 @@
 
 Generalized chart for deploying single containerized application into k8s clusters
 
-![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 ## Additional Information
 
@@ -12,22 +12,27 @@ Idea behind this is having a framework for deploying built docker images by chan
 **image.repository** and **image.tag** values.
 
 This chart supports modifying following values:
- - creating Deployment
- - defining persistent volumes (only if replica 1) and it's mount point
- - single container within pod
+ - creating Deployment, Statefulset, Job
+ - defining replica counts
+ - defining persistent volumes and it's mount point
+ - defining a container within pod
+ - defining multiple initContainers
  - defining custom container ports
+ - defining custom health checks for container ports
+ - default health check for container ports named http
  - defining service ports
  - defining container env variables
- - autoscaling configuration
- - pod disruption budgets
- - node selector
- - toleratoins
- - affinity
- - configuring resources
- - ingress
- - pod annotatoins
- - image pull secrets
+ - defining autoscaling configuration
+ - defining pod disruption budgets
+ - defining node selector
+ - defining toleratoins
+ - defining affinity
+ - defining custom pod resource requirements
+ - enabling ingress
+ - defining custom pod annotatoins
+ - defining image pull secrets
  - name override
+ - enabling service and pod monitoring
 
 ## Installing the Chart
 
@@ -60,15 +65,21 @@ $ helm install my-release sysbee/kubedeploy
 | image.repository | string | `"nginx"` | define container repositor |
 | image.tag | string | `""` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` | define [ImagePullSecrets](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podspec-v1-core) |
-| ingress.annotations | object | `{"cert-manager.io/cluster-issuer":"letsencrypt","kubernetes.io/ingress.class":"haproxy"}` | additional ingress annotations |
+| ingress | object | see object values | define [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object |
+| ingress.annotations | object | defaults to haproxy ingress and letsencrypt issuer | additional ingress annotations |
 | ingress.className | string | `""` | ingress class name |
-| ingress.enabled | bool | `false` | define [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object |
-| ingress.hosts[0] | object | `{"host":"chart-example.local","paths":[{"path":"/"}]}` | ingress hosts with paths |
+| ingress.enabled | bool | `false` | enable ingres for deployment |
+| ingress.hosts | list | see list values | Ingress host list. |
+| ingress.hosts[0].host | string, required | chart-example.local | define ingress hostname |
+| ingress.hosts[0].paths | list | `[{"path":"/"}]` | ingress host paths |
 | ingress.pathType | string | `"ImplementationSpecific"` | default ingress pathType |
-| ingress.tls[0] | object | `{"hosts":["chart-example.local"],"secretName":"chart-example-tls"}` | define secret name and host per ingress.hosts for ssl support |
-| initContainers.containers[0] | required | `{"args":[],"command":["exit","0"],"name":"busybox-init","repository":"busybox","tag":"latest"}` | define init container name |
+| ingress.tls | list | see list values | Ingress TLS list |
+| ingress.tls[0].hosts | list | `["chart-example.local"]` | list of TLS enabled ingress hosts |
+| ingress.tls[0].secretName | string, required | `"chart-example-tls"` | name of the secret to use for storing ssl certificate @ default -- chart-example-tls |
+| initContainers.containers | list | see below | sequential list of init containers. Each init container must complete successfully before the next one starts |
 | initContainers.containers[0].args | list | `[]` | Define custom arguments for initContainer |
 | initContainers.containers[0].command | list | `["exit","0"]` | Define custom command for initContainer to run |
+| initContainers.containers[0].name | required | busybox-init | define init container name |
 | initContainers.containers[0].repository | required | `"busybox"` | define initContainer repository |
 | initContainers.containers[0].tag | string | `"latest"` | Overrides the image tag whose default is latest |
 | initContainers.enabled | bool | `false` | define if we should deploy init container within a pod see https://kubernetes.io/docs/concepts/workloads/pods/init-containers/ |
@@ -80,6 +91,18 @@ $ helm install my-release sysbee/kubedeploy
 | jobspec.parallelism | int | `1` | define job paralelisam see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism |
 | jobspec.restartPolicy | string | `"OnFailure"` | define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures |
 | kubeVersionOverride | string | `""` | Allow override of kubernetes version by default this will be automatically detected and requires no modification |
+| monitoring | object | see below | Parameters for the Prometheus [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.ServiceMonitor) or [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.PodMonitor) objects. |
+| monitoring.enabled | bool | `false` | Enable Monitoring if service is enabled it will default to ServiceMonitor otherwise PodMonitor will be used |
+| monitoring.labels | object | `{}` | Provide additional labels to the ServiceMonitor metadata |
+| monitoring.metricRelabelings | list | `[]` | Provide additional metricRelabelings to apply to samples before ingestion. |
+| monitoring.relabelings | list | `[]` | Provide additional relabelings to apply to samples before scraping |
+| monitoring.scheme | string | `"http"` | HTTP scheme to use for scraping. |
+| monitoring.scrapeInterval | string | `"20s"` | Provide interval at which metrics should be scraped |
+| monitoring.scrapePath | string | `"/metrics"` | Provide HTTP path to scrape for metrics. |
+| monitoring.scrapePort | string | `"metrics"` | Provide named service port used for scraping |
+| monitoring.scrapeTimeout | string | `"30s"` | Timeout after which the scrape is ended If not specified |
+| monitoring.targetLabels | list | `[]` | Additional metric labels |
+| monitoring.tlsConfig | object | `{}` | TLS configuration to use when scraping the endpoint |
 | nameOverride | string | `""` | Override release name used in calculated "releasename-chartname" naming |
 | nodeSelector | object | `{}` | define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
 | persistency.accessModes[0] | string | `"ReadWriteOnce"` |  |
@@ -97,8 +120,11 @@ $ helm install my-release sysbee/kubedeploy
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. See [resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for syntax |
 | securityContext | object | `{}` |  |
 | service.enabled | bool | `true` | controls if the service object should be deployed to cluster |
-| service.ports | list | `[{"name":"http","port":80,"protocol":"TCP","targetPort":"http"}]` | define port for service see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core) |
-| service.type | string | `"ClusterIP"` |  |
+| service.ports | list | see list values | define port for service see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core) |
+| service.ports[0].name | string, required | `"http"` | Name of the service port, should match container port name |
+| service.ports[0].protocol | required | `"TCP"` | Define service protocol. [Supported protocols](https://kubernetes.io/docs/concepts/services-networking/service/#protocol-support) |
+| service.ports[0].targetPort | string, required | `"http"` | Define name of the port exposed by the container |
+| service.type | string | `"ClusterIP"` | Service type see [Reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
@@ -108,6 +134,10 @@ $ helm install my-release sysbee/kubedeploy
 Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
 
 ## Changelog
+
+### 0.7.0
+- added support for enabling monitoring via prometheus operator.
+- cleaned up helmchart documentation for easier readability
 
 ### 0.6.0
 - added support for overriding healthcheck probes
