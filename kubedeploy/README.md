@@ -104,7 +104,7 @@ $ helm install my-release sysbee/kubedeploy
 | jobspec.restartPolicy | string | `"OnFailure"` | define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures |
 | kubeVersionOverride | string | `""` | Allow override of kubernetes version by default this will be automatically detected and requires no modification |
 | monitoring | object | see below | Parameters for the Prometheus [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.ServiceMonitor) or [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.PodMonitor) objects. |
-| monitoring.enabled | bool | `false` | Enable Monitoring if service is enabled it will default to ServiceMonitor otherwise PodMonitor will be used |
+| monitoring.enabled | bool | `false` | Enable monitoring. If service.enabled is true chart will generate ServiceMonitor object, otherwise PodMonitor will be used. |
 | monitoring.labels | object | `{}` | Provide additional labels to the ServiceMonitor metadata |
 | monitoring.metricRelabelings | list | `[]` | Provide additional metricRelabelings to apply to samples before ingestion. |
 | monitoring.relabelings | list | `[]` | Provide additional relabelings to apply to samples before scraping |
