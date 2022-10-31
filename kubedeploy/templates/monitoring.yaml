@@ -7,6 +7,7 @@ metadata:
   name: {{ include "kubedeploy.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
+    {{- include "kubedeploy.labels" . | nindent 4 }}
   {{- if .Values.monitoring.labels }}
       {{- toYaml .Values.monitoring.labels | nindent 4 }}
   {{- else }}
@@ -18,7 +19,7 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "kubedeploy.selectorLabels" . | nindent 4 }}
+      {{- include "kubedeploy.selectorLabels" . | nindent 6 }}
   {{- with .Values.monitoring.targetLabels }}
   targetLabels:
     {{- toYaml . | nindent 4 }}
@@ -48,6 +49,7 @@ metadata:
   name: {{ include "kubedeploy.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
+    {{- include "kubedeploy.labels" . | nindent 4 }}
   {{- if .Values.monitoring.labels }}
       {{- toYaml .Values.monitoring.labels | nindent 4 }}
   {{- else }}
@@ -59,7 +61,7 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "kubedeploy.selectorLabels" . | nindent 4 }}
+      {{- include "kubedeploy.selectorLabels" . | nindent 6 }}
   {{- with .Values.monitoring.targetLabels }}
   targetLabels:
     {{- toYaml . | nindent 4 }}

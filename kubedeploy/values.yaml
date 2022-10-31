@@ -269,8 +269,8 @@ monitoring:
   scrapePath: /metrics
   # -- Provide interval at which metrics should be scraped
   scrapeInterval: 20s
-  # -- Timeout after which the scrape is ended If not specified
-  scrapeTimeout: 30s
+  # -- Timeout after which the scrape is ended (must be less than scrapeInterval)
+  scrapeTimeout: 15s
   # -- HTTP scheme to use for scraping.
   scheme: http
   # -- TLS configuration to use when scraping the endpoint
