@@ -1,3 +1,7 @@
+### 0.7.1
+- fixed bug with monitoring label matchers
+- fixed bug with default scrapeTimeout value
+
 ### 0.7.0
 - added support for enabling monitoring via prometheus operator.
 - cleaned up helmchart documentation for easier readability
