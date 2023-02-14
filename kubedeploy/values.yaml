@@ -27,6 +27,18 @@ jobspec:
   # -- define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
   backoffLimit: 3
 
+# -- Define a list of hashes containing name and data that will be used in generating additional configmaps
+# please see values.yaml for example
+configMaps: []
+  # - name: kubedeploy-configmap
+  #   data:
+  #     kubedeploy: |+
+  #       configmap values
+  #
+  # - name: kubedeploy2-configmap
+  #   data:
+  #     config: |+
+  #       config2
 
 initContainers:
   # -- define if we should deploy init container within a pod
