@@ -1,3 +1,7 @@
+### 0.8.1
+- Use fullname helper for defining app.kubernetes.io/name. This fixes scenario where app.kubernetes.io/name would always be kubedeploy if nameOverride is not set. In this fix, fullNameOverride will be used first, then nameOverride if present, if none are present, use release name + chart name as app name label
+- Use image.tag value if available for app.kubernetes.io/version
+
 ### 0.8.0
 - added support for defining ConfigMap objects from values
 
