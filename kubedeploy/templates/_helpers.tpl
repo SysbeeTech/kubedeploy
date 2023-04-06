@@ -50,7 +50,9 @@ Common labels
 {{- define "kubedeploy.labels" -}}
 helm.sh/chart: {{ include "kubedeploy.chart" . }}
 {{ include "kubedeploy.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
+{{- if .Values.image.tag }}
+app.kubernetes.io/version: {{ .Values.image.tag | quote }}
+{{- else }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
@@ -60,7 +62,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "kubedeploy.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "kubedeploy.name" . }}
+app.kubernetes.io/name: {{ include "kubedeploy.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
