@@ -78,7 +78,7 @@ spec:
             {{- with .Values.healthcheck.probes }}
           {{- toYaml . | nindent 10 }}
             {{- end }}
-          {{- else }}
+          {{- else if not .Values.healthcheck.disableAutomatic }}
             {{- range .Values.ports }}
               {{- if eq (toString .name) "http" }}
           livenessProbe:

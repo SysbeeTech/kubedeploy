@@ -73,7 +73,9 @@ initContainers:
       args: []
 
 healthcheck:
-  # -- Define custom healthcheck probes for container, otherwise try to use automatic http probes if http port detected
+  # -- Disable automatic healthcheck probes. Automatic probes will always create a http healthcheck probe if there is a port named http
+  disableAutomatic: false
+  # -- Define custom healthcheck probes for container, overriding any automatic probes
   enabled: false
   probes:
     # -- Define [livenessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
