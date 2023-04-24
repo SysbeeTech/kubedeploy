@@ -1,4 +1,8 @@
+### 0.8.2
+- add option to disable automatic healthcheck probes
+
 ### 0.8.1
+*Breaking change*
 - Use fullname helper for defining app.kubernetes.io/name. This fixes scenario where app.kubernetes.io/name would always be kubedeploy if nameOverride is not set. In this fix, fullNameOverride will be used first, then nameOverride if present, if none are present, use release name + chart name as app name label
 - Use image.tag value if available for app.kubernetes.io/version
 
