@@ -15,7 +15,7 @@ env:
 jobs:
   public-publish:
     runs-on: docker-runner
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event_name == 'push' && contains(github.ref, 'refs/tags/') && vars.PUBLIC_CHART == 'true' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event_name == 'push' && (github.ref == 'refs/heads/main' || contains(github.ref, 'refs/tags/')) && vars.PUBLIC_CHART == 'true' }}
     container: sysbee/kubeci:latest
     steps:
       - uses: actions/checkout@v3
