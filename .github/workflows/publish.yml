@@ -1,0 +1,37 @@
+---
+name: Publish
+on:
+  workflow_run:
+    workflows: [Tests]
+    types:
+      - completed
+
+env:
+  RELEASE_NAME: testing
+  AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs:
+  public-publish:
+    runs-on: docker-runner
+    if: ${{ github.event.workflow_run.conclusion == 'success' && (github.ref == 'refs/heads/main' || contains(github.ref, 'refs/tags/')) && vars.PUBLIC_CHART == 'true' }}
+    container: sysbee/kubeci:latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: rm -rfv "$HOME/.local/share/helm/plugins/"
+      - run: helm plugin install https://github.com/hypnoglow/helm-s3.git
+      - run: helm repo add sysbee s3://${{ vars.S3_BUCKET }}/stable/sysbee
+      - run: helm repo update
+      - run: helm package ${{ vars.CHART_NAME }}
+      - run: helm s3 push --force --relative *.tgz sysbee
+
+  publish-docs:
+    runs-on: docker-runner
+    if: ${{ github.event.workflow_run.conclusion == 'success' && (github.ref == 'refs/heads/main' || contains(github.ref, 'refs/tags/')) && vars.PUBLIC_CHART == 'true' }}
+    container: pandoc/core
+    steps:
+      - uses: actions/checkout@v3
+      - run: apk add aws-cli
+      - run: pandoc -t html5 -f markdown -s --toc --toc-depth 2 --template pandoc/github.html5 --css pandoc/github.css kubedeploy/README.md -o index.html
+      - run: aws s3 cp index.html s3://${{ vars.S3_BUCKET }}/${{ vars.CHART_NAME }}/index.html
