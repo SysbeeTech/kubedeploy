@@ -250,8 +250,8 @@ autoscaling:
 
 
 keda:
-  # -- Kubernetes Event-driven Autoscaling: KEDA 2.x [ref](ref: https://keda.sh/docs/2.3/concepts/scaling-deployments/)
-  # Note: mutually exclusive with HPA, enabling KEDA disables HPA
+  # -- Kubernetes Event-driven Autoscaling: KEDA 2.x [ref](https://keda.sh/docs/2.3/concepts/scaling-deployments/)
+  # **Note:** mutually exclusive with HPA, enabling KEDA disables HPA
   enabled: false
   # -- Number of minimum replicas for KEDA autoscaling
   minReplicas: 1

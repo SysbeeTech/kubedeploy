@@ -1,3 +1,6 @@
+### 0.9.0
+- added KEDA 2.x support
+
 ### 0.8.2
 - add option to disable automatic healthcheck probes
 
