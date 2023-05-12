@@ -105,6 +105,15 @@ $ helm install my-release sysbee/kubedeploy
 | jobspec.command | list | `[]` | define command for job |
 | jobspec.parallelism | int | `1` | define job paralelisam see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism |
 | jobspec.restartPolicy | string | `"OnFailure"` | define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures |
+| keda.behavior | object | `{}` | HPA configurable scaling behavior see [ref](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior) |
+| keda.cooldownPeriod | int | `300` | The period to wait after the last trigger reported active before scaling the resource back to 0 [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#cooldownperiod) |
+| keda.enabled | bool | `false` | Kubernetes Event-driven Autoscaling: KEDA 2.x [ref](ref: https://keda.sh/docs/2.3/concepts/scaling-deployments/) Note: mutually exclusive with HPA, enabling KEDA disables HPA |
+| keda.maxReplicas | int | `10` | Number of maximum replicas for KEDA autoscaling |
+| keda.minReplicas | int | `1` | Number of minimum replicas for KEDA autoscaling |
+| keda.pollingInterval | int | `30` | Interval for checking each trigger [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#pollinginterval) |
+| keda.restoreToOriginalReplicaCount | bool | `false` | After scaled object is deleted return workload to initial replica count [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#advanced) |
+| keda.scaledObject.annotations | object | `{}` | Scaled object annotations, can be used to pause scaling [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#pause-autoscaling) |
+| keda.triggers | list | `[]` | Keda triggers [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#triggers) see values for prometheus example |
 | kubeVersionOverride | string | `""` | Allow override of kubernetes version by default this will be automatically detected and requires no modification |
 | monitoring | object | see below | Parameters for the Prometheus [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.ServiceMonitor) or [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.PodMonitor) objects. |
 | monitoring.enabled | bool | `false` | Enable monitoring. If service.enabled is true chart will generate ServiceMonitor object, otherwise PodMonitor will be used. |

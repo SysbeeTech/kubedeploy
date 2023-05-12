@@ -248,6 +248,41 @@ autoscaling:
   # -- (int) Target memory utilization as percentage of resources.requests.mem
   targetMemoryUtilizationPercentage:
 
+
+keda:
+  # -- Kubernetes Event-driven Autoscaling: KEDA 2.x [ref](ref: https://keda.sh/docs/2.3/concepts/scaling-deployments/)
+  # Note: mutually exclusive with HPA, enabling KEDA disables HPA
+  enabled: false
+  # -- Number of minimum replicas for KEDA autoscaling
+  minReplicas: 1
+  # -- Number of maximum replicas for KEDA autoscaling
+  maxReplicas: 10
+  # -- Interval for checking each trigger [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#pollinginterval)
+  pollingInterval: 30
+  # -- The period to wait after the last trigger reported active before scaling the resource back to 0 [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#cooldownperiod)
+  cooldownPeriod: 300
+  # -- After scaled object is deleted return workload to initial replica count [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#advanced)
+  restoreToOriginalReplicaCount: false
+  scaledObject:
+    # -- Scaled object annotations, can be used to pause scaling [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#pause-autoscaling)
+    annotations: {}
+  # -- HPA configurable scaling behavior see [ref](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior)
+  behavior: {}
+  #  scaleDown:
+  #    stabilizationWindowSeconds: 300
+  #    policies:
+  #    - type: Percent
+  #      value: 100
+  #      periodSeconds: 15
+  # -- Keda triggers [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#triggers) see values for prometheus example
+  triggers: []
+  #  - type: prometheus
+  #    metadata:
+  #      serverAddress: http://<prometheus-host>:9090
+  #      metricName: haproxy_process_idle_time_percent
+  #      threshold: '50'
+  #      query: avg(100-avg_over_time(haproxy_process_idle_time_percent{container="kubernetes-ingress-controller",service="mytest-kubernetes-ingress"}[2m]))
+
 # -- Define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
 nodeSelector: {}
 

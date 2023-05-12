@@ -1,5 +1,11 @@
-{{- if and (.Values.autoscaling.enabled) (eq (toString .Values.deploymentMode) "Deployment") }}
-apiVersion: autoscaling/v2beta1
+{{- if and (.Values.autoscaling.enabled) (eq (toString .Values.deploymentMode) "Deployment") (not .Values.keda.enabled) }}
+{{- if .Capabilities.APIVersions.Has "autoscaling/v2" }}
+apiVersion: autoscaling/v2
+{{- else if .Capabilities.APIVersions.Has "autoscaling/v2beta2" }}
+apiVersion: autoscaling/v2beta2
+{{- else }}
+  {{- fail "ERROR: You must have autoscaling/v2 or autoscaling/v2beta2 to use HorizontalPodAutoscaler" }}
+{{- end }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "kubedeploy.fullname" . }}
