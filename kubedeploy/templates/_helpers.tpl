@@ -191,18 +191,4 @@ spec:
   tolerations:
     {{- toYaml . | nindent 8 }}
   {{- end }}
-  {{- if and (.Values.persistency.enabled) (eq (toString .Values.deploymentMode) "Statefulset") }}
-  volumeClaimTemplates:
-    - metadata:
-        name: {{ $fullName }}
-      spec:
-        accessModes:
-        {{- range .Values.persistency.accessModes }}
-          - {{ . }}
-        {{- end }}
-        storageClassName: {{ .Values.persistency.storageClassName }}
-        resources:
-          requests:
-            storage: {{ .Values.persistency.capacity.storage }}
-  {{- end }}
 {{- end }}
