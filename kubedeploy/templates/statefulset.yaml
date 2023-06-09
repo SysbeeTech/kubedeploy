@@ -20,5 +20,5 @@ spec:
       {{- end }}
       labels:
         {{- include "kubedeploy.selectorLabels" . | nindent 8 }}
-    {{- include "kubedeploy.specSection" . | nindent 8 }}
+    {{- include "kubedeploy.specSection" . | nindent 4 }}
 {{- end }}
