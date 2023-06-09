@@ -78,6 +78,19 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+VolumeMounts for containers
+*/}}
+{{- define "kubedeploy.volumeMounts" -}}
+{{- $fullName := include "kubedeploy.fullname" . -}}
+{{- if and (.Values.persistency.enabled) (eq (toString .Values.deploymentMode) "Statefulset") }}
+  - mountPath: {{ .Values.persistency.mountPath }}
+    name: {{ $fullName }}
+{{- else }}
+  []
+{{- end }}
+{{- end }}
+
+{{/*
 Spec: common section helper
 */}}
 {{- define "kubedeploy.specSection" -}}
@@ -110,11 +123,8 @@ spec:
       env:
         {{- toYaml . | nindent 12 }}
       {{- end }}
-      {{- if and ($.Values.persistency.enabled) (lt (int $.Values.replicaCount) 2) }}
       volumeMounts:
-        - mountPath: {{ $.Values.persistency.mountPath }}
-          name: {{ $fullName }}-vol
-      {{- end }}
+        {{- include "kubedeploy.volumeMounts" $ | indent 8 }}
       resources:
         {{- toYaml $.Values.initContainers.resources | nindent 12 }}
     {{- end }}
@@ -165,6 +175,8 @@ spec:
           {{- end }}
         {{- end }}
       {{- end }}
+      volumeMounts:
+        {{- include "kubedeploy.volumeMounts" . | indent 8 }}
       resources:
         {{- toYaml .Values.resources | nindent 12 }}
   {{- with .Values.nodeSelector }}
