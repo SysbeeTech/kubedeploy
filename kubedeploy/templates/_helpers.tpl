@@ -105,6 +105,8 @@ spec:
     {{- toYaml .Values.podSecurityContext | nindent 8 }}
   {{- if eq (toString .Values.deploymentMode) "Job" }}
   restartPolicy: {{ .Values.jobspec.restartPolicy }}
+  {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
+  restartPolicy: {{ .Values.cronjobspec.restartPolicy }}
   {{- end }}
   {{- if .Values.initContainers.enabled }}
   initContainers:
@@ -139,12 +141,16 @@ spec:
       command:
         {{- if eq (toString .Values.deploymentMode) "Job" }}
         {{- toYaml .Values.jobspec.command |nindent 12 }}
+        {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
+        {{- toYaml .Values.cronjobspec.command |nindent 12 }}
         {{- else }}
         {{- toYaml .Values.image.command |nindent 12 }}
         {{- end }}
       args:
         {{- if eq (toString .Values.deploymentMode) "Job" }}
         {{- toYaml .Values.jobspec.args |nindent 12 }}
+        {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
+        {{- toYaml .Values.cronjobspec.args |nindent 12 }}
         {{- else }}
         {{- toYaml .Values.image.args |nindent 12 }}
         {{- end }}

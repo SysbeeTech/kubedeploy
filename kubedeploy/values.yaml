@@ -8,12 +8,37 @@ replicaCount: 1
 # -- available deployment modes currently supported:
 #   <ul><li>**Deployment**</li>
 #   <li>**Job**</li>
-#   <li>**Statefulset**</li></ul>
-deploymentMode: Deployment
+#   <li>**Statefulset**</li>
+#   <li>**Cronjob**</li></ul>
+deploymentMode: Cronjob
 
 # -- Allow override of kubernetes version
 # by default this will be automatically detected and requires no modification
 kubeVersionOverride: ""
+
+cronjobspec:
+  # -- define cronjob schedule, for details see: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#writing-a-cronjob-spec
+  schedule: "* * * * *"
+  # ┌───────────── minute (0 - 59)
+  # │ ┌───────────── hour (0 - 23)
+  # │ │ ┌───────────── day of the month (1 - 31)
+  # │ │ │ ┌───────────── month (1 - 12)
+  # │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday;
+  # │ │ │ │ │                                   7 is also Sunday on some systems)
+  # │ │ │ │ │                                   OR sun, mon, tue, wed, thu, fri, sat
+  # │ │ │ │ │
+  # * * * * *
+
+  # define restart policy for cronjob if deploymentMode is Cronjob.
+  restartPolicy: OnFailure
+  # -- define command for cronjob
+  command: []
+  # -- define args for cronjob
+  args: []
+  # -- define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
+  backoffLimit: 3
+  # -- (optional) define deadline for starting the job, see: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#starting-deadline
+  startingdeadlineseconds: 180
 
 jobspec:
   # -- define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures

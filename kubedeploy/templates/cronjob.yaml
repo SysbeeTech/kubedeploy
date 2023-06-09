@@ -1,0 +1,27 @@
+{{- if eq (toString .Values.deploymentMode) "Cronjob" }}
+{{- $fullName := include "kubedeploy.fullname" . -}}
+apiVersion: apps/v1
+kind: CronJob
+metadata:
+  name: {{ include "kubedeploy.fullname" . }}
+  labels:
+    {{- include "kubedeploy.labels" . | nindent 4 }}
+spec:
+  schedule: "{{ required "Please define valid cronjob schedule" .Values.cronjobspec.schedule | default "* * * * *" }}"
+  backoffLimit: {{ .Values.cronjobspec.backoffLimit }}
+  {{- if .Values.cronjobspec.startingdeadlineseconds }}
+  startingDeadlineSeconds: {{ .Values.cronjobspec.startingdeadlineseconds }}
+  {{- end }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kubedeploy.selectorLabels" . | nindent 8 }}
+    {{- include "kubedeploy.specSection" . | nindent 8 }}
+
+{{- end }}
