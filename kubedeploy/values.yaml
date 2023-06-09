@@ -18,7 +18,7 @@ kubeVersionOverride: ""
 
 cronjobspec:
   # -- define cronjob schedule, for details see: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#writing-a-cronjob-spec
-  schedule: "* * * * *"
+  schedule: "0 * * * *"
   # ┌───────────── minute (0 - 59)
   # │ ┌───────────── hour (0 - 23)
   # │ │ ┌───────────── day of the month (1 - 31)
@@ -39,6 +39,12 @@ cronjobspec:
   backoffLimit: 3
   # -- (optional) define deadline for starting the job, see: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#starting-deadline
   startingDeadlineSeconds: 180
+  # -- define number of sucessful job logs to keep 
+  successfulJobsHistoryLimit: 3
+  # -- define number of failed job logs to keep
+  failedJobsHistoryLimit: 1
+  # -- concurrency policy options: Allow (default), Forbid or Replace, see: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#concurrency-policy
+  concurrencyPolicy: ""
 
 jobspec:
   # -- define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures

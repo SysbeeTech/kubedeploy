@@ -12,6 +12,9 @@ spec:
   {{- if .Values.cronjobspec.startingDeadlineSeconds }}
   startingDeadlineSeconds: {{ .Values.cronjobspec.startingDeadlineSeconds }}
   {{- end }}
+  successfulJobsHistoryLimit: {{ .Values.cronjobspec.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronjobspec.failedJobsHistoryLimit }}
+  concurrencyPolicy: {{- if .Values.cronjobspec.concurrencyPolicy }}{{ .Values.cronjobspec.concurrencyPolicy }}{{- end }}
   jobTemplate:
     spec:
       template:
