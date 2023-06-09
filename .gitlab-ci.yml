@@ -12,6 +12,14 @@ deploychart:
     - helm upgrade --install ${RELEASE_NAME}-job ${CHART_NAME} --set deploymentMode=Job --set image.repository=nginx --set image.tag=1.16.0 --wait --timeout 300s
     - helm upgrade --install ${RELEASE_NAME}-statefulset ${CHART_NAME} --set deploymentMode=Statefulset --set image.repository=nginx --set image.tag=1.16.0 --set persistency.enabled=true --wait --timeout 300s
 
+verify:
+  extends: .runner
+  stage: verify
+  script:
+    - kind export kubeconfig --name ${CI_COMMIT_SHORT_SHA}
+    - kubectl wait --for=condition=available --timeout=300s deployment/${RELEASE_NAME}-deployment-${CHART_NAME}
+    - kubectl get deployment ${RELEASE_NAME}-deployment-${CHART_NAME} -n default -o=jsonpath='{.status.replicas}' |grep 1
+
 publish_docs:
   stage: publish
   tags:
