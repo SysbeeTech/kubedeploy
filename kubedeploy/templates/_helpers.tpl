@@ -77,9 +77,8 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-
 {{/*
-Spec: section 
+Spec: common section helper 
 */}}
 {{- define "kubedeploy.specSection" -}}
 {{- $fullName := include "kubedeploy.fullname" . -}}
