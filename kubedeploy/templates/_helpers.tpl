@@ -78,7 +78,7 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Spec: common section helper 
+Spec: common section helper
 */}}
 {{- define "kubedeploy.specSection" -}}
 {{- $fullName := include "kubedeploy.fullname" . -}}
@@ -165,11 +165,6 @@ spec:
           {{- end }}
         {{- end }}
       {{- end }}
-      {{- if and (.Values.persistency.enabled) (lt (int .Values.replicaCount) 2) }}
-      volumeMounts:
-        - mountPath: {{ .Values.persistency.mountPath }}
-          name: {{ $fullName }}-vol
-      {{- end }}
       resources:
         {{- toYaml .Values.resources | nindent 12 }}
   {{- with .Values.nodeSelector }}
@@ -183,12 +178,6 @@ spec:
   {{- with .Values.tolerations }}
   tolerations:
     {{- toYaml . | nindent 8 }}
-  {{- end }}
-  {{- if and (.Values.persistency.enabled) (lt (int .Values.replicaCount) 2) }}
-  volumes:
-    - name: {{ $fullName }}-vol
-      persistentVolumeClaim:
-        claimName: {{ $fullName }}-claim
   {{- end }}
   {{- if and (.Values.persistency.enabled) (eq (toString .Values.deploymentMode) "Statefulset") }}
   volumeClaimTemplates:

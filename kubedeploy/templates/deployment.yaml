@@ -10,10 +10,6 @@ spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
-  {{- if and (.Values.persistency.enabled) (lt (int .Values.replicaCount) 2) }}
-  strategy:
-    type: Recreate
-  {{- end }}
   selector:
     matchLabels:
       {{- include "kubedeploy.selectorLabels" . | nindent 6 }}

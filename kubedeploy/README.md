@@ -132,7 +132,7 @@ $ helm install my-release sysbee/kubedeploy
 | nodeSelector | object | `{}` | Define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
 | persistency.accessModes | list | `["ReadWriteOnce"]` | Define storage [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes). Must be supported by available storageClass |
 | persistency.capacity.storage | string | `"5Gi"` | Define storage capacity |
-| persistency.enabled | bool | `false` | Enable support for persistent volumes. Currently supported only in deploymentMode **Deployment** with **replicaCount = 1** Or in Statefulset deploymentMode with any number of replicas |
+| persistency.enabled | bool | `false` | Enable support for persistent volumes. Supported only in Statefulset deploymentMode with any number of replicas |
 | persistency.mountPath | string | `"/data"` | Define path where persistent volume will be mounted in container |
 | persistency.storageClassName | string | uses cluster default storageClassName | Define custom name for persistent storage class name |
 | podAnnotations | object | `{}` | Define pod's [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |

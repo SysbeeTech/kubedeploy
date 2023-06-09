@@ -211,8 +211,7 @@ persistency:
   storageClassName:
 
   # -- Enable support for persistent volumes.
-  # Currently supported only in deploymentMode **Deployment** with **replicaCount = 1**
-  # Or in Statefulset deploymentMode with any number of replicas
+  # Supported only in Statefulset deploymentMode with any number of replicas
   enabled: false
   capacity:
     # -- Define storage capacity
