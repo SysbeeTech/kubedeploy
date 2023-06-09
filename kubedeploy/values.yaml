@@ -10,7 +10,7 @@ replicaCount: 1
 #   <li>**Job**</li>
 #   <li>**Statefulset**</li>
 #   <li>**Cronjob**</li></ul>
-deploymentMode: Cronjob
+deploymentMode: Deployment
 
 # -- Allow override of kubernetes version
 # by default this will be automatically detected and requires no modification
@@ -38,7 +38,7 @@ cronjobspec:
   # -- define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy
   backoffLimit: 3
   # -- (optional) define deadline for starting the job, see: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#starting-deadline
-  startingdeadlineseconds: 180
+  startingDeadlineSeconds: 180
 
 jobspec:
   # -- define restart policy for jobs if deploymentMode is: Job. Please see https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures

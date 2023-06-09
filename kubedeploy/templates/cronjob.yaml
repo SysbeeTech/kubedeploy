@@ -9,8 +9,8 @@ metadata:
 spec:
   schedule: "{{ required "Please define valid cronjob schedule" .Values.cronjobspec.schedule | default "* * * * *" }}"
   backoffLimit: {{ .Values.cronjobspec.backoffLimit }}
-  {{- if .Values.cronjobspec.startingdeadlineseconds }}
-  startingDeadlineSeconds: {{ .Values.cronjobspec.startingdeadlineseconds }}
+  {{- if .Values.cronjobspec.startingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ .Values.cronjobspec.startingDeadlineSeconds }}
   {{- end }}
   jobTemplate:
     spec:
