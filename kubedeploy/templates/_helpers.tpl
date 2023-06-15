@@ -111,27 +111,36 @@ spec:
   {{- if .Values.initContainers.enabled }}
   initContainers:
     {{- range .Values.initContainers.containers }}
-
     - name: {{ required "Please define valid init container name" .name }}
       image: "{{ required "Please define valid init container repository" .repository }}:{{ .tag | default "latest" }}"
+      {{- with .command }}
       command:
-        {{- toYaml .command |nindent 12 }}
+        {{- toYaml . |nindent 12 }}
+      {{- end }}
+      {{- with .args }}
       args:
-        {{- toYaml .args |nindent 12 }}
+        {{- toYaml . |nindent 12 }}
+      {{- end }}
+      {{- with $.Values.securityContext }}
       securityContext:
-        {{- toYaml $.Values.securityContext | nindent 12 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       imagePullPolicy: {{ $.Values.initContainers.pullPolicy }}
       {{- with $.Values.env }}
       env:
         {{- toYaml . | nindent 12 }}
       {{- end }}
       volumeMounts:
-        {{- include "kubedeploy.volumeMounts" $ | indent 8 }}
+        {{- include "kubedeploy.volumeMounts" $ | indent 6 }}
       resources:
-        {{- if or .resources.limits .resources.requests }}
-        {{- toYaml .resources | nindent 10 }}
+        {{- if not .resources }}
+        {{- toYaml $.Values.initContainers.resources | nindent 8 }}
         {{- else }}
-        {{- toYaml $.Values.additionalContainers.resources | nindent 8 }}
+        {{- if or .resources.limits .resources.requests }}
+        {{- toYaml .resources | nindent 8 }}
+        {{- else }}
+        {{- toYaml $.Values.initContainers.resources | nindent 8 }}
+        {{- end }}
         {{- end }}
     {{- end }}
   {{- end }}
@@ -193,12 +202,18 @@ spec:
     {{- range .Values.additionalContainers.containers }}
     - name: {{ required "Please define valid additional container name" .name }}
       image: "{{ required "Please define valid additional container repository" .repository }}:{{ .tag | default "latest" }}"
+      {{- with .command }}
       command:
-        {{- toYaml .command |nindent 12 }}
+        {{- toYaml . |nindent 12 }}
+      {{- end }}
+      {{- with .args }}
       args:
-        {{- toYaml .args |nindent 12 }}
+        {{- toYaml . |nindent 12 }}
+      {{- end }}
+      {{- with $.Values.securityContext }}
       securityContext:
-        {{- toYaml $.Values.securityContext | nindent 12 }}
+        {{- toYaml . | nindent 12 }}
+      {{- end }}
       imagePullPolicy: {{ $.Values.additionalContainers.pullPolicy }}
       {{- with $.Values.env }}
       env:
@@ -218,10 +233,14 @@ spec:
       volumeMounts:
         {{- include "kubedeploy.volumeMounts" $ | indent 8 }}
       resources:
+        {{- if not .resources }}
+        {{- toYaml $.Values.additionalContainers.resources | nindent 8 }}
+        {{- else }}
         {{- if or .resources.limits .resources.requests }}
-        {{- toYaml .resources | nindent 10 }}
+        {{- toYaml .resources | nindent 8 }}
         {{- else }}
         {{- toYaml $.Values.additionalContainers.resources | nindent 8 }}
+        {{- end }}
         {{- end }}
     {{- end }}
     {{- end }}

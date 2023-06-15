@@ -99,7 +99,7 @@ initContainers:
       # -- Overrides the image tag whose default is latest
       tag: "latest"
       # -- Define custom command for initContainer to run
-      command: ["exit", "0"]
+      command: ["sh", "-c", "exit 0"]
       # -- Define custom arguments for initContainer
       args: []
       # -- Define custom resources for this specific init container. If not specified
@@ -128,13 +128,13 @@ additionalContainers:
   containers:
       # additionalContainer.containers[0].name -- (required) define additional container name
       # @default -- busybox-init
-    - name: "busybox-init"
+    - name: "busybox-additional"
       # -- (required) define additionalContainer repository
       repository: busybox
       # -- Overrides the image tag whose default is latest
       tag: "latest"
       # -- Define custom command for additionalContainer to run
-      command: ["exit", "0"]
+      command: ["sh", "-c", "while true; do sleep 30; done;"]
       # -- Define custom arguments for additionalContainer
       args: []
       # -- Define container ports that will be exposed
