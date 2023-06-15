@@ -102,6 +102,9 @@ initContainers:
       command: ["exit", "0"]
       # -- Define custom arguments for initContainer
       args: []
+      # -- Define custom resources for this specific init container. If not specified
+      # default resources from initContainer.resources will be used
+      resources: {}
 
 additionalContainers:
   # -- define if we should deploy additional containers within a pod

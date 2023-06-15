@@ -119,6 +119,7 @@ $ helm install my-release sysbee/kubedeploy
 | initContainers.containers[0].command | list | `["exit","0"]` | Define custom command for initContainer to run |
 | initContainers.containers[0].name | required | busybox-init | define init container name |
 | initContainers.containers[0].repository | required | `"busybox"` | define initContainer repository |
+| initContainers.containers[0].resources | object | `{}` | Define custom resources for this specific init container. If not specified default resources from initContainer.resources will be used |
 | initContainers.containers[0].tag | string | `"latest"` | Overrides the image tag whose default is latest |
 | initContainers.enabled | bool | `false` | define if we should deploy init containers within a pod see https://kubernetes.io/docs/concepts/workloads/pods/init-containers/ |
 | initContainers.pullPolicy | string | `"IfNotPresent"` | default initContainers pull policy |
