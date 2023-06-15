@@ -61,6 +61,19 @@ $ helm install my-release sysbee/kubedeploy
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| additionalContainers.containers | list | see below | list of additional containers. |
+| additionalContainers.containers[0].args | list | `[]` | Define custom arguments for additionalContainer |
+| additionalContainers.containers[0].command | list | `["exit","0"]` | Define custom command for additionalContainer to run |
+| additionalContainers.containers[0].healthcheck.enabled | bool | `false` | Define custom healthcheck probes for container |
+| additionalContainers.containers[0].healthcheck.probes.livenessProbe | object | `{}` | Define [livenessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) |
+| additionalContainers.containers[0].healthcheck.probes.readinessProbe | object | `{}` | Define [readinessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) |
+| additionalContainers.containers[0].ports | list | `[]` | Define container ports that will be exposed see: [containerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core) |
+| additionalContainers.containers[0].repository | required | `"busybox"` | define additionalContainer repository |
+| additionalContainers.containers[0].resources | object | `{}` | Define custom resources for this specific additional container. If not specified default resources from additionalContainer.resources will be used |
+| additionalContainers.containers[0].tag | string | `"latest"` | Overrides the image tag whose default is latest |
+| additionalContainers.enabled | bool | `false` | define if we should deploy additional containers within a pod see https://kubernetes.io/docs/concepts/workloads/pods/ |
+| additionalContainers.pullPolicy | string | `"IfNotPresent"` | default additionalContainers pull policy |
+| additionalContainers.resources | object | `{}` | Define default resources for all additional containers |
 | affinity | object | `{}` | Define pod [affinity](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/) |
 | autoscaling.enabled | bool | `false` | Enable autoscaling feature. This will only work when deploymentMode is set to **Deployment** |
 | autoscaling.maxReplicas | int | `10` | Number of max replicas for autoscaling |
@@ -68,7 +81,16 @@ $ helm install my-release sysbee/kubedeploy
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | Target cpu utilization as percentage of resources.requests.cpu |
 | autoscaling.targetMemoryUtilizationPercentage | int | `nil` | Target memory utilization as percentage of resources.requests.mem |
 | configMaps | list | `[]` | Define a list of hashes containing name and data that will be used in generating additional configmaps please see values.yaml for example |
-| deploymentMode | string | `"Deployment"` | available deployment modes currently supported:   <ul><li>**Deployment**</li>   <li>**Job**</li>   <li>**Statefulset**</li></ul> |
+| cronjobspec.args | list | `[]` | define args for cronjob |
+| cronjobspec.backoffLimit | int | `3` | define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy |
+| cronjobspec.command | list | `[]` | define command for cronjob |
+| cronjobspec.concurrencyPolicy | string | `""` | concurrency policy options: Allow (default), Forbid or Replace, see: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#concurrency-policy |
+| cronjobspec.failedJobsHistoryLimit | int | `1` | define number of failed job logs to keep |
+| cronjobspec.restartPolicy | string | `"OnFailure"` |  |
+| cronjobspec.schedule | string | `"0 * * * *"` | define cronjob schedule, for details see: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#writing-a-cronjob-spec |
+| cronjobspec.startingDeadlineSeconds | optional | `180` | define deadline for starting the job, see: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#starting-deadline |
+| cronjobspec.successfulJobsHistoryLimit | int | `3` | define number of successful job logs to keep |
+| deploymentMode | string | `"Deployment"` | available deployment modes currently supported:   <ul><li>**Deployment**</li>   <li>**Job**</li>   <li>**Statefulset**</li>   <li>**Cronjob**</li></ul> |
 | env | list | `[]` | Define environment variables for containers for reference see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core). Environment variables set will be exposed both to main container and all of the initContainers |
 | fullnameOverride | string | `""` | Override full resource names instead of using calculated "releasename-chartname" default naming convention |
 | healthcheck.disableAutomatic | bool | `false` | Disable automatic healthcheck probes. Automatic probes will always create a http healthcheck probe if there is a port named http |
@@ -98,7 +120,7 @@ $ helm install my-release sysbee/kubedeploy
 | initContainers.containers[0].name | required | busybox-init | define init container name |
 | initContainers.containers[0].repository | required | `"busybox"` | define initContainer repository |
 | initContainers.containers[0].tag | string | `"latest"` | Overrides the image tag whose default is latest |
-| initContainers.enabled | bool | `false` | define if we should deploy init container within a pod see https://kubernetes.io/docs/concepts/workloads/pods/init-containers/ |
+| initContainers.enabled | bool | `false` | define if we should deploy init containers within a pod see https://kubernetes.io/docs/concepts/workloads/pods/init-containers/ |
 | initContainers.pullPolicy | string | `"IfNotPresent"` | default initContainers pull policy |
 | initContainers.resources | object | `{}` | Define init containers resources |
 | jobspec.args | list | `[]` | define args for job |

@@ -39,7 +39,7 @@ cronjobspec:
   backoffLimit: 3
   # -- (optional) define deadline for starting the job, see: https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#starting-deadline
   startingDeadlineSeconds: 180
-  # -- define number of sucessful job logs to keep 
+  # -- define number of successful job logs to keep
   successfulJobsHistoryLimit: 3
   # -- define number of failed job logs to keep
   failedJobsHistoryLimit: 1
@@ -72,7 +72,7 @@ configMaps: []
   #       config2
 
 initContainers:
-  # -- define if we should deploy init container within a pod
+  # -- define if we should deploy init containers within a pod
   # see https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
   enabled: false
   # -- default initContainers pull policy
@@ -102,6 +102,59 @@ initContainers:
       command: ["exit", "0"]
       # -- Define custom arguments for initContainer
       args: []
+
+additionalContainers:
+  # -- define if we should deploy additional containers within a pod
+  # see https://kubernetes.io/docs/concepts/workloads/pods/
+  enabled: false
+  # -- default additionalContainers pull policy
+  pullPolicy: IfNotPresent
+  # -- Define default resources for all additional containers
+  resources: {}
+    # If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+  # -- (list) list of additional containers.
+  # @default -- see below
+  containers:
+      # additionalContainer.containers[0].name -- (required) define additional container name
+      # @default -- busybox-init
+    - name: "busybox-init"
+      # -- (required) define additionalContainer repository
+      repository: busybox
+      # -- Overrides the image tag whose default is latest
+      tag: "latest"
+      # -- Define custom command for additionalContainer to run
+      command: ["exit", "0"]
+      # -- Define custom arguments for additionalContainer
+      args: []
+      # -- Define container ports that will be exposed
+      # see: [containerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core)
+      ports: []
+        #- name: http
+        #  containerPort: 80
+        #  protocol: TCP
+        # - name: prometheus
+        #   containerPort: 9000
+        #   protocol: TCP
+      healthcheck:
+        # -- Define custom healthcheck probes for container
+        enabled: false
+        probes:
+          # -- Define [livenessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+          livenessProbe: {}
+          # -- Define [readinessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+          readinessProbe: {}
+
+      # -- Define custom resources for this specific additional container. If not specified
+      # default resources from additionalContainer.resources will be used
+      resources: {}
 
 healthcheck:
   # -- Disable automatic healthcheck probes. Automatic probes will always create a http healthcheck probe if there is a port named http

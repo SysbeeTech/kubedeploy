@@ -128,7 +128,11 @@ spec:
       volumeMounts:
         {{- include "kubedeploy.volumeMounts" $ | indent 8 }}
       resources:
-        {{- toYaml $.Values.initContainers.resources | nindent 12 }}
+        {{- if or .resources.limits .resources.requests }}
+        {{- toYaml .resources | nindent 10 }}
+        {{- else }}
+        {{- toYaml $.Values.additionalContainers.resources | nindent 8 }}
+        {{- end }}
     {{- end }}
   {{- end }}
 
@@ -184,7 +188,43 @@ spec:
       volumeMounts:
         {{- include "kubedeploy.volumeMounts" . | indent 8 }}
       resources:
-        {{- toYaml .Values.resources | nindent 12 }}
+        {{- toYaml .Values.resources | nindent 8 }}
+    {{- if .Values.additionalContainers.enabled }}
+    {{- range .Values.additionalContainers.containers }}
+    - name: {{ required "Please define valid additional container name" .name }}
+      image: "{{ required "Please define valid additional container repository" .repository }}:{{ .tag | default "latest" }}"
+      command:
+        {{- toYaml .command |nindent 12 }}
+      args:
+        {{- toYaml .args |nindent 12 }}
+      securityContext:
+        {{- toYaml $.Values.securityContext | nindent 12 }}
+      imagePullPolicy: {{ $.Values.additionalContainers.pullPolicy }}
+      {{- with $.Values.env }}
+      env:
+        {{- toYaml . | nindent 12 }}
+      {{- end }}
+      {{- with .ports }}
+      ports:
+        {{- toYaml . | nindent 12 }}
+      {{- end }}
+
+      {{- if .healthcheck.enabled }}
+      {{- with .healthcheck.probes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- end }}
+
+      volumeMounts:
+        {{- include "kubedeploy.volumeMounts" $ | indent 8 }}
+      resources:
+        {{- if or .resources.limits .resources.requests }}
+        {{- toYaml .resources | nindent 10 }}
+        {{- else }}
+        {{- toYaml $.Values.additionalContainers.resources | nindent 8 }}
+        {{- end }}
+    {{- end }}
+    {{- end }}
   {{- with .Values.nodeSelector }}
   nodeSelector:
     {{- toYaml . | nindent 8 }}
