@@ -12,7 +12,7 @@ environments:
 releases:
   # simple deployment testing
   - name: {{requiredEnv "RELEASE_NAME"}}
-    namespace: net-policy
+    namespace: netpolicy
     chart: ../{{ requiredEnv "CHART_NAME" }}
     installed: true
     values:
@@ -48,7 +48,7 @@ releases:
 
   # net-policy with ingress and monitoring
   - name: {{requiredEnv "RELEASE_NAME"}}-withingress
-    namespace: net-policy
+    namespace: netpolicy
     chart: ../{{ requiredEnv "CHART_NAME" }}
     installed: true
     values:

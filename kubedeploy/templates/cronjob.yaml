@@ -1,6 +1,6 @@
 {{- if eq (toString .Values.deploymentMode) "Cronjob" }}
 {{- $fullName := include "kubedeploy.fullname" . -}}
-apiVersion: apps/v1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ include "kubedeploy.fullname" . }}

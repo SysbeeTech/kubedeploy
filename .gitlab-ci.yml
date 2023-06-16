@@ -9,6 +9,9 @@ include:
   before_script:
     - kind export kubeconfig --name ${CI_COMMIT_SHORT_SHA}
 
+.deploychart:
+  script:
+    - echo "skipped"
 
 test_deployment:
   extends: .deploy
@@ -23,7 +26,7 @@ test_statefulset:
 test_network_policy:
   extends: .deploy
   script:
-    - helmfile apply --file tests/statefulset.yaml
+    - helmfile apply --file tests/networkpolicy.yaml
 
 test_job:
   extends: .deploy
