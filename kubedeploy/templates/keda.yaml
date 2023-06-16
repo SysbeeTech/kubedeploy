@@ -6,8 +6,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "kubedeploy.labels" . | nindent 4 }}
-  {{- if .Values.keda.scaledObject.annotations }}
-  annotations: {{ toYaml .Values.keda.scaledObject.annotations | nindent 4 }}
+  {{- with .Values.keda.scaledObject.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   scaleTargetRef:
@@ -19,14 +20,14 @@ spec:
   triggers:
 {{- with .Values.keda.triggers }}
 {{ toYaml . | indent 2 }}
-{{ end }}
+{{- end }}
   advanced:
     restoreToOriginalReplicaCount: {{ .Values.keda.restoreToOriginalReplicaCount }}
 {{- if .Values.keda.behavior }}
     horizontalPodAutoscalerConfig:
       behavior:
-{{ with .Values.keda.behavior -}}
-{{ toYaml . | indent 8 }}
-{{ end }}
-{{- end }}
-{{- end }}
+{{- with .Values.keda.behavior }}
+{{- toYaml . | nindent 8 -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

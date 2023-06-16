@@ -1,3 +1,4 @@
 *.tgz
 helmfile.yml
 values.yaml
+helmfile-output.yaml

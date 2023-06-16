@@ -3,6 +3,20 @@ include:
   - project: helm/charts
     file: '/ci-template/.gitlab-ci.yml'
 
+helmfile_output_lint:
+  extends: .runner
+  stage: lint
+  script:
+    - helmfile template -f tests/lint-test.yaml > helmfile-output.yaml
+    - yamllint helmfile-output.yaml
+  allow_failure:
+    exit_codes: 2
+  artifacts:
+    when: on_failure
+    paths:
+      - helmfile-output.yaml
+    expire_in: 1 week
+
 .deploy:
   extends: .runner
   stage: deploy
