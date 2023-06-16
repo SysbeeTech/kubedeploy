@@ -8,6 +8,6 @@ metadata:
   labels:
     {{ $labels | nindent 4 }}
 data:
-{{- toYaml .data | nindent 2}}
+{{- .data | default ""| toYaml | nindent 2}}
 {{- end }}
 {{- end }}

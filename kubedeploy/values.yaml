@@ -62,11 +62,14 @@ jobspec:
 # please see values.yaml for example
 configMaps: []
   # - name: kubedeploy-configmap
+  #   mount: True # should this configmap be mounted as volume on containers
+  #   mountPath: /data/confmap # define mount path for mounting the configmap
   #   data:
   #     kubedeploy: |+
   #       configmap values
   #
   # - name: kubedeploy2-configmap
+  #   mount: False
   #   data:
   #     config: |+
   #       config2

@@ -82,12 +82,32 @@ VolumeMounts for containers
 */}}
 {{- define "kubedeploy.volumeMounts" -}}
 {{- $fullName := include "kubedeploy.fullname" . -}}
+{{- /* Iterate over confiMaps mounts to count how many should be mounted */ -}}
+{{- $cfgmountcount := 0 }}
+{{- range .Values.configMaps }}
+    {{- if eq (toString .mount |lower) "true" }}
+    {{- $cfgmountcount = add $cfgmountcount 1 }}
+    {{- end }}
+{{- end }}
+{{- /* Define which volumes should be mounted */ -}}
 {{- if and (.Values.persistency.enabled) (eq (toString .Values.deploymentMode) "Statefulset") }}
   - mountPath: {{ .Values.persistency.mountPath }}
     name: {{ $fullName }}
+{{- else if gt $cfgmountcount 0 }}
+{{- /*skip adding anything if there are cfgmounts to be added */ -}}
 {{- else }}
   []
 {{- end }}
+{{- /* Now process configmap mounts */ -}}
+{{- if gt $cfgmountcount 0 }}
+{{- range .Values.configMaps }}
+    {{- if eq (toString .mount | lower) "true" }}
+  - mountPath: {{ required "You need to define .Values.configMaps[].mountPath if .Values.configMaps[].mount is set to True" .mountPath }}
+    name: {{ .name }}
+    {{- end }}
+{{- end }}
+{{- end }}
+
 {{- end }}
 
 {{/*

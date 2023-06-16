@@ -63,7 +63,7 @@ $ helm install my-release sysbee/kubedeploy
 |-----|------|---------|-------------|
 | additionalContainers.containers | list | see below | list of additional containers. |
 | additionalContainers.containers[0].args | list | `[]` | Define custom arguments for additionalContainer |
-| additionalContainers.containers[0].command | list | `["exit","0"]` | Define custom command for additionalContainer to run |
+| additionalContainers.containers[0].command | list | `["sh","-c","while true; do sleep 30; done;"]` | Define custom command for additionalContainer to run |
 | additionalContainers.containers[0].healthcheck.enabled | bool | `false` | Define custom healthcheck probes for container |
 | additionalContainers.containers[0].healthcheck.probes.livenessProbe | object | `{}` | Define [livenessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) |
 | additionalContainers.containers[0].healthcheck.probes.readinessProbe | object | `{}` | Define [readinessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) |
@@ -116,7 +116,7 @@ $ helm install my-release sysbee/kubedeploy
 | ingress.tls[0].secretName | string, required | chart-example-tls | Name of the secret to use for storing ssl certificate |
 | initContainers.containers | list | see below | sequential list of init containers. Each init container must complete successfully before the next one starts |
 | initContainers.containers[0].args | list | `[]` | Define custom arguments for initContainer |
-| initContainers.containers[0].command | list | `["exit","0"]` | Define custom command for initContainer to run |
+| initContainers.containers[0].command | list | `["sh","-c","exit 0"]` | Define custom command for initContainer to run |
 | initContainers.containers[0].name | required | busybox-init | define init container name |
 | initContainers.containers[0].repository | required | `"busybox"` | define initContainer repository |
 | initContainers.containers[0].resources | object | `{}` | Define custom resources for this specific init container. If not specified default resources from initContainer.resources will be used |
