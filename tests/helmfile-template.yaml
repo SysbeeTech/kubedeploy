@@ -1,0 +1,22 @@
+---
+helmDefaults:
+  atomic: true
+  wait: true
+  createNamespace: true
+
+environments:
+  default:
+    values:
+      - common-values.yaml
+
+releases:
+  # simple deployment testing
+  - name: {{requiredEnv "RELEASE_NAME"}}
+    namespace: deployment
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - deploymentMode: Deployment
+      - image:
+          repository: nginx
+          tag: latest

@@ -1,0 +1,93 @@
+---
+helmDefaults:
+  atomic: true
+  wait: true
+  createNamespace: true
+
+environments:
+  default:
+    values:
+      - common-values.yaml
+
+releases:
+  # simple deployment testing
+  - name: {{requiredEnv "RELEASE_NAME"}}
+    namespace: net-policy
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - deploymentMode: Deployment
+      - image:
+          repository: nginx
+          tag: latest
+      - networkPolicy:
+          enabled: true
+          ingress:
+            - from:
+                - ipBlock:
+                    cidr: 172.17.0.0/16
+                    except:
+                      - 172.17.1.0/24
+                - namespaceSelector:
+                    matchLabels:
+                      project: myproject
+                - podSelector:
+                    matchLabels:
+                      role: frontend
+              ports:
+                - protocol: TCP
+                  port: 6379
+          egress:
+            - to:
+                - ipBlock:
+                    cidr: 10.0.0.0/24
+              ports:
+                - protocol: TCP
+                  port: 5978
+
+
+  # net-policy with ingress and monitoring
+  - name: {{requiredEnv "RELEASE_NAME"}}-withingress
+    namespace: net-policy
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - deploymentMode: Deployment
+      - image:
+          repository: nginx
+          tag: latest
+      - ingress:
+          enabled: true
+      - monitoring:
+          enabled: true
+      - ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: metrics
+          containerPort: 9000
+          protocol: TCP
+      - networkPolicy:
+          enabled: true
+          ingress:
+            - from:
+                - ipBlock:
+                    cidr: 172.17.0.0/16
+                    except:
+                      - 172.17.1.0/24
+                - namespaceSelector:
+                    matchLabels:
+                      project: myproject
+                - podSelector:
+                    matchLabels:
+                      role: frontend
+              ports:
+                - protocol: TCP
+                  port: 6379
+          egress:
+            - to:
+                - ipBlock:
+                    cidr: 10.0.0.0/24
+              ports:
+                - protocol: TCP
+                  port: 5978

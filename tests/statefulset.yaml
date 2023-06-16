@@ -1,0 +1,69 @@
+---
+helmDefaults:
+  atomic: true
+  wait: true
+  createNamespace: true
+
+environments:
+  default:
+    values:
+      - common-values.yaml
+
+releases:
+  # simple statefulset testing
+  - name: {{requiredEnv "RELEASE_NAME"}}
+    namespace: statefulset
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - deploymentMode: Statefulset
+      - image:
+          repository: nginx
+          tag: latest
+
+  # statefulset with init and additional containers
+  - name: {{requiredEnv "RELEASE_NAME"}}-multi-container
+    namespace: statefulset
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - persistency:
+          enabled: true
+          capacity:
+            storage: {{ .Values.persistency.size }}
+      - deploymentMode: Statefulset
+      - image:
+          repository: nginx
+          tag: latest
+      - additionalContainers:
+          enabled: true
+      - initContainers:
+          enabled: true
+
+  # statefulset with configmaps and additional containers
+  - name: {{requiredEnv "RELEASE_NAME"}}-configmaps
+    namespace: statefulset
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - persistency:
+          enabled: true
+          capacity:
+            storage: {{ .Values.persistency.size }}
+      - deploymentMode: Statefulset
+      - image:
+          repository: nginx
+          tag: latest
+      - additionalContainers:
+          enabled: true
+      - configMaps:
+        - name: kubedeploy-configmap
+          mount: true
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          data:
+            config: |+
+              config2

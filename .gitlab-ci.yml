@@ -3,25 +3,45 @@ include:
   - project: helm/charts
     file: '/ci-template/.gitlab-ci.yml'
 
-deploychart:
+.deploy:
   extends: .runner
   stage: deploy
-  script:
+  before_script:
     - kind export kubeconfig --name ${CI_COMMIT_SHORT_SHA}
-    - helm upgrade --install ${RELEASE_NAME}-deployment ${CHART_NAME} --set deploymentMode=Deployment --set image.repository=nginx --set image.tag=1.16.0 --wait --timeout 300s
-    - helm upgrade --install ${RELEASE_NAME}-job ${CHART_NAME} --set deploymentMode=Job --set image.repository=nginx --set image.tag=1.16.0 --wait --timeout 300s
-    - helm upgrade --install ${RELEASE_NAME}-statefulset ${CHART_NAME} --set deploymentMode=Statefulset --set image.repository=nginx --set image.tag=1.16.0 --set persistency.enabled=true --wait --timeout 300s
-    - helm upgrade --install ${RELEASE_NAME}-multi-container-deployment ${CHART_NAME} --set deploymentMode=Deployment --set additionalContainers.enabled=true --set initContainers.enabled=true --set image.repository=nginx --set image.tag=1.16.0 --wait --timeout 300s
-    - helm upgrade --install ${RELEASE_NAME}-configmap-deployment ${CHART_NAME} -f tests/configmap-deployment.yaml --wait --timeout 300s
-    - helm upgrade --install ${RELEASE_NAME}-network-policy ${CHART_NAME} -f tests/network-policy.yaml --wait --timeout 300s
+
+
+test_deployment:
+  extends: .deploy
+  script:
+    - helmfile apply --file tests/deployment.yaml
+
+test_statefulset:
+  extends: .deploy
+  script:
+    - helmfile apply --file tests/statefulset.yaml
+
+test_network_policy:
+  extends: .deploy
+  script:
+    - helmfile apply --file tests/statefulset.yaml
+
+test_job:
+  extends: .deploy
+  script:
+    - helmfile apply --file tests/job.yaml
+
+test_cronjob:
+  extends: .deploy
+  script:
+    - helmfile apply --file tests/cronjob.yaml
 
 verify:
   extends: .runner
   stage: verify
   script:
     - kind export kubeconfig --name ${CI_COMMIT_SHORT_SHA}
-    - kubectl wait --for=condition=available --timeout=300s deployment/${RELEASE_NAME}-deployment-${CHART_NAME}
-    - kubectl get deployment ${RELEASE_NAME}-deployment-${CHART_NAME} -n default -o=jsonpath='{.status.replicas}' |grep 1
+    - kubectl wait --for=condition=available --timeout=300s deployment/${RELEASE_NAME}-${CHART_NAME}
+    - kubectl get deployment ${RELEASE_NAME}-${CHART_NAME} -n deployment -o=jsonpath='{.status.replicas}' |grep 1
 
 publish_docs:
   stage: publish

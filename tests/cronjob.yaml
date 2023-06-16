@@ -1,0 +1,61 @@
+---
+helmDefaults:
+  atomic: true
+  wait: true
+  createNamespace: true
+
+environments:
+  default:
+    values:
+      - common-values.yaml
+
+releases:
+  # simple deployment testing
+  - name: {{requiredEnv "RELEASE_NAME"}}
+    namespace: cronjob
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - deploymentMode: Cronjob
+      - image:
+          repository: nginx
+          tag: latest
+
+  # deployment with init and additional containers
+  - name: {{requiredEnv "RELEASE_NAME"}}-multi-container
+    namespace: cronjob
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - deploymentMode: Cronjob
+      - image:
+          repository: nginx
+          tag: latest
+      - additionalContainers:
+          enabled: true
+      - initContainers:
+          enabled: true
+
+  # deployment with configmaps and additional containers
+  - name: {{requiredEnv "RELEASE_NAME"}}-configmaps
+    namespace: jop
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - deploymentMode: Cronjob
+      - image:
+          repository: nginx
+          tag: latest
+      - additionalContainers:
+          enabled: true
+      - configMaps:
+        - name: kubedeploy-configmap
+          mount: true
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          data:
+            config: |+
+              config2
