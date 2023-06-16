@@ -12,6 +12,11 @@ spec:
     matchLabels:
       {{- include "kubedeploy.selectorLabels" . | nindent 6 }}
   serviceName: {{ include "kubedeploy.fullname" . }}
+  {{- if semverCompare ">=1.22-0" .Capabilities.KubeVersion.GitVersion -}}
+  {{- with .Values.minReadySeconds }}
+  minReadySeconds: {{ . }}
+  {{- end }}
+  {{- end }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
