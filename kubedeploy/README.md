@@ -101,7 +101,7 @@ $ helm install my-release sysbee/kubedeploy
 | image.command | list | `[]` | Define custom command for image to run. [Reference](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/) |
 | image.pullPolicy | string | `"IfNotPresent"` | Default container pull policy |
 | image.repository | string | `"nginx"` | Define container repository |
-| image.tag | string | `""` | Define the image tag whose default is the chart appVersion. |
+| image.tag | string | `"latest"` | Define the image tag defaulting to latest. |
 | imagePullSecrets | list | `[]` | Define [ImagePullSecrets](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podspec-v1-core) |
 | ingress | object | see ingress object values | Define [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object |
 | ingress.annotations | object | defaults to haproxy ingress and letsencrypt issuer | Additional Ingress annotations |
@@ -152,6 +152,11 @@ $ helm install my-release sysbee/kubedeploy
 | monitoring.targetLabels | list | `[]` | Additional metric labels |
 | monitoring.tlsConfig | object | `{}` | TLS configuration to use when scraping the endpoint |
 | nameOverride | string | `""` | Override release name used in calculated "releasename-chartname" default naming convention |
+| networkPolicy.egress | list | `[]` | Define spec.egress for NetowkPolicy rules |
+| networkPolicy.enabled | bool | `false` | Enables pod based [NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/) |
+| networkPolicy.ingress | list | `[]` | Define spec.ingress for NetowkPolicy rules |
+| networkPolicy.ingressNamespace | string | `"ingress"` | Define namespace where ingress controllers are deployed Used to generate automatic policy to enable ingress access when .Values.ingress is enabled |
+| networkPolicy.monitoringNamespace | string | `"monitoring"` | Define namespace where monitoring stack is deployed Used to generate automatic policy to enable monitoring access when .Values.monitoring is enabled |
 | nodeSelector | object | `{}` | Define custom [node selectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
 | persistency.accessModes | list | `["ReadWriteOnce"]` | Define storage [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes). Must be supported by available storageClass |
 | persistency.capacity.storage | string | `"5Gi"` | Define storage capacity |

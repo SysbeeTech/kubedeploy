@@ -1,0 +1,41 @@
+{{- if and (.Values.networkPolicy.enabled) (or .Values.ingress.enabled .Values.monitoring.enabled) }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "kubedeploy.fullname" . }}-system
+  labels:
+    {{- include "kubedeploy.labels" . |nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "kubedeploy.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    {{- if .Values.ingress.enabled }}
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: {{ toString .Values.networkPolicy.ingressNamespace |default "ingress" }}
+      ports:
+        {{- range .Values.ports }}
+        {{- if ne  $.Values.monitoring.scrapePort .name }}
+        - protocol: {{ .protocol |default "TCP" }}
+          port: {{ .containerPort }}
+        {{- end }}
+        {{- end }}
+    {{- end }}
+    {{- if .Values.monitoring.enabled }}
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: {{ toString .Values.networkPolicy.monitoringNamespace | default "monitoring" }}
+      ports:
+        {{- range .Values.ports }}
+        {{- if eq $.Values.monitoring.scrapePort .name }}
+        - protocol: {{ .protocol |default "TCP" }}
+          port: {{ .containerPort }}
+        {{- end }}
+        {{- end }}
+    {{- end }}
+{{- end }}

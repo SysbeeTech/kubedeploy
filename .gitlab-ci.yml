@@ -13,6 +13,7 @@ deploychart:
     - helm upgrade --install ${RELEASE_NAME}-statefulset ${CHART_NAME} --set deploymentMode=Statefulset --set image.repository=nginx --set image.tag=1.16.0 --set persistency.enabled=true --wait --timeout 300s
     - helm upgrade --install ${RELEASE_NAME}-multi-container-deployment ${CHART_NAME} --set deploymentMode=Deployment --set additionalContainers.enabled=true --set initContainers.enabled=true --set image.repository=nginx --set image.tag=1.16.0 --wait --timeout 300s
     - helm upgrade --install ${RELEASE_NAME}-configmap-deployment ${CHART_NAME} -f tests/configmap-deployment.yaml --wait --timeout 300s
+    - helm upgrade --install ${RELEASE_NAME}-network-policy ${CHART_NAME} -f tests/network-policy.yaml --wait --timeout 300s
 
 verify:
   extends: .runner
