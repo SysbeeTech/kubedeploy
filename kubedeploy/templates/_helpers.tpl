@@ -191,11 +191,11 @@ spec:
       image: "{{ required "Please define valid init container repository" .repository }}:{{ .tag | default "latest" }}"
       {{- with .command }}
       command:
-        {{- toYaml . |nindent 12 }}
+        {{- toYaml . |nindent 8 }}
       {{- end }}
       {{- with .args }}
       args:
-        {{- toYaml . |nindent 12 }}
+        {{- toYaml . |nindent 8 }}
       {{- end }}
       {{- with $.Values.securityContext }}
       securityContext:
@@ -254,7 +254,7 @@ spec:
 
       {{- if .Values.healthcheck.enabled }}
         {{- with .Values.healthcheck.probes }}
-      {{- toYaml . | nindent 10 }}
+      {{- toYaml . | nindent 6 }}
         {{- end }}
       {{- else if not .Values.healthcheck.disableAutomatic }}
         {{- range .Values.ports }}
@@ -329,7 +329,7 @@ spec:
   affinity:
   {{- end }}
   {{- with .Values.affinity }}
-    {{- toYaml . | nindent 8 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- if eq .Values.podAntiAffinity "hard" }}
     podAntiAffinity:

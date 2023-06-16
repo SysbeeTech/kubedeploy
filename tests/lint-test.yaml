@@ -4,11 +4,6 @@ helmDefaults:
   wait: true
   createNamespace: true
 
-environments:
-  default:
-    values:
-      - common-values.yaml
-
 releases:
   # simple deployment testing
   - name: {{requiredEnv "RELEASE_NAME"}}
@@ -104,8 +99,8 @@ releases:
                   port: 6379
           egress:
             - to:
-                - ipBlock:
-                    cidr: 10.0.0.0/24
+              - ipBlock:
+                  cidr: 10.0.0.0/24
               ports:
                 - protocol: TCP
                   port: 5978
@@ -137,7 +132,7 @@ releases:
             annotations:
               scaled-object-annnotation-key: value
           behavior:
-            scaleDonw:
+            scaleDown:
               stabilizatoinWindowSecodns: 300
           triggers:
             - type: prometheus
@@ -157,12 +152,12 @@ releases:
           nodeAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
               nodeSelectorTerms:
-              - matchExpressions:
-                - key: topology.kubernetes.io/zone
-                  operator: In
-                  values:
-                  - antarctica-east1
-                  - antarctica-west1
+                - matchExpressions:
+                  - key: topology.kubernetes.io/zone
+                    operator: In
+                    values:
+                      - antarctica-east1
+                      - antarctica-west1
       - podDisruptionBudget:
           enabled: true
       - monitoring:
