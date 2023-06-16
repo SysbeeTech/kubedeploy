@@ -107,7 +107,31 @@ VolumeMounts for containers
     {{- end }}
 {{- end }}
 {{- end }}
+{{- end }}
 
+{{/*
+Volumees for containers
+*/}}
+{{- define "kubedeploy.volumes" -}}
+{{- $fullName := include "kubedeploy.fullname" . -}}
+{{- /* Iterate over confiMaps mounts to count how many should be mounted */ -}}
+{{- $cfgmountcount := 0 }}
+{{- range .Values.configMaps }}
+    {{- if eq (toString .mount |lower) "true" }}
+    {{- $cfgmountcount = add $cfgmountcount 1 }}
+    {{- end }}
+{{- end }}
+{{- /* Define volumes */ -}}
+{{- if gt $cfgmountcount 0 }}
+volumes:
+{{- range .Values.configMaps }}
+    {{- if eq (toString .mount | lower) "true" }}
+  - name: {{ .name }}
+    configMap:
+      name: {{ .name }}
+    {{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -264,6 +288,7 @@ spec:
         {{- end }}
     {{- end }}
     {{- end }}
+  {{- include "kubedeploy.volumes" . | indent 2 }}
   {{- with .Values.nodeSelector }}
   nodeSelector:
     {{- toYaml . | nindent 8 }}
