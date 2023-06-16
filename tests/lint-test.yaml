@@ -1,0 +1,169 @@
+---
+helmDefaults:
+  atomic: true
+  wait: true
+  createNamespace: true
+
+environments:
+  default:
+    values:
+      - common-values.yaml
+
+releases:
+  # simple deployment testing
+  - name: {{requiredEnv "RELEASE_NAME"}}
+    namespace: deployment
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - deploymentMode: Deployment
+      - replicaCount: 2
+      - configMaps:
+        - name: kubedeploy-configmap
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          mount: False
+          data:
+            config: |+
+              config2
+      - initContainers:
+          enabled: true
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100m
+            requests:
+              cpu: 100m
+              memory: 100m
+      - additionalContainers:
+          enabled: true
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200m
+            requests:
+              cpu: 200m
+              memory: 200m
+      - healthcheck:
+          enabled: true
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /eth/v1/node/health
+            initialDelaySeconds: 180
+            timeoutSeconds: 10
+            periodSeconds: 20
+            successThreshold: 1
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /eth/v1/node/health
+            initialDelaySeconds: 180
+      - image:
+          repository: nginx
+          tag: latest
+          command:
+            - test-command
+          args:
+            - test-args
+      - imagePullSecrets:
+          - name: regcred
+      - fullnameOverride: {{requiredEnv "RELEASE_NAME"}}
+      - minReadySeconds: 30
+      - serviceAccount:
+          annotations:
+            service-account-annotation-key: value
+      - podAnnotations:
+          pod-annotation-key: value
+      - podSecurityContext:
+          fsGroup: 2000
+      - securityContext:
+          runAsUser: 100
+          runAsNonRoot: true
+      - networkPolicy:
+          enabled: true
+          ingress:
+            - from:
+                - ipBlock:
+                    cidr: 172.17.0.0/16
+                    except:
+                      - 172.17.1.0/24
+                - namespaceSelector:
+                    matchLabels:
+                      project: myproject
+                - podSelector:
+                    matchLabels:
+                      role: frontend
+              ports:
+                - protocol: TCP
+                  port: 6379
+          egress:
+            - to:
+                - ipBlock:
+                    cidr: 10.0.0.0/24
+              ports:
+                - protocol: TCP
+                  port: 5978
+      - ports:
+          - name: http
+            containerPort: 80
+            protocol: TCP
+          - name: metrics
+            containerPort: 9000
+            protocol: TCP
+      - env:
+        - name: ENV1
+          value: EnvValue
+      - service:
+          enabled: true
+      - ingress:
+          enabled: true
+          className: haproxy
+      - resources:
+          limits:
+            cpu: 500m
+            memory: 500Mi
+          requests:
+            cpu: 500m
+            memory: 500Mi
+      - keda:
+          enabled: true
+          scaledObject:
+            annotations:
+              scaled-object-annnotation-key: value
+          behavior:
+            scaleDonw:
+              stabilizatoinWindowSecodns: 300
+          triggers:
+            - type: prometheus
+              metadata:
+                serverAddress: http://prometheus:9090
+      - nodeSelector:
+          system: true
+      - topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: testing-replicas
+      - podAntiAffinity: "soft"
+      - affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+              - matchExpressions:
+                - key: topology.kubernetes.io/zone
+                  operator: In
+                  values:
+                  - antarctica-east1
+                  - antarctica-west1
+      - podDisruptionBudget:
+          enabled: true
+      - monitoring:
+          enabled: true
