@@ -28,6 +28,8 @@ releases:
     installed: true
     values:
       - replicaCount: 2
+      - podAntiAffinity: "soft"
+      - minReadySeconds: 30
       - deploymentMode: Deployment
       - image:
           repository: nginx

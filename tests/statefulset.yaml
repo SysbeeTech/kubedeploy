@@ -21,12 +21,16 @@ releases:
           repository: nginx
           tag: latest
 
-  # statefulset with init and additional containers
+  # statefulset with init and additional containers, 2 replicas with soft antiaffinity
+  # and min ready seconds set to 30
   - name: {{requiredEnv "RELEASE_NAME"}}-multi-container
     namespace: statefulset
     chart: ../{{ requiredEnv "CHART_NAME" }}
     installed: true
     values:
+      - replicaCount: 2
+      - podAntiAffinity: "soft"
+      - minReadySeconds: 5
       - persistency:
           enabled: true
           capacity:

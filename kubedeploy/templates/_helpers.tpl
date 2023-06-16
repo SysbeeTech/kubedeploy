@@ -67,6 +67,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+MatchExpressions
+*/}}
+{{- define "kubedeploy.matchExpressions" -}}
+- key: app.kubernetes.io/name
+  operator: In
+  values:
+    - {{ include "kubedeploy.fullname" . }}
+- key: app.kubernetes.io/instance
+  operator: In
+  values:
+    - {{ .Release.Name }}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "kubedeploy.serviceAccountName" -}}
@@ -311,9 +325,28 @@ spec:
   nodeSelector:
     {{- toYaml . | nindent 8 }}
   {{- end }}
-  {{- with .Values.affinity }}
+  {{- if or .Values.affinity .Values.podAntiAffinity }}
   affinity:
+  {{- end }}
+  {{- with .Values.affinity }}
     {{- toYaml . | nindent 8 }}
+  {{- end }}
+  {{- if eq .Values.podAntiAffinity "hard" }}
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - topologyKey: {{ .Values.podAntiAffinityTopologyKey }}
+          labelSelector:
+            matchExpressions:
+              {{- include "kubedeploy.matchExpressions" . | nindent 14 }}
+  {{- else if eq .Values.podAntiAffinity "soft" }}
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            topologyKey: {{ .Values.podAntiAffinityTopologyKey }}
+            labelSelector:
+              matchExpressions:
+                {{- include "kubedeploy.matchExpressions" . | nindent 16 }}
   {{- end }}
   {{- with .Values.tolerations }}
   tolerations:
