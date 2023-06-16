@@ -21,6 +21,13 @@ maintainers:
     email: branko@sysbee.net
     url: https://www.sysbee.net
 
+contributors:
+  - name: Sasa Tekovic
+    email: sasa@sysbee.net
+    url: https://www.sysbee.net
+  - name: Sinisa Dukaric
+    email: sinisa.dukaric@gmail.com
+
 keywords:
   - application
   - kubernetes

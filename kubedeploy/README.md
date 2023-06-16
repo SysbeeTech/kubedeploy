@@ -12,6 +12,12 @@ Generalized chart for deploying single containerized application into Kubernetes
 | ---- | ------ | --- |
 | Branko Toic | <branko@sysbee.net> | <https://www.sysbee.net> |
 
+## Contributors
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Sasa Tekovic | <sasa@sysbee.net> | <https://www.sysbee.net> |
+| Sinisa Dukaric | <sinisa.dukaric@gmail.com> | |
+
 ## Additional Information
 
 This simple chart is created to deploy any generic containerized application to kubernetes cluster.
