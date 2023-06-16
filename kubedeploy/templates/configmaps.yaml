@@ -1,13 +1,17 @@
 {{- $labels := include "kubedeploy.labels" . -}}
 {{- if gt (len .Values.configMaps) 0 -}}
-{{- range .Values.configMaps }}
+{{- range $index, $configMap := .Values.configMaps }}
+{{- $name := include "kubedeploy.cfgmapname" (list $ $configMap) -}}
+{{- if $index }}
+---
+{{- end }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ required "Please define valid configmap name" .name }}
+  name: {{ $name }}
   labels:
-    {{ $labels | nindent 4 }}
+    {{- $labels | nindent 4 }}
 data:
-{{- .data | default ""| toYaml | nindent 2}}
-{{- end }}
+{{- $configMap.data | default ""| toYaml | nindent 2}}
+{{ end }}
 {{- end }}

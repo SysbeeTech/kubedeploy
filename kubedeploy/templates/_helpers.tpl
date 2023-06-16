@@ -78,6 +78,18 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
+configmap name generator
+*/}}
+{{- define "kubedeploy.cfgmapname" -}}
+{{- $top := index . 0 -}}
+{{- $local := index . 1 -}}
+{{- $name := required "Please define valid configmap name" $local.name -}}
+{{- $fullName := include "kubedeploy.fullname" $top -}}
+{{- printf "%s-%s" $fullName $name -}}
+{{- end -}}
+
+
+{{/*
 VolumeMounts for containers
 */}}
 {{- define "kubedeploy.volumeMounts" -}}
@@ -101,9 +113,10 @@ VolumeMounts for containers
 {{- /* Now process configmap mounts */ -}}
 {{- if gt $cfgmountcount 0 }}
 {{- range .Values.configMaps }}
+    {{- $name := include "kubedeploy.cfgmapname" (list $ .) -}}
     {{- if eq (toString .mount | lower) "true" }}
   - mountPath: {{ required "You need to define .Values.configMaps[].mountPath if .Values.configMaps[].mount is set to True" .mountPath }}
-    name: {{ .name }}
+    name: {{ $name }}
     {{- end }}
 {{- end }}
 {{- end }}
@@ -125,10 +138,11 @@ Volumees for containers
 {{- if gt $cfgmountcount 0 }}
 volumes:
 {{- range .Values.configMaps }}
+    {{- $name := include "kubedeploy.cfgmapname" (list $ .) -}}
     {{- if eq (toString .mount | lower) "true" }}
-  - name: {{ .name }}
+  - name: {{ $name }}
     configMap:
-      name: {{ .name }}
+      name: {{ $name }}
     {{- end }}
 {{- end }}
 {{- end }}
