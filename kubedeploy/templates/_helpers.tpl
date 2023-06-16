@@ -166,6 +166,10 @@ spec:
   {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
   restartPolicy: {{ .Values.cronjobspec.restartPolicy }}
   {{- end }}
+  {{- with .Values.topologySpreadConstraints }}
+  topologySpreadConstraints:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   {{- if .Values.initContainers.enabled }}
   initContainers:
     {{- range .Values.initContainers.containers }}

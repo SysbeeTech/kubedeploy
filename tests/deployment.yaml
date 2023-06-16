@@ -21,6 +21,26 @@ releases:
           repository: nginx
           tag: latest
 
+  # deployment with replicas
+  - name: {{requiredEnv "RELEASE_NAME"}}-replicas
+    namespace: deployment
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - replicaCount: 2
+      - deploymentMode: Deployment
+      - image:
+          repository: nginx
+          tag: latest
+      - topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: testing-replicas
+
+
   # deployment with init and additional containers
   - name: {{requiredEnv "RELEASE_NAME"}}-multi-container
     namespace: deployment
