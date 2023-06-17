@@ -7,18 +7,24 @@ metadata:
   labels:
     {{- include "kubedeploy.labels" . | nindent 4 }}
 spec:
-  schedule: "{{ required "Please define valid cronjob schedule" .Values.cronjobspec.schedule | default "* * * * *" }}"
-  {{- if .Values.cronjobspec.startingDeadlineSeconds }}
-  startingDeadlineSeconds: {{ .Values.cronjobspec.startingDeadlineSeconds }}
+  schedule: "{{ required "Please define valid cronjob schedule" .Values.cronjobspec.schedule }}"
+  {{- with .Values.cronjobspec.startingDeadlineSeconds }}
+  startingDeadlineSeconds: {{ . }}
   {{- end }}
-  successfulJobsHistoryLimit: {{ .Values.cronjobspec.successfulJobsHistoryLimit }}
-  failedJobsHistoryLimit: {{ .Values.cronjobspec.failedJobsHistoryLimit }}
-	{{- if .Values.cronjobspec.concurrencyPolicy }}
-  concurrencyPolicy: {{ .Values.cronjobspec.concurrencyPolicy }}
+  {{- with .Values.cronjobspec.successfulJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ . }}
+  {{- end }}
+  {{- with .Values.cronjobspec.failedJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ . }}
+  {{- end }}
+	{{- with .Values.cronjobspec.concurrencyPolicy }}
+  concurrencyPolicy: {{ . }}
   {{- end }}
   jobTemplate:
     spec:
-      backoffLimit: {{ .Values.cronjobspec.backoffLimit }}
+      {{- with .Values.cronjobspec.backoffLimit }}
+      backoffLimit: {{ . }}
+      {{- end }}
       template:
         metadata:
         {{- with .Values.podAnnotations }}
@@ -28,5 +34,4 @@ spec:
           labels:
             {{- include "kubedeploy.selectorLabels" . | nindent 12 }}
     {{- include "kubedeploy.specSection" . | nindent 8 }}
-
 {{- end }}

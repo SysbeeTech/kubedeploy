@@ -13,16 +13,16 @@ metadata:
 spec:
   scaleTargetRef:
     name: {{ include "kubedeploy.fullname" . }}
-  pollingInterval: {{ .Values.keda.pollingInterval }}
-  cooldownPeriod: {{ .Values.keda.cooldownPeriod }}
-  minReplicaCount: {{ .Values.keda.minReplicas }}
-  maxReplicaCount: {{ .Values.keda.maxReplicas }}
+  pollingInterval: {{ .Values.keda.pollingInterval | default 30 }}
+  cooldownPeriod: {{ .Values.keda.cooldownPeriod | default 300 }}
+  minReplicaCount: {{ .Values.keda.minReplicas | default 1 }}
+  maxReplicaCount: {{ .Values.keda.maxReplicas | default 10 }}
   triggers:
 {{- with .Values.keda.triggers }}
 {{ toYaml . | indent 2 }}
 {{- end }}
   advanced:
-    restoreToOriginalReplicaCount: {{ .Values.keda.restoreToOriginalReplicaCount }}
+    restoreToOriginalReplicaCount: {{ .Values.keda.restoreToOriginalReplicaCount | default false}}
 {{- if .Values.keda.behavior }}
     horizontalPodAutoscalerConfig:
       behavior:

@@ -284,13 +284,12 @@ ingress:
   # -- Enable Ingres for release
   enabled: false
   # -- Ingress class name
-  className: ""
+  className: "haproxy"
   # -- Default Ingress pathType
   pathType: ImplementationSpecific
   # -- Additional Ingress annotations
-  # @default -- defaults to haproxy ingress and letsencrypt issuer
+  # @default -- defaults to support cert-manager letsencrypt issuer
   annotations:
-    kubernetes.io/ingress.class: haproxy
     cert-manager.io/cluster-issuer: letsencrypt
   # -- (list) Ingress host list.
   # @default -- see ingress.hosts[0] values

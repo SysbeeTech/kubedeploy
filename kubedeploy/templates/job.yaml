@@ -7,8 +7,12 @@ metadata:
   labels:
     {{- include "kubedeploy.labels" . | nindent 4 }}
 spec:
-  backoffLimit: {{ .Values.jobspec.backoffLimit }}
-  parallelism: {{ .Values.jobspec.parallelism }}
+  {{- with .Values.jobspec.backoffLimit }}
+  backoffLimit: {{ . }}
+  {{- end }}
+  {{- with .Values.jobspec.parallelism }}
+  parallelism: {{ . }}
+  {{- end }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}

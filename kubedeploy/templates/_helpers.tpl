@@ -173,8 +173,10 @@ spec:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   serviceAccountName: {{ include "kubedeploy.serviceAccountName" . }}
+  {{- with .Values.podSecurityContext }}
   securityContext:
-    {{- toYaml .Values.podSecurityContext | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   {{- if eq (toString .Values.deploymentMode) "Job" }}
   restartPolicy: {{ .Values.jobspec.restartPolicy }}
   {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
@@ -222,10 +224,12 @@ spec:
   {{- end }}
   containers:
     - name: {{ include "kubedeploy.fullname" . }}
+      {{- with .Values.securityContext }}
       securityContext:
-        {{- toYaml .Values.securityContext | nindent 8 }}
-      image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-      imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy |default "IfNotPresent" }}
       command:
         {{- if eq (toString .Values.deploymentMode) "Job" }}
         {{- toYaml .Values.jobspec.command |nindent 8 }}
@@ -251,9 +255,9 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.healthcheck.enabled }}
-        {{- with .Values.healthcheck.probes }}
+      {{- with .Values.healthcheck.probes }}
       {{- toYaml . | nindent 6 }}
-        {{- end }}
+      {{- end }}
       {{- else if not .Values.healthcheck.disableAutomatic }}
         {{- range .Values.ports }}
           {{- if eq (toString .name) "http" }}
@@ -270,8 +274,10 @@ spec:
       {{- end }}
       volumeMounts:
         {{- include "kubedeploy.volumeMounts" . | nindent 8 }}
+      {{- with .Values.resources }}
       resources:
-        {{- toYaml .Values.resources | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     {{- if .Values.additionalContainers.enabled }}
     {{- range .Values.additionalContainers.containers }}
     - name: {{ required "Please define valid additional container name" .name }}
