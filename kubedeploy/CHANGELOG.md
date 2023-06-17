@@ -1,3 +1,20 @@
+### 1.0.0
+####Breaking changes:
+- Persistent volumes are now available only with statefulsets. Previous version of chart allowed for persistent volumes with deploymentMode: Deployment when replicaCount was less than 2. From version 1.0.0 persistent volumes will be supported only for statefulsets.
+- configMaps in version 0.8.0 where not generating unique names across releases. Starting from version 1.0.0 defined configmap names will have their final name prefixed using fullname helper function.
+
+#### New Features:
+- added support for defining NetworkPolicy objects (https://kubernetes.io/docs/concepts/services-networking/network-policies/) by using .Values.networkPolicy. If networkpolicies are enabled, chart will automatically add ingress rules for monitoring and ingress
+- it is now possible to define multiple containers in pods by using .Values.additionalContainers
+- extended support for defining fine grained resource options for each container in .Values.additionalContainers and .Values.initContainers
+- added support for mounting configmaps as volumes in pods by using .Values.configMaps[].mount: True and defining .Values.configMaps[].mountPath
+- added deploymentMode of type Cronjob. See .Values.cronjobspec for more details
+- added support for defining minReadySeconds for Deployments and Statefulsets
+- added support for defining topologySpreadConstraints
+- added .Values.podAntiAffinity and .Values.podAntiAffinityTopologyKey for easier definition of pod antiaffinity rules.
+- added support for defining main container lifecycle hooks in .Values.image.lifecycle
+- other code improvements and bug fixes
+
 ### 0.9.0
 - added KEDA 2.x support
 

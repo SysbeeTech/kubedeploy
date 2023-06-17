@@ -22,29 +22,33 @@ Main idea behind this chart is having a simple framework for deploying docker im
 As such it might not be the perfect fit for every workload, however it will allow you to run most of generic applications.
 
 If you have multiple different containers it is recommended to install each container in its own release.
-Using [helmfile](https://github.com/roboll/helmfile) is strongly encouraged in such scenarios.
+Using [helmfile](https://github.com/roboll/helmfile) is strongly encouraged when dealing with multiple releases.
 
-List of currently available features:
+List of currently available features configurable through chart values.yaml:
 
- * creating Deployment, Statefulset, Job releases
- * defining custom replica count in release
- * defining single persistent volume per release and defining its mount point
- * defining a single custom container image within a pod
- * defining multiple custom independent initContainers images with their resource policy
- * defining arbitrary container ports
+ * creating Deployment, Statefulset, Job, CronJob releases
+ * controlling release replica count
+ * support for persistent volumes on Statefulsets
+ * defining multiple ConfigMap objects with support for mounting them as volumes in pod (main container, additionalContainers, initContainers)
+ * support for defining multiple initContainers with fine grained resources
+ * support for defining multiple additionalContainers with fine grained resources and custom healthchecks
+ * support for custom lifecycle hooks on main container
+ * defining exposed container ports
+ * defining custom pod resource requirements
  * default http liveness and readiness probes for container ports named http
- * defining custom liveness and readiness probes for specific port or overriding the default one
+ * defining custom liveness and readiness probes with ability to disable automatic healthcheck probes
  * defining multiple service ports
- * defining multiple container env variables (shared with initContainers)
- * defining deployment auto scaling configuration
+ * defining pod env variables (main container, additionalContainers, initContainers)
+ * defining built-in deployment auto scaling configuration
  * defining KEDA 2.x scaling configuration
- * defining deployment pod disruption budgets
+ * defining pod NetworkPolicy objects
+ * defining pod disruption budgets
  * defining node selector
  * defining tolerations
+ * defining topologySpreadConstraints
  * defining affinity
- * defining custom pod resource requirements
- * defining multiple ConfigMap objects
- * enabling ingress
+ * easy podAntiAffinity setup
+ * defining ingress objects
  * defining custom pod annotations
  * defining image pull secrets
  * name override

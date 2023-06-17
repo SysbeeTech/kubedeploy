@@ -11,4 +11,4 @@ Or here: https://charts.sysbee.io/kubedeploy/
 - Bump chart version in kubedeploy/Chart.yaml
 - Update kubedeploy/CHANGELOG.md
 - Merge with main branch
-- glab release create 0.9.0 -F kubedeploy/CHANGELOG.md
+- glab release create 1.0.0 -F kubedeploy/CHANGELOG.md

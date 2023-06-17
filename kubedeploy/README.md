@@ -26,29 +26,33 @@ Main idea behind this chart is having a simple framework for deploying docker im
 As such it might not be the perfect fit for every workload, however it will allow you to run most of generic applications.
 
 If you have multiple different containers it is recommended to install each container in its own release.
-Using [helmfile](https://github.com/roboll/helmfile) is strongly encouraged in such scenarios.
+Using [helmfile](https://github.com/roboll/helmfile) is strongly encouraged when dealing with multiple releases.
 
-List of currently available features:
+List of currently available features configurable through chart values.yaml:
 
- * creating Deployment, Statefulset, Job releases
- * defining custom replica count in release
- * defining single persistent volume per release and defining its mount point
- * defining a single custom container image within a pod
- * defining multiple custom independent initContainers images with their resource policy
- * defining arbitrary container ports
+ * creating Deployment, Statefulset, Job, CronJob releases
+ * controlling release replica count
+ * support for persistent volumes on Statefulsets
+ * defining multiple ConfigMap objects with support for mounting them as volumes in pod (main container, additionalContainers, initContainers)
+ * support for defining multiple initContainers with fine grained resources
+ * support for defining multiple additionalContainers with fine grained resources and custom healthchecks
+ * support for custom lifecycle hooks on main container
+ * defining exposed container ports
+ * defining custom pod resource requirements
  * default http liveness and readiness probes for container ports named http
- * defining custom liveness and readiness probes for specific port or overriding the default one
+ * defining custom liveness and readiness probes with ability to disable automatic healthcheck probes
  * defining multiple service ports
- * defining multiple container env variables (shared with initContainers)
- * defining deployment auto scaling configuration
+ * defining pod env variables (main container, additionalContainers, initContainers)
+ * defining built-in deployment auto scaling configuration
  * defining KEDA 2.x scaling configuration
- * defining deployment pod disruption budgets
+ * defining pod NetworkPolicy objects
+ * defining pod disruption budgets
  * defining node selector
  * defining tolerations
+ * defining topologySpreadConstraints
  * defining affinity
- * defining custom pod resource requirements
- * defining multiple ConfigMap objects
- * enabling ingress
+ * easy podAntiAffinity setup
+ * defining ingress objects
  * defining custom pod annotations
  * defining image pull secrets
  * name override
@@ -105,13 +109,15 @@ $ helm install my-release sysbee/kubedeploy
 | healthcheck.probes.readinessProbe | object | `{}` | Define [readinessProbe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) |
 | image.args | list | `[]` | Define custom arguments for image to run. [Reference](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/) |
 | image.command | list | `[]` | Define custom command for image to run. [Reference](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/) |
+| image.lifecycle | object | `{}` | Define custom [container lifecycle hooks](https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/). [More info](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) |
 | image.pullPolicy | string | `"IfNotPresent"` | Default container pull policy |
 | image.repository | string | `"nginx"` | Define container repository |
 | image.tag | string | `"latest"` | Define the image tag defaulting to latest. |
+| image.terminationGracePeriodSeconds | int | `30` | Define custom [terminationGracePeriodSeconds](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution). Should be greater then expected run time of lifecycle hooks |
 | imagePullSecrets | list | `[]` | Define [ImagePullSecrets](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podspec-v1-core) |
 | ingress | object | see ingress object values | Define [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object |
-| ingress.annotations | object | defaults to haproxy ingress and letsencrypt issuer | Additional Ingress annotations |
-| ingress.className | string | `""` | Ingress class name |
+| ingress.annotations | object | defaults to support cert-manager letsencrypt issuer | Additional Ingress annotations |
+| ingress.className | string | `"haproxy"` | Ingress class name |
 | ingress.enabled | bool | `false` | Enable Ingres for release |
 | ingress.hosts | list | see ingress.hosts[0] values | Ingress host list. |
 | ingress.hosts[0].host | string, required | chart-example.local | Define Ingress hostname |
@@ -145,6 +151,7 @@ $ helm install my-release sysbee/kubedeploy
 | keda.scaledObject.annotations | object | `{}` | Scaled object annotations, can be used to pause scaling [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#pause-autoscaling) |
 | keda.triggers | list | `[]` | Keda triggers [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#triggers) see values for prometheus example |
 | kubeVersionOverride | string | `""` | Allow override of kubernetes version by default this will be automatically detected and requires no modification |
+| minReadySeconds | int | `10` | Define [minReadySeconds](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#min-ready-seconds) for deployments and statefulsets |
 | monitoring | object | see below | Parameters for the Prometheus [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.ServiceMonitor) or [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.PodMonitor) objects. |
 | monitoring.enabled | bool | `false` | Enable monitoring. If service.enabled is true chart will generate ServiceMonitor object, otherwise PodMonitor will be used. |
 | monitoring.labels | object | `{}` | Provide additional labels to the ServiceMonitor metadata |
@@ -170,6 +177,8 @@ $ helm install my-release sysbee/kubedeploy
 | persistency.mountPath | string | `"/data"` | Define path where persistent volume will be mounted in container |
 | persistency.storageClassName | string | uses cluster default storageClassName | Define custom name for persistent storage class name |
 | podAnnotations | object | `{}` | Define pod's [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
+| podAntiAffinity | string | `""` | Pod anti-affinity can prevent the scheduler from placing application replicas on the same node. The default value "soft" means that the scheduler should *prefer* to not schedule two replica pods  onto the same node but no guarantee is provided. The value "hard" means that the scheduler is *required* to not schedule two replica pods onto the same node. The value "" will disable pod anti-affinity so that no anti-affinity rules will be configured. |
+| podAntiAffinityTopologyKey | string | `"kubernetes.io/hostname"` | If anti-affinity is enabled sets the topologyKey to use for anti-affinity. This can be changed to, for example, failure-domain.beta.kubernetes.io/zone |
 | podDisruptionBudget.enabled | bool | `false` | Enable and define pod disruption budget default (off) see: [podDisruptionBudget](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | podDisruptionBudget.maxUnavailable | int | `nil` | Maximum unavailable replicas |
 | podDisruptionBudget.minAvailable | int | `1` | Minimum available replicas |
@@ -194,6 +203,23 @@ $ helm install my-release sysbee/kubedeploy
 Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
 
 ## Changelog
+
+### 1.0.0
+####Breaking changes:
+- Persistent volumes are now available only with statefulsets. Previous version of chart allowed for persistent volumes with deploymentMode: Deployment when replicaCount was less than 2. From version 1.0.0 persistent volumes will be supported only for statefulsets.
+- configMaps in version 0.8.0 where not generating unique names across releases. Starting from version 1.0.0 defined configmap names will have their final name prefixed using fullname helper function.
+
+#### New Features:
+- added support for defining NetworkPolicy objects (https://kubernetes.io/docs/concepts/services-networking/network-policies/) by using .Values.networkPolicy. If networkpolicies are enabled, chart will automatically add ingress rules for monitoring and ingress
+- it is now possible to define multiple containers in pods by using .Values.additionalContainers
+- extended support for defining fine grained resource options for each container in .Values.additionalContainers and .Values.initContainers
+- added support for mounting configmaps as volumes in pods by using .Values.configMaps[].mount: True and defining .Values.configMaps[].mountPath
+- added deploymentMode of type Cronjob. See .Values.cronjobspec for more details
+- added support for defining minReadySeconds for Deployments and Statefulsets
+- added support for defining topologySpreadConstraints
+- added .Values.podAntiAffinity and .Values.podAntiAffinityTopologyKey for easier definition of pod antiaffinity rules.
+- added support for defining main container lifecycle hooks in .Values.image.lifecycle
+- other code improvements and bug fixes
 
 ### 0.9.0
 - added KEDA 2.x support
