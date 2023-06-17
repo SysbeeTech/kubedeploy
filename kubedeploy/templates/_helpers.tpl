@@ -254,6 +254,10 @@ spec:
       ports:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.image.lifecycle }}
+      lifecycle:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.healthcheck.enabled }}
       {{- with .Values.healthcheck.probes }}
       {{- toYaml . | nindent 6 }}
@@ -349,6 +353,9 @@ spec:
             labelSelector:
               matchExpressions:
                 {{- include "kubedeploy.matchExpressions" . | nindent 16 }}
+  {{- end }}
+  {{- with .Values.image.terminationGracePeriodSeconds }}
+  terminationGracePeriodSeconds: {{ . | default 30 }}
   {{- end }}
   {{- with .Values.tolerations }}
   tolerations:

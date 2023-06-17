@@ -184,6 +184,10 @@ image:
   command: []
   # -- Define custom arguments for image to run. [Reference](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/)
   args: []
+  # -- Define custom [container lifecycle hooks](https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/). [More info](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
+  lifecycle: {}
+  # -- Define custom [terminationGracePeriodSeconds](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution). Should be greater then expected run time of lifecycle hooks
+  terminationGracePeriodSeconds: 30
 
 # -- Define [ImagePullSecrets](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podspec-v1-core)
 imagePullSecrets: []
