@@ -95,6 +95,7 @@ Kubernetes: `>=1.20.0-0`
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | Target cpu utilization as percentage of resources.requests.cpu |
 | autoscaling.targetMemoryUtilizationPercentage | int | `nil` | Target memory utilization as percentage of resources.requests.mem |
 | configMaps | list | `[]` | Define a list of hashes containing name and data that will be used in generating additional configmaps please see values.yaml for example |
+| configMapsHash | bool | `false` | Redeploy Deployments and Statefulsets on configmap content change. If set to true, values of configmaps will be calculated as sha256sum and added as annotation to pod. On content change this will trigger pod redeployment/restart |
 | cronjobspec.args | list | `[]` | define args for cronjob |
 | cronjobspec.backoffLimit | int | `3` | define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy |
 | cronjobspec.command | list | `[]` | define command for cronjob |

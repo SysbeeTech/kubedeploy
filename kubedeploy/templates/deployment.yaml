@@ -18,9 +18,14 @@ spec:
       {{- include "kubedeploy.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- if or .Values.podAnnotations .Values.configMapHash }}
       annotations:
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.configMapHash }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmaps.yaml") . | sha256sum }}
+      {{- end }}
       {{- end }}
       labels:
         {{- include "kubedeploy.selectorLabels" . | nindent 8 }}

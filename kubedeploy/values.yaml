@@ -74,6 +74,11 @@ configMaps: []
   #     config: |+
   #       config2
 
+# -- Redeploy Deployments and Statefulsets on configmap content change.
+# If set to true, values of configmaps will be calculated as sha256sum and added
+# as annotation to pod. On content change this will trigger pod redeployment/restart
+configMapsHash: false
+
 initContainers:
   # -- define if we should deploy init containers within a pod
   # see https://kubernetes.io/docs/concepts/workloads/pods/init-containers/

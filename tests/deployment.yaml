@@ -81,6 +81,7 @@ releases:
     values:
       - additionalContainers:
           enabled: true
+      - configMapHash: true
       - configMaps:
         - name: kubedeploy-configmap
           mount: true

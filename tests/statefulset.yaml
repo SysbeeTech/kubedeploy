@@ -59,6 +59,7 @@ releases:
             storage: {{ .Values.persistency.size }}
       - additionalContainers:
           enabled: true
+      - configMapHash: true
       - configMaps:
         - name: kubedeploy-configmap
           mount: true
