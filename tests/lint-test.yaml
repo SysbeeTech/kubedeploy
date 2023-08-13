@@ -25,6 +25,11 @@ releases:
           data:
             config: |+
               config2
+        - name: envfrom-configmap
+          mount: False
+          data:
+            ENV_VAR1: "value1"
+            ENV_VAR2: "value2"
       - initContainers:
           enabled: true
           resources:
@@ -122,6 +127,9 @@ releases:
       - env:
         - name: ENV1
           value: EnvValue
+      - envFrom:
+        - configMapRef:
+            name: {{requiredEnv "RELEASE_NAME"}}-envfrom-configmap
       - service:
           enabled: true
       - ingress:

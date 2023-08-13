@@ -8,18 +8,26 @@ environments:
   default:
     values:
       - common-values.yaml
-
-releases:
-  # simple deployment testing
-  - name: {{requiredEnv "RELEASE_NAME"}}
+---
+templates:
+  default: &default
     namespace: netpolicy
     chart: ../{{ requiredEnv "CHART_NAME" }}
     installed: true
-    values:
+    valuesTemplate:
+      - fullnameOverride: '{{`{{ .Release.Name }}`}}'
       - deploymentMode: Deployment
       - image:
           repository: nginx
           tag: latest
+
+
+releases:
+  - name: {{requiredEnv "RELEASE_NAME"}}
+    labels:
+      test: netpolicy
+    <<: *default
+    values:
       - networkPolicy:
           enabled: true
           ingress:
@@ -48,14 +56,10 @@ releases:
 
   # net-policy with ingress and monitoring
   - name: {{requiredEnv "RELEASE_NAME"}}-withingress
-    namespace: netpolicy
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
+    labels:
+      test: netpolicy-ingress
+    <<: *default
     values:
-      - deploymentMode: Deployment
-      - image:
-          repository: nginx
-          tag: latest
       - ingress:
           enabled: true
       - monitoring:

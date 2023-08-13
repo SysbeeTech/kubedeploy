@@ -57,8 +57,8 @@ verify:
   stage: verify
   script:
     - kind export kubeconfig --name ${CI_COMMIT_SHORT_SHA}
-    - kubectl wait --for=condition=available --timeout=300s deployment/${RELEASE_NAME}-${CHART_NAME}
-    - kubectl get deployment ${RELEASE_NAME}-${CHART_NAME} -n deployment -o=jsonpath='{.status.replicas}' |grep 1
+    - kubectl wait --for=condition=available --timeout=300s -n deployment deployment/${RELEASE_NAME}
+    - kubectl get deployment ${RELEASE_NAME} -n deployment -o=jsonpath='{.status.replicas}' |grep 1
 
 publish_docs:
   stage: publish

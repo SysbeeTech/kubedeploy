@@ -8,29 +8,32 @@ environments:
   default:
     values:
       - common-values.yaml
+---
+templates:
+  default: &default
+    namespace: job
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    valuesTemplate:
+      - fullnameOverride: '{{`{{ .Release.Name }}`}}'
+      - deploymentMode: Job
+      - image:
+          repository: nginx
+          tag: latest
 
 releases:
   # simple deployment testing
   - name: {{requiredEnv "RELEASE_NAME"}}
-    namespace: job
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
-    values:
-      - deploymentMode: Job
-      - image:
-          repository: nginx
-          tag: latest
+    labels:
+      test: simple
+    <<: *default
 
   # deployment with init and additional containers
   - name: {{requiredEnv "RELEASE_NAME"}}-multi-container
-    namespace: job
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
+    labels:
+      test: multi-container
+    <<: *default
     values:
-      - deploymentMode: Job
-      - image:
-          repository: nginx
-          tag: latest
       - additionalContainers:
           enabled: true
       - initContainers:
@@ -38,14 +41,10 @@ releases:
 
   # deployment with configmaps and additional containers
   - name: {{requiredEnv "RELEASE_NAME"}}-configmaps
-    namespace: jop
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
+    labels:
+      test: configmaps
+    <<: *default
     values:
-      - deploymentMode: Job
-      - image:
-          repository: nginx
-          tag: latest
       - additionalContainers:
           enabled: true
       - configMaps:

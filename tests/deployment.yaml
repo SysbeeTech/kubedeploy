@@ -8,32 +8,35 @@ environments:
   default:
     values:
       - common-values.yaml
+---
+templates:
+  default: &default
+    namespace: deployment
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    valuesTemplate:
+      - fullnameOverride: '{{`{{ .Release.Name }}`}}'
+      - deploymentMode: Deployment
+      - image:
+          repository: nginx
+          tag: latest
 
 releases:
   # simple deployment testing
   - name: {{requiredEnv "RELEASE_NAME"}}
-    namespace: deployment
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
-    values:
-      - deploymentMode: Deployment
-      - image:
-          repository: nginx
-          tag: latest
+    labels:
+      test: simple
+    <<: *default
 
   # deployment with replicas
   - name: {{requiredEnv "RELEASE_NAME"}}-replicas
-    namespace: deployment
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
+    labels:
+      test: replicas
+    <<: *default
     values:
       - replicaCount: 2
       - podAntiAffinity: "soft"
       - minReadySeconds: 30
-      - deploymentMode: Deployment
-      - image:
-          repository: nginx
-          tag: latest
       - topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: zone
@@ -45,14 +48,10 @@ releases:
 
   # deployment with init and additional containers
   - name: {{requiredEnv "RELEASE_NAME"}}-multi-container
-    namespace: deployment
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
+    labels:
+      test: multi-container
+    <<: *default
     values:
-      - deploymentMode: Deployment
-      - image:
-          repository: nginx
-          tag: latest
       - additionalContainers:
           enabled: true
       - initContainers:
@@ -60,14 +59,10 @@ releases:
 
   # deployment with extraObjects
   - name: {{requiredEnv "RELEASE_NAME"}}-extraobjects
-    namespace: deployment
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
+    labels:
+      test: extraobjects
+    <<: *default
     values:
-      - deploymentMode: Deployment
-      - image:
-          repository: nginx
-          tag: latest
       - extraObjects:
           - apiVersion: v1
             kind: Secret
@@ -80,14 +75,10 @@ releases:
 
   # deployment with configmaps and additional containers
   - name: {{requiredEnv "RELEASE_NAME"}}-configmaps
-    namespace: deployment
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
+    labels:
+      test: configmaps
+    <<: *default
     values:
-      - deploymentMode: Deployment
-      - image:
-          repository: nginx
-          tag: latest
       - additionalContainers:
           enabled: true
       - configMaps:
@@ -101,3 +92,22 @@ releases:
           data:
             config: |+
               config2
+
+  # deployment with envFrom configmaps and additional containers
+  - name: {{requiredEnv "RELEASE_NAME"}}-envfrom
+    labels:
+      test: envfrom
+    <<: *default
+    values:
+      - additionalContainers:
+          enabled: true
+      - initContainers:
+          enabled: true
+      - configMaps:
+        - name: env-cfgmap
+          data:
+            ENV_VAR1: "value1"
+            ENV_VAR2: "value2"
+      - envFrom:
+        - configMapRef:
+            name: {{requiredEnv "RELEASE_NAME"}}-envfrom-env-cfgmap

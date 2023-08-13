@@ -263,6 +263,17 @@ env: []
   #       name: secret-name
   #       key: key-name
 
+# -- Define environment variables for containers from ConfigMap or Secret objects
+# for reference see [envFrom secret example](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables)
+# or [envFrom configmap example](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables)
+envFrom: []
+  # env from configmap
+  # - configMapRef:
+  #     name: special-config
+  # env from secret
+  # - secretRef:
+  #     name: test-secret
+
 service:
   # -- Service type see [Reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) for available options.
   type: ClusterIP
@@ -414,7 +425,6 @@ podAntiAffinity: ""
 # This can be changed to, for example, failure-domain.beta.kubernetes.io/zone
 
 podAntiAffinityTopologyKey: kubernetes.io/hostname
-
 
 # -- Create dynamic manifest via values (templated). See values for example:
 extraObjects: []

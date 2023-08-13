@@ -8,25 +8,32 @@ environments:
   default:
     values:
       - common-values.yaml
-
-releases:
-  # simple statefulset testing
-  - name: {{requiredEnv "RELEASE_NAME"}}
+---
+templates:
+  default: &default
     namespace: statefulset
     chart: ../{{ requiredEnv "CHART_NAME" }}
     installed: true
-    values:
+    valuesTemplate:
+      - fullnameOverride: '{{`{{ .Release.Name }}`}}'
       - deploymentMode: Statefulset
       - image:
           repository: nginx
           tag: latest
 
+releases:
+  # simple statefulset testing
+  - name: {{requiredEnv "RELEASE_NAME"}}
+    labels:
+      test: simple
+    <<: *default
+
   # statefulset with init and additional containers, 2 replicas with soft antiaffinity
   # and min ready seconds set to 30
   - name: {{requiredEnv "RELEASE_NAME"}}-multi-container
-    namespace: statefulset
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
+    labels:
+      test: multi-container
+    <<: *default
     values:
       - replicaCount: 2
       - podAntiAffinity: "soft"
@@ -35,10 +42,6 @@ releases:
           enabled: true
           capacity:
             storage: {{ .Values.persistency.size }}
-      - deploymentMode: Statefulset
-      - image:
-          repository: nginx
-          tag: latest
       - additionalContainers:
           enabled: true
       - initContainers:
@@ -46,18 +49,14 @@ releases:
 
   # statefulset with configmaps and additional containers
   - name: {{requiredEnv "RELEASE_NAME"}}-configmaps
-    namespace: statefulset
-    chart: ../{{ requiredEnv "CHART_NAME" }}
-    installed: true
+    labels:
+      test: configmaps
+    <<: *default
     values:
       - persistency:
           enabled: true
           capacity:
             storage: {{ .Values.persistency.size }}
-      - deploymentMode: Statefulset
-      - image:
-          repository: nginx
-          tag: latest
       - additionalContainers:
           enabled: true
       - configMaps:

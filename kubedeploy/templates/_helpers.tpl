@@ -208,6 +208,10 @@ spec:
       env:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $.Values.envFrom }}
+      envFrom:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumeMounts:
         {{- include "kubedeploy.volumeMounts" $ | nindent 6 }}
       resources:
@@ -248,6 +252,10 @@ spec:
         {{- end }}
       {{- with .Values.env }}
       env:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.envFrom }}
+      envFrom:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.ports }}
@@ -301,6 +309,10 @@ spec:
       imagePullPolicy: {{ $.Values.additionalContainers.pullPolicy }}
       {{- with $.Values.env }}
       env:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $.Values.envFrom }}
+      envFrom:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .ports }}
