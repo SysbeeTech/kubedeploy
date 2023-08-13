@@ -6,6 +6,9 @@ metadata:
   labels:
     {{- include "kubedeploy.labels" . | nindent 4 }}
 spec:
+  {{- if .Values.service.headless }}
+  clusterIP: "None"
+  {{- end }}
   type: {{ .Values.service.type }}
   {{- with .Values.service.ports }}
   ports:

@@ -279,6 +279,8 @@ service:
   type: ClusterIP
   # -- Controls if the service should be deployed for this release
   enabled: true
+  # -- Create a headless service see [ref](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)
+  headless: false
   # -- (list) Define listening port for service
   # see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core)
   # @default -- see service.ports[]

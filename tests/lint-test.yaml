@@ -132,6 +132,7 @@ releases:
             name: {{requiredEnv "RELEASE_NAME"}}-envfrom-configmap
       - service:
           enabled: true
+          headless: true
       - ingress:
           enabled: true
           className: haproxy

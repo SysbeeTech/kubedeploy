@@ -52,7 +52,14 @@ releases:
               ports:
                 - protocol: TCP
                   port: 5978
-
+  # headless service test
+  - name: {{requiredEnv "RELEASE_NAME"}}-headless-svc
+    labels:
+      test: netpolicy
+    <<: *default
+    values:
+      - service:
+          headless: true
 
   # net-policy with ingress and monitoring
   - name: {{requiredEnv "RELEASE_NAME"}}-withingress
