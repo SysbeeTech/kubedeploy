@@ -79,3 +79,21 @@ publish_docs:
       - tags
     variables:
       - $PUBLIC_CHART == "true"
+
+public-release:
+  tags:
+    - docker-runner
+  image: sysbee/kubeci:latest
+  extends: .runner
+  stage: publish
+  before_script:
+    - helm plugin install https://github.com/hypnoglow/helm-s3.git
+    - helm repo add sysbee s3://${S3_BUCKET}/release/sysbee
+    - helm repo update
+  script:
+    - helm package ${CHART_NAME}
+    - helm s3 push --relative *.tgz sysbee
+  only:
+    variables:
+      - $PUBLIC_CHART == "true"
+      - $CI_COMMIT_REF_NAME =~ /^release\/.*$/

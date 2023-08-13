@@ -58,6 +58,26 @@ releases:
       - initContainers:
           enabled: true
 
+  # deployment with extraObjects
+  - name: {{requiredEnv "RELEASE_NAME"}}-extraobjects
+    namespace: deployment
+    chart: ../{{ requiredEnv "CHART_NAME" }}
+    installed: true
+    values:
+      - deploymentMode: Deployment
+      - image:
+          repository: nginx
+          tag: latest
+      - extraObjects:
+          - apiVersion: v1
+            kind: Secret
+            metadata:
+              name: secret-basic-auth
+            type: kubernetes.io/basic-auth
+            stringData:
+              username: admin
+              password: t0p-S3c43t
+
   # deployment with configmaps and additional containers
   - name: {{requiredEnv "RELEASE_NAME"}}-configmaps
     namespace: deployment

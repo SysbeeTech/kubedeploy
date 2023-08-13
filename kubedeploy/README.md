@@ -2,7 +2,7 @@
 
 Generalized chart for deploying single containerized application into Kubernetes clusters
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 **Homepage:** <https://charts.sysbee.io/kubedeploy/>
 
@@ -67,6 +67,10 @@ $ helm repo add sysbee https://charts.sysbee.io/stable/sysbee
 $ helm install my-release sysbee/kubedeploy
 ```
 
+## Requirements
+
+Kubernetes: `>=1.20.0-0`
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -102,6 +106,7 @@ $ helm install my-release sysbee/kubedeploy
 | cronjobspec.successfulJobsHistoryLimit | int | `3` | define number of successful job logs to keep |
 | deploymentMode | string | `"Deployment"` | available deployment modes currently supported:   <ul><li>**Deployment**</li>   <li>**Job**</li>   <li>**Statefulset**</li>   <li>**Cronjob**</li></ul> |
 | env | list | `[]` | Define environment variables for containers for reference see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core). Environment variables set will be exposed both to main container and all of the initContainers |
+| extraObjects | list | `[]` | Create dynamic manifest via values (templated). See values for example: |
 | fullnameOverride | string | `""` | Override full resource names instead of using calculated "releasename-chartname" default naming convention |
 | healthcheck.disableAutomatic | bool | `false` | Disable automatic healthcheck probes. Automatic probes will always create a http healthcheck probe if there is a port named http |
 | healthcheck.enabled | bool | `false` | Define custom healthcheck probes for container, overriding any automatic probes |
