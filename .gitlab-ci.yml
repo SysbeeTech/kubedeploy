@@ -92,7 +92,7 @@ public-release:
     - helm repo update
   script:
     - helm package ${CHART_NAME}
-    - helm s3 push --relative *.tgz sysbee
+    - helm s3 push --force --relative *.tgz sysbee
   only:
     variables:
       - $PUBLIC_CHART == "true"
