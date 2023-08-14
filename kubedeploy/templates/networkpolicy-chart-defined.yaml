@@ -16,7 +16,7 @@ spec:
     - from:
       - namespaceSelector:
           matchLabels:
-            name: {{ toString .Values.networkPolicy.ingressNamespace |default "ingress" }}
+            kubernetes.io/metadata.name: {{ toString .Values.networkPolicy.ingressNamespace |default "ingress" }}
       ports:
         {{- range .Values.ports }}
         {{- if ne  $.Values.monitoring.scrapePort .name }}
@@ -29,7 +29,7 @@ spec:
     - from:
       - namespaceSelector:
           matchLabels:
-            name: {{ toString .Values.networkPolicy.monitoringNamespace | default "monitoring" }}
+            kubernetes.io/metadata.name: {{ toString .Values.networkPolicy.monitoringNamespace | default "monitoring" }}
       ports:
         {{- range .Values.ports }}
         {{- if eq $.Values.monitoring.scrapePort .name }}
