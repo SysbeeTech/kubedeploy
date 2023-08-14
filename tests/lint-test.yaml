@@ -36,19 +36,45 @@ releases:
           resources:
             limits:
               cpu: 100m
-              memory: 100m
+              memory: 100Mi
             requests:
               cpu: 100m
-              memory: 100m
+              memory: 100Mi
       - additionalContainers:
           enabled: true
           resources:
             limits:
               cpu: 200m
-              memory: 200m
+              memory: 200Mi
             requests:
               cpu: 200m
-              memory: 200m
+              memory: 200Mi
+          containers:
+            - name: "busybox-custom"
+              repository: busybox
+              tag: "latest"
+              command: ["sh", "-c", "while true; do sleep 30; done;"]
+              ports:
+                - name: http2
+                  containerPort: 80
+                  protocol: TCP
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 20Mi
+                requests:
+                  cpu: 50m
+                  memory: 10Mi
+              healthcheck:
+                enabled: true
+                probes:
+                  livenessProbe:
+                    exec:
+                      command:
+                      - echo
+                      - "alive"
+                    initialDelaySeconds: 5
+                    periodSeconds: 5
       - healthcheck:
           enabled: true
           livenessProbe:

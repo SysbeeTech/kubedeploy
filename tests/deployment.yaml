@@ -73,6 +73,20 @@ releases:
               username: admin
               password: t0p-S3c43t
 
+  # deployment with additional containers without healthcheck
+  - name: {{requiredEnv "RELEASE_NAME"}}-nohc-additional
+    labels:
+      test: nohc-additional
+    <<: *default
+    values:
+      - additionalContainers:
+          enabled: true
+          containers:
+            - name: "busybox-nohc"
+              repository: "busybox"
+              tag: "latest"
+              command: ["sh", "-c", "while true; do sleep 30; done;"]
+
   # deployment with configmaps and additional containers
   - name: {{requiredEnv "RELEASE_NAME"}}-configmaps
     labels:
@@ -81,6 +95,25 @@ releases:
     values:
       - additionalContainers:
           enabled: true
+          containers:
+            - name: "busybox-custom"
+              repository: busybox
+              tag: "latest"
+              command: ["sh", "-c", "while true; do sleep 30; done;"]
+              ports:
+                - name: http2
+                  containerPort: 80
+                  protocol: TCP
+              healthcheck:
+                enabled: true
+                probes:
+                  livenessProbe:
+                    exec:
+                      command:
+                      - echo
+                      - "alive"
+                    initialDelaySeconds: 5
+                    periodSeconds: 5
       - configMapHash: true
       - configMaps:
         - name: kubedeploy-configmap

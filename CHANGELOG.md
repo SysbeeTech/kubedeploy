@@ -6,3 +6,4 @@
 - added configmap hash to pod annotations support
 - enhanced the test runs
 - bugfix chart managed network policies were using wrong namespace selectors
+- bugfix set default value (healthcheck.enabled: false) for additoinalContainers healthcheck if unspecified

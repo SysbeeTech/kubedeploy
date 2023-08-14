@@ -319,9 +319,11 @@ spec:
       ports:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .healthcheck.enabled }}
-      {{- with .healthcheck.probes }}
+      {{- with .healthcheck }}
+      {{- if .enabled }}
+      {{- with .probes }}
       {{- toYaml . | nindent 6 }}
+      {{- end }}
       {{- end }}
       {{- end }}
       volumeMounts:
