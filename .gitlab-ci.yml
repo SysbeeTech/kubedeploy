@@ -7,7 +7,7 @@ helmfile_output_lint:
   extends: .runner
   stage: lint
   script:
-    - helmfile template -f tests/lint-test.yaml > helmfile-output.yaml
+    - helmfile template -f deploy-tests/lint-test.yaml > helmfile-output.yaml
     - yamllint helmfile-output.yaml
   allow_failure:
     exit_codes: 2
@@ -16,6 +16,16 @@ helmfile_output_lint:
     paths:
       - helmfile-output.yaml
     expire_in: 1 week
+
+helm_unittests:
+  tags:
+    - docker-runner
+  image: sysbee/kubeci:latest
+  stage: tests
+  before_script:
+    - helm plugin install https://github.com/helm-unittest/helm-unittest.git
+  script:
+    - helm unittest --color ${CHART_NAME}/
 
 .deploy:
   extends: .runner
@@ -27,30 +37,18 @@ helmfile_output_lint:
   script:
     - echo "skipped"
 
-test_deployment:
+deploy_tests:
   extends: .deploy
+  parallel:
+    matrix:
+      - TESTS:
+          - deployment
+          - statefulset
+          - network
+          - job
+          - cronjob
   script:
-    - helmfile apply --file tests/deployment.yaml
-
-test_statefulset:
-  extends: .deploy
-  script:
-    - helmfile apply --file tests/statefulset.yaml
-
-test_network_policy:
-  extends: .deploy
-  script:
-    - helmfile apply --file tests/networkpolicy.yaml
-
-test_job:
-  extends: .deploy
-  script:
-    - helmfile apply --file tests/job.yaml
-
-test_cronjob:
-  extends: .deploy
-  script:
-    - helmfile apply --file tests/cronjob.yaml
+    - helmfile apply --file deploy-tests/${TESTS}.yaml
 
 verify:
   extends: .runner

@@ -1,0 +1,25 @@
+suite: test (full)nameOverride
+templates:
+  - deployment.yaml
+tests:
+  - it: name override
+    set:
+      nameOverride: test
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: -test$
+      - matchRegex:
+          path: spec.selector.matchLabels["app.kubernetes.io/name"]
+          pattern: -test$
+
+  - it: fullnameOverride
+    set:
+      fullnameOverride: fullname
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: ^fullname$
+      - matchRegex:
+          path: spec.selector.matchLabels["app.kubernetes.io/name"]
+          pattern: ^fullname$

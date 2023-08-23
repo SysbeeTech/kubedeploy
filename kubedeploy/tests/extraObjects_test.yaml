@@ -1,0 +1,51 @@
+suite: test extraObjects
+templates:
+  - extra-objects.yaml
+
+tests:
+
+  - it: test empty by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # We only test the number of rendered documents. There is no input validation
+  # as this is the end-users responsibility
+
+  - it: test adding single object
+    set:
+      extraObjects:
+        - apiVersion: v1
+          kind: Secret
+          metadata:
+            name: secret-basic-auth
+          type: kubernetes.io/basic-auth
+          stringData:
+            username: admin
+            password: t0p-Secret
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: test adding multiple objects
+    set:
+      extraObjects:
+        - apiVersion: v1
+          kind: Secret
+          metadata:
+            name: secret-basic-auth
+          type: kubernetes.io/basic-auth
+          stringData:
+            username: admin
+            password: t0p-Secret
+        - apiVersion: v1
+          kind: Secret
+          metadata:
+            name: secret-basic-auth2
+          type: kubernetes.io/basic-auth
+          stringData:
+            username: admin
+            password: t0p-Secret
+    asserts:
+      - hasDocuments:
+          count: 2

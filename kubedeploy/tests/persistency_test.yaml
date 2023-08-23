@@ -1,0 +1,89 @@
+suite: test persistency
+templates:
+  - statefulset.yaml
+
+tests:
+  - it: test default persistency
+    set:
+      deploymentMode: Statefulset
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.volumeClaimTemplates
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].volumeMounts
+
+  - it: test enabled persistency with default values
+    set:
+      deploymentMode: Statefulset
+      persistency:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.volumeClaimTemplates
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 1
+      - isSubset:
+          path: spec.volumeClaimTemplates[0]
+          content:
+            metadata:
+              name: RELEASE-NAME-kubedeploy
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              storageClassName:
+              resources:
+                requests:
+                  storage: 5Gi
+      - lengthEqual:
+          path: spec.template.spec.containers[0].volumeMounts
+          count: 1
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[0]
+          content:
+            mountPath: /data
+            name: RELEASE-NAME-kubedeploy
+
+  - it: test enabled persistency with custom values
+    set:
+      deploymentMode: Statefulset
+      persistency:
+        enabled: true
+        storageClassName: efs
+        capacity:
+          storage: 30Gi
+        mountPath: /app/data
+        accessModes:
+          - ReadWriteMany
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.volumeClaimTemplates
+      - lengthEqual:
+          path: spec.volumeClaimTemplates
+          count: 1
+      - isSubset:
+          path: spec.volumeClaimTemplates[0]
+          content:
+            metadata:
+              name: RELEASE-NAME-kubedeploy
+            spec:
+              accessModes:
+                - ReadWriteMany
+              storageClassName: efs
+              resources:
+                requests:
+                  storage: 30Gi
+      - lengthEqual:
+          path: spec.template.spec.containers[0].volumeMounts
+          count: 1
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[0]
+          content:
+            mountPath: /app/data
+            name: RELEASE-NAME-kubedeploy

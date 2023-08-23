@@ -1,0 +1,147 @@
+suite: test monitoring
+templates:
+  - monitoring.yaml
+
+
+tests:
+  - it: test if monitoring is disabled by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: test if monitoring is disabled in absence of CRD
+    set:
+      monitoring:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: test if monitoring is enabled when CRD present
+    capabilities:
+      apiVersions:
+        - monitoring.coreos.com/v1
+    set:
+      monitoring:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - equal:
+          path: spec.namespaceSelector.matchNames[0]
+          value: NAMESPACE
+      - equal:
+          path: metadata.labels.release
+          value: prometheus
+      - isSubset:
+          path: spec.selector.matchLabels
+          content:
+            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+            app.kubernetes.io/instance: RELEASE-NAME
+
+  - it: test monitoring is enabled with default values
+    capabilities:
+      apiVersions:
+        - monitoring.coreos.com/v1
+    set:
+      monitoring:
+        enabled: true
+      service:
+        enabled: true
+    asserts:
+      - isKind:
+          of: ServiceMonitor
+      - isSubset:
+          path: spec.endpoints[0]
+          content:
+            port: metrics
+            scheme: http
+            path: /metrics
+            interval: 20s
+            scrapeTimeout: 15s
+
+  - it: test monitoring is enabled with default values service disabled
+    capabilities:
+      apiVersions:
+        - monitoring.coreos.com/v1
+    set:
+      monitoring:
+        enabled: true
+      service:
+        enabled: false
+    asserts:
+      - isKind:
+          of: PodMonitor
+      - isSubset:
+          path: spec.podMetricsEndpoints[0]
+          content:
+            port: metrics
+            scheme: http
+            path: /metrics
+            interval: 20s
+            scrapeTimeout: 15s
+
+  - it: test monitoring is enabled with custom values
+    capabilities:
+      apiVersions:
+        - monitoring.coreos.com/v1
+    set:
+      service:
+        enabled: true
+      monitoring:
+        enabled: true
+        labels:
+          myLabel: custom-prom
+        targetLabels:
+          - label: value
+        scrapePort: prom
+        scrapePath: /_metrics
+        scrapeInterval: 30s
+        scrapeTimeout: 10s
+        scheme: https
+        relabelings:
+          - source_labels: [__meta_kubernetes_namespace]
+            regex: “testing|staging”
+            action: drop
+        metricRelabelings:
+          - regex: "prometheus_replica"
+            action: labeldrop
+        tlsConfig:
+          caFile: /etc/istio-certs/root-cert.pem
+          certFile: /etc/istio-certs/cert-chain.pem
+          insecureSkipVerify: true
+          keyFile: /etc/istio-certs/key.pem
+    asserts:
+      - notExists:
+          path: metadata.labels.release
+      - equal:
+          path: metadata.labels.myLabel
+          value: custom-prom
+      - isKind:
+          of: ServiceMonitor
+      - equal:
+          path: spec.targetLabels[0].label
+          value: value
+      - isSubset:
+          path: spec.endpoints[0]
+          content:
+            port: prom
+            scheme: https
+            path: /_metrics
+            interval: 30s
+            scrapeTimeout: 10s
+            relabelings:
+              - source_labels: [__meta_kubernetes_namespace]
+                regex: “testing|staging”
+                action: drop
+            metricRelabelings:
+              - regex: "prometheus_replica"
+                action: labeldrop
+            tlsConfig:
+              caFile: /etc/istio-certs/root-cert.pem
+              certFile: /etc/istio-certs/cert-chain.pem
+              insecureSkipVerify: true
+              keyFile: /etc/istio-certs/key.pem

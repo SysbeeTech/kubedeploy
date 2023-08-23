@@ -1,0 +1,109 @@
+suite: test autoscaling
+templates:
+  - hpa.yaml
+  - deployment.yaml
+
+capabilities:
+  majorVersion: 1
+  minorVersion: 22
+  apiVersions:
+    - autoscaling/v2
+
+tests:
+  - it: test if autoscaling is disabled by default
+    template: hpa.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: test if autoscaling enabled with defaults
+    template: hpa.yaml
+    set:
+      autoscaling:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HorizontalPodAutoscaler
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - isSubset:
+          path: spec.scaleTargetRef
+          content:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: RELEASE-NAME-kubedeploy
+      - equal:
+          path: spec.minReplicas
+          value: 1
+      - equal:
+          path: spec.maxReplicas
+          value: 10
+      - isSubset:
+          path: spec.metrics[0]
+          content:
+            type: Resource
+            resource:
+              name: cpu
+              target:
+                type: Utilization
+                averageUtilization: 80
+
+  - it: test autoscaling with cusotm values
+    template: hpa.yaml
+    set:
+      autoscaling:
+        enabled: true
+        minReplicas: 3
+        maxReplicas: 5
+        targetCPUUtilizationPercentage: 60
+        targetMemoryUtilizationPercentage: 70
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HorizontalPodAutoscaler
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - isSubset:
+          path: spec.scaleTargetRef
+          content:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: RELEASE-NAME-kubedeploy
+      - equal:
+          path: spec.minReplicas
+          value: 3
+      - equal:
+          path: spec.maxReplicas
+          value: 5
+      - isSubset:
+          path: spec.metrics[0]
+          content:
+            type: Resource
+            resource:
+              name: cpu
+              target:
+                type: Utilization
+                averageUtilization: 60
+      - isSubset:
+          path: spec.metrics[1]
+          content:
+            type: Resource
+            resource:
+              name: memory
+              target:
+                type: Utilization
+                averageUtilization: 70
+
+  - it: test if replicas is removed from deployment when hpa enabled
+    template: deployment.yaml
+    set:
+      autoscaling:
+        enabled: true
+    asserts:
+      - notExists:
+          path: spec.replicas

@@ -1,0 +1,218 @@
+suite: test networkPolicy
+templates:
+  - networkpolicy.yaml
+  - networkpolicy-chart-defined.yaml
+tests:
+
+  - it: test empty by default
+    templates:
+      - networkpolicy.yaml
+      - networkpolicy-chart-defined.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # By default enabling NetworkPolicy will result in policy with empty
+  # ingress and egress rules. Rendered document will contain empty policyTypes
+  # which will default to -Ingress with empty ingress rules resulting in
+  # default deny for ingress rules for pods with chart selectors
+  # and no egress restrictions
+
+  - it: test when enabled with empty rules
+    template: networkpolicy.yaml
+    set:
+      networkPolicy:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: NetworkPolicy
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - isSubset:
+          path: spec.podSelector
+          content:
+            matchLabels:
+              app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+              app.kubernetes.io/instance: RELEASE-NAME
+      - exists:
+          path: spec.policyTypes
+      - isNullOrEmpty:
+          path: spec.policyTypes
+
+    # chart defined rules
+  - it: test when enabled with empty rules
+    template: networkpolicy.yaml
+    set:
+      networkPolicy:
+        enabled: true
+        ingress:
+          - from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: custom
+        egress:
+          - to:
+            - ipBlock:
+                cidr: 10.0.0.0/24
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: NetworkPolicy
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - isSubset:
+          path: spec.podSelector
+          content:
+            matchLabels:
+              app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+              app.kubernetes.io/instance: RELEASE-NAME
+      - exists:
+          path: spec.policyTypes
+      - equal:
+          path: spec.policyTypes[0]
+          value: Ingress
+      - equal:
+          path: spec.policyTypes[1]
+          value: Egress
+      - exists:
+          path: spec.ingress
+      - lengthEqual:
+          path: spec.ingress
+          count: 1
+      - isSubset:
+          path: spec.ingress[0]
+          content:
+            from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: custom
+      - exists:
+          path: spec.egress
+      - lengthEqual:
+          path: spec.egress
+          count: 1
+      - isSubset:
+          path: spec.egress[0]
+          content:
+            to:
+              - ipBlock:
+                  cidr: 10.0.0.0/24
+
+  # This should be empty if no ingrees or monitoring values are enabled
+  - it: test chart defined policy when enabled with empty rules
+    template: networkpolicy-chart-defined.yaml
+    set:
+      networkPolicy:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # This should render network policy objects allowing ingress and monitoring
+  # namespaces if ingress.enabled=true and monitoring.enabled=true
+  - it: test chart defined policy when enabled with empty rules
+    template: networkpolicy-chart-defined.yaml
+    set:
+      ingress:
+        enabled: true
+      monitoring:
+        enabled: true
+      networkPolicy:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: NetworkPolicy
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy-system
+      - isSubset:
+          path: spec.podSelector
+          content:
+            matchLabels:
+              app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+              app.kubernetes.io/instance: RELEASE-NAME
+      - lengthEqual:
+          path: spec.policyTypes
+          count: 1
+      - contains:
+          path: spec.policyTypes
+          content:
+            Ingress
+      - exists:
+          path: spec.ingress
+      - lengthEqual:
+          path: spec.ingress
+          count: 2
+      - isSubset:
+          path: spec.ingress[0]
+          content:
+            from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: ingress
+      - isSubset:
+          path: spec.ingress[1]
+          content:
+            from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: monitoring
+
+  - it: test chart defined policy when enabled with custom namespaces
+    template: networkpolicy-chart-defined.yaml
+    set:
+      ingress:
+        enabled: true
+      monitoring:
+        enabled: true
+      networkPolicy:
+        enabled: true
+        ingressNamespace: nginx-ingress
+        monitoringNamespace: prometheus
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: NetworkPolicy
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy-system
+      - isSubset:
+          path: spec.podSelector
+          content:
+            matchLabels:
+              app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+              app.kubernetes.io/instance: RELEASE-NAME
+      - lengthEqual:
+          path: spec.policyTypes
+          count: 1
+      - contains:
+          path: spec.policyTypes
+          content:
+            Ingress
+      - exists:
+          path: spec.ingress
+      - lengthEqual:
+          path: spec.ingress
+          count: 2
+      - isSubset:
+          path: spec.ingress[0]
+          content:
+            from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: nginx-ingress
+      - isSubset:
+          path: spec.ingress[1]
+          content:
+            from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: prometheus

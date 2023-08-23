@@ -1,0 +1,79 @@
+suite: test cronjobspec
+templates:
+  - cronjob.yaml
+
+tests:
+
+  - it: test default cronjob
+    set:
+      deploymentMode: Cronjob
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: CronJob
+      - equal:
+          path: spec.schedule
+          value: "0 * * * *"
+      - equal:
+          path: spec.startingDeadlineSeconds
+          value: 180
+      - equal:
+          path: spec.successfulJobsHistoryLimit
+          value: 3
+      - equal:
+          path: spec.failedJobsHistoryLimit
+          value: 1
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 3
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: OnFailure
+
+  - it: test custom cronjobspec
+    set:
+      deploymentMode: Cronjob
+      cronjobspec:
+        schedule: "*/5 * * * *"
+        restartPolicy: Never
+        command: ["nginx"]
+        args: ["-v"]
+        backoffLimit: 2
+        startingDeadlineSeconds: 60
+        successfulJobsHistoryLimit: 1
+        failedJobsHistoryLimit: 3
+        concurrencyPolicy: "Forbid"
+
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: CronJob
+      - equal:
+          path: spec.schedule
+          value: "*/5 * * * *"
+      - equal:
+          path: spec.startingDeadlineSeconds
+          value: 60
+      - equal:
+          path: spec.successfulJobsHistoryLimit
+          value: 1
+      - equal:
+          path: spec.failedJobsHistoryLimit
+          value: 3
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 2
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: Never
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].command[0]
+          value: nginx
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          value: -v

@@ -1,0 +1,123 @@
+suite: test service
+templates:
+  - service.yaml
+
+tests:
+  - it: test if service is enabled by default
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - lengthEqual:
+          path: spec.ports
+          count: 1
+      - isSubset:
+          path: spec.ports[0]
+          content:
+            name: http
+            port: 80
+            protocol: TCP
+            targetPort: http
+      - isSubset:
+          path: spec.selector
+          content:
+            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+            app.kubernetes.io/instance: RELEASE-NAME
+
+  - it: test if serviceaccount can be disabled
+    set:
+      service.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: test headless service
+    set:
+      service:
+        headless: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.clusterIP
+          value: None
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - lengthEqual:
+          path: spec.ports
+          count: 1
+      - isSubset:
+          path: spec.ports[0]
+          content:
+            name: http
+            port: 80
+            protocol: TCP
+            targetPort: http
+      - isSubset:
+          path: spec.selector
+          content:
+            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+            app.kubernetes.io/instance: RELEASE-NAME
+
+  - it: test custom service ports
+    set:
+      service:
+        headless: true
+        ports:
+          - name: prometheus
+            port: 9000
+            protocol: TCP
+            targetPort: prometheus
+          - name: test
+            port: 3333
+            protocol: TCP
+            targetPort: test
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.clusterIP
+          value: None
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - lengthEqual:
+          path: spec.ports
+          count: 2
+      - isSubset:
+          path: spec.ports[0]
+          content:
+            name: prometheus
+            port: 9000
+            protocol: TCP
+            targetPort: prometheus
+      - isSubset:
+          path: spec.ports[1]
+          content:
+            name: test
+            port: 3333
+            protocol: TCP
+            targetPort: test
+      - isSubset:
+          path: spec.selector
+          content:
+            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+            app.kubernetes.io/instance: RELEASE-NAME

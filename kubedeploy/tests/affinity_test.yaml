@@ -1,0 +1,163 @@
+suite: test affinity
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default affinity
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.affinity
+
+  - it: test affinity added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - RELEASE-NAME-kubedeploy
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100
+
+  - it: test affinity added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - RELEASE-NAME-kubedeploy
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100
+
+  - it: test affinity added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - RELEASE-NAME-kubedeploy
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100
+
+  - it: test affinity added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - RELEASE-NAME-kubedeploy
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.affinity
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.affinity
+          content:
+            podAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100

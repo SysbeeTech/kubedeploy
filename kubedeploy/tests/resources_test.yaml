@@ -1,0 +1,79 @@
+suite: test resources
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default resources
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.containers[0].resources
+
+  - it: test resources added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      resources:
+        requests:
+          mem: 512Mi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].resources
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.mem
+          value: 512Mi
+
+  - it: test resources added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      resources:
+        requests:
+          mem: 512Mi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].resources
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.mem
+          value: 512Mi
+
+  - it: test resources added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      resources:
+        requests:
+          mem: 512Mi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].resources
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.mem
+          value: 512Mi
+
+  - it: test resources added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      resources:
+        requests:
+          mem: 512Mi
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.mem
+          value: 512Mi

@@ -1,0 +1,54 @@
+suite: test jobspec
+templates:
+  - job.yaml
+
+tests:
+
+  - it: test default job
+    set:
+      deploymentMode: Job
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Job
+      - equal:
+          path: spec.parallelism
+          value: 1
+      - equal:
+          path: spec.backoffLimit
+          value: 3
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: OnFailure
+
+  - it: test custom jobspec
+    set:
+      deploymentMode: Job
+      jobspec:
+        restartPolicy: Never
+        command: ["nginx"]
+        args: ["-v"]
+        backoffLimit: 2
+        parallelism: 2
+
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Job
+      - equal:
+          path: spec.backoffLimit
+          value: 2
+      - equal:
+          path: spec.parallelism
+          value: 2
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+      - equal:
+          path: spec.template.spec.containers[0].command[0]
+          value: nginx
+      - equal:
+          path: spec.template.spec.containers[0].args[0]
+          value: -v

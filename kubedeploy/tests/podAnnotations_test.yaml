@@ -1,0 +1,75 @@
+suite: test podAnnotations
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default podAnnotations
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.metadata.annotations
+
+  - it: test podAnnotations added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      podAnnotations:
+        test: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.metadata.annotations
+      - equal:
+          path: spec.template.metadata.annotations.test
+          value: "true"
+
+  - it: test podAnnotations added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      podAnnotations:
+        test: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.metadata.annotations
+      - equal:
+          path: spec.template.metadata.annotations.test
+          value: "true"
+
+  - it: test podAnnotations added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      podAnnotations:
+        test: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.metadata.annotations
+      - equal:
+          path: spec.template.metadata.annotations.test
+          value: "true"
+
+  - it: test podAnnotations added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      podAnnotations:
+        test: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.metadata.annotations
+      - equal:
+          path: spec.jobTemplate.spec.template.metadata.annotations.test
+          value: "true"

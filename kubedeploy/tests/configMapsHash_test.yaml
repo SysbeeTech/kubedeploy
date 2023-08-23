@@ -1,0 +1,87 @@
+suite: test configMapsHash
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - configmaps.yaml
+
+
+tests:
+
+  - it: test if configmapshash is disabled by default
+    template: deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.metadata.annotations
+
+
+  - it: test enabled configmaphash on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      configMapsHash: true
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations
+      - equal:
+          path: spec.template.metadata.annotations['checksum/config']
+          value: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+
+  - it: test enabled configmaphash on deployment with custom configmaps
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      configMaps:
+        - name: configmap-name
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |
+              configmap values
+
+        - name: configmap-name2
+          data:
+            config: |
+              config2
+      configMapsHash: true
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations
+      - equal:
+          path: spec.template.metadata.annotations['checksum/config']
+          value: 97acd5d8a9f7d89510ca8b0d20c8527eab150a551a8909f7fa4f8d06b5f55c8c
+
+  - it: test enabled configmaphash on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      configMapsHash: true
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations
+      - equal:
+          path: spec.template.metadata.annotations['checksum/config']
+          value: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+
+  - it: test enabled configmaphash on statefulset with custom configmaps
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      configMaps:
+        - name: configmap-name
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |
+              configmap values
+
+        - name: configmap-name2
+          data:
+            config: |
+              config2
+      configMapsHash: true
+    asserts:
+      - exists:
+          path: spec.template.metadata.annotations
+      - equal:
+          path: spec.template.metadata.annotations['checksum/config']
+          value: 97acd5d8a9f7d89510ca8b0d20c8527eab150a551a8909f7fa4f8d06b5f55c8c

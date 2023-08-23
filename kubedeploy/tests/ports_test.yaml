@@ -1,0 +1,159 @@
+suite: test ports
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default ports parameters
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.containers[0].ports
+
+  - it: test ports parameters added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: prometheus
+          containerPort: 9000
+          protocol: TCP
+    asserts:
+      - hasDocuments:
+          count: 1
+      - lengthEqual:
+          path: spec.template.spec.containers[0].ports
+          count: 2
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].name
+          value: "http"
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 80
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].protocol
+          value: TCP
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].name
+          value: "prometheus"
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].containerPort
+          value: 9000
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].protocol
+          value: TCP
+
+  - it: test ports parameters added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: prometheus
+          containerPort: 9000
+          protocol: TCP
+    asserts:
+      - hasDocuments:
+          count: 1
+      - lengthEqual:
+          path: spec.template.spec.containers[0].ports
+          count: 2
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].name
+          value: "http"
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 80
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].protocol
+          value: TCP
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].name
+          value: "prometheus"
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].containerPort
+          value: 9000
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].protocol
+          value: TCP
+
+  - it: test ports parameters added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: prometheus
+          containerPort: 9000
+          protocol: TCP
+    asserts:
+      - hasDocuments:
+          count: 1
+      - lengthEqual:
+          path: spec.template.spec.containers[0].ports
+          count: 2
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].name
+          value: "http"
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 80
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].protocol
+          value: TCP
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].name
+          value: "prometheus"
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].containerPort
+          value: 9000
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].protocol
+          value: TCP
+
+  - it: test ports parameters added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: prometheus
+          containerPort: 9000
+          protocol: TCP
+    asserts:
+      - hasDocuments:
+          count: 1
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.containers[0].ports
+          count: 2
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].ports[0].name
+          value: "http"
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].ports[0].containerPort
+          value: 80
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].ports[0].protocol
+          value: TCP
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].ports[1].name
+          value: "prometheus"
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].ports[1].containerPort
+          value: 9000
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].ports[1].protocol
+          value: TCP

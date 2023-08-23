@@ -1,0 +1,231 @@
+suite: test configMaps
+templates:
+  - configmaps.yaml
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+
+tests:
+
+  - it: test if configmaps is disabled by default
+    template: configmaps.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: test custom configmaps
+    template: configmaps.yaml
+    set:
+      configMaps:
+        - name: configmap-name
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |
+              configmap values
+
+        - name: configmap-name2
+          data:
+            config: |
+              config2
+    asserts:
+      - hasDocuments:
+          count: 2
+      - isKind:
+          of: ConfigMap
+      - exists:
+          path: data
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy-configmap-name
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy-configmap-name2
+        documentIndex: 1
+      - isSubset:
+          path: data
+          content:
+            kubedeploy: |
+              configmap values
+        documentIndex: 0
+      - isSubset:
+          path: data
+          content:
+            config: |
+              config2
+        documentIndex: 1
+
+  - it: test configmaps mounts missing mountPoint
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      configMaps:
+        - name: configmap-name
+          mount: True
+          data:
+            kubedeploy: |
+              configmap values
+    asserts:
+      - failedTemplate:
+          errorMessage: "You need to define .Values.configMaps[].mountPath if .Values.configMaps[].mount is set to True"
+
+  - it: test configmaps mounts on deployments
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      configMaps:
+        - name: configmap-name
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |
+              configmap values
+
+        - name: configmap-name2
+          data:
+            config: |
+              config2
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Deployment
+      - lengthEqual:
+          path: spec.template.spec.volumes
+          count: 1
+      - isSubset:
+          path: spec.template.spec.volumes[0]
+          content:
+            name: RELEASE-NAME-kubedeploy-configmap-name
+            configMap:
+              name: RELEASE-NAME-kubedeploy-configmap-name
+      - lengthEqual:
+          path: spec.template.spec.containers[0].volumeMounts
+          count: 1
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-configmap-name
+
+  - it: test configmaps mounts on statefulsets with persistence
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      persistency:
+        enabled: true
+      configMaps:
+        - name: configmap-name
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |
+              configmap values
+
+        - name: configmap-name2
+          data:
+            config: |
+              config2
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: StatefulSet
+      - lengthEqual:
+          path: spec.template.spec.volumes
+          count: 1
+      - isSubset:
+          path: spec.template.spec.volumes[0]
+          content:
+            name: RELEASE-NAME-kubedeploy-configmap-name
+            configMap:
+              name: RELEASE-NAME-kubedeploy-configmap-name
+      - lengthEqual:
+          path: spec.template.spec.containers[0].volumeMounts
+          count: 2
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[1]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-configmap-name
+
+  - it: test configmaps mounts on jobs
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      configMaps:
+        - name: configmap-name
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |
+              configmap values
+
+        - name: configmap-name2
+          data:
+            config: |
+              config2
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Job
+      - lengthEqual:
+          path: spec.template.spec.volumes
+          count: 1
+      - isSubset:
+          path: spec.template.spec.volumes[0]
+          content:
+            name: RELEASE-NAME-kubedeploy-configmap-name
+            configMap:
+              name: RELEASE-NAME-kubedeploy-configmap-name
+      - lengthEqual:
+          path: spec.template.spec.containers[0].volumeMounts
+          count: 1
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-configmap-name
+
+  - it: test configmaps mounts on cronjobs
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      configMaps:
+        - name: configmap-name
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |
+              configmap values
+
+        - name: configmap-name2
+          data:
+            config: |
+              config2
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: CronJob
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          count: 1
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.volumes[0]
+          content:
+            name: RELEASE-NAME-kubedeploy-configmap-name
+            configMap:
+              name: RELEASE-NAME-kubedeploy-configmap-name
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.containers[0].volumeMounts
+          count: 1
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[0].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-configmap-name

@@ -1,0 +1,75 @@
+suite: test podSecurityContext
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default podSecurityContext
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.securityContext
+
+  - it: test podSecurityContext added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      podSecurityContext:
+        fsGroup: 2000
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.securityContext
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 2000
+
+  - it: test podSecurityContext added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      podSecurityContext:
+        fsGroup: 2000
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.securityContext
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 2000
+
+  - it: test podSecurityContext added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      podSecurityContext:
+        fsGroup: 2000
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.securityContext
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 2000
+
+  - it: test podSecurityContext added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      podSecurityContext:
+        fsGroup: 2000
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.securityContext
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.fsGroup
+          value: 2000

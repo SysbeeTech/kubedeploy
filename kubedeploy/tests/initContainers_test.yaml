@@ -1,0 +1,546 @@
+suite: test initContainers
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test if init containers are disabled by default
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.initContainers
+
+  ## check required parameters in initContainers.containers
+  - it: test required initContainers.containers repository parameter
+    template: deployment.yaml
+    set:
+      initContainers:
+        enabled: true
+        containers:
+          - name: test
+            tag: whatever
+    asserts:
+      - failedTemplate:
+          errorMessage: Please define valid init container repository
+  - it: test required initContainers.containers name parameter
+    template: deployment.yaml
+    set:
+      initContainers:
+        enabled: true
+        containers:
+          - repository: nginx
+            tag: whatever
+    asserts:
+      - failedTemplate:
+          errorMessage: Please define valid init container name
+  ## Testing on deployments
+
+  - it: test default sample values for initContainers on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      initContainers:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.initContainers
+      - lengthEqual:
+          path: spec.template.spec.initContainers
+          count: 1
+
+  # env, envFrom, configMaps mounts, securityContext
+  - it: test initContainers shared values on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      initContainers:
+        enabled: true
+      env:
+        - name: "ENV1"
+          value: "value1"
+      envFrom:
+        - configMapRef:
+           name: "value"
+      securityContext:
+        fsGroup: 2000
+      configMaps:
+        - name: kubedeploy-configmap
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          mount: False
+          data:
+            config: |+
+              config2
+    asserts:
+      - isSubset:
+          path: spec.template.spec.initContainers[0].securityContext
+          content:
+            fsGroup: 2000
+      - isSubset:
+          path: spec.template.spec.initContainers[0].env[0]
+          content:
+            name: ENV1
+            value: value1
+      - isSubset:
+          path: spec.template.spec.initContainers[0].envFrom[0]
+          content:
+            configMapRef:
+              name: value
+      - isSubset:
+          path: spec.template.spec.initContainers[0].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+
+  - it: test initContainers custom values on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      initContainers:
+        enabled: true
+        pullPolicy: Always
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+        containers:
+          - name: "nginx-init"
+            repository: nginx
+            tag: "latest"
+            command: [ "nginx"]
+            args: ["-v"]
+            resources:
+              requests:
+                cpu: 2
+                memory: 512Mi
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: nginx-init
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: nginx:latest
+      - equal:
+          path: spec.template.spec.initContainers[0].command[0]
+          value: nginx
+      - equal:
+          path: spec.template.spec.initContainers[0].args[0]
+          value: -v
+      - equal:
+          path: spec.template.spec.initContainers[0].imagePullPolicy
+          value: Always
+      - isSubset:
+          path: spec.template.spec.initContainers[0].resources
+          content:
+            requests:
+              cpu: 2
+              memory: 512Mi
+
+  - it: test initContainers global resources on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      initContainers:
+        enabled: true
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+    asserts:
+      - isSubset:
+          path: spec.template.spec.initContainers[0].resources
+          content:
+            requests:
+              cpu: 1
+              memory: 128Mi
+
+  ## Testing on statefulsets
+
+  - it: test default sample values for initContainers on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      initContainers:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.initContainers
+      - lengthEqual:
+          path: spec.template.spec.initContainers
+          count: 1
+
+  # env, envFrom, configMaps mounts, securityContext
+  - it: test initContainers shared values on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      initContainers:
+        enabled: true
+      env:
+        - name: "ENV1"
+          value: "value1"
+      envFrom:
+        - configMapRef:
+           name: "value"
+      securityContext:
+        fsGroup: 2000
+      configMaps:
+        - name: kubedeploy-configmap
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          mount: False
+          data:
+            config: |+
+              config2
+    asserts:
+      - isSubset:
+          path: spec.template.spec.initContainers[0].securityContext
+          content:
+            fsGroup: 2000
+      - isSubset:
+          path: spec.template.spec.initContainers[0].env[0]
+          content:
+            name: ENV1
+            value: value1
+      - isSubset:
+          path: spec.template.spec.initContainers[0].envFrom[0]
+          content:
+            configMapRef:
+              name: value
+      - isSubset:
+          path: spec.template.spec.initContainers[0].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+
+  - it: test initContainers custom values on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      initContainers:
+        enabled: true
+        pullPolicy: Always
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+        containers:
+          - name: "nginx-init"
+            repository: nginx
+            tag: "latest"
+            command: [ "nginx"]
+            args: ["-v"]
+            resources:
+              requests:
+                cpu: 2
+                memory: 512Mi
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: nginx-init
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: nginx:latest
+      - equal:
+          path: spec.template.spec.initContainers[0].command[0]
+          value: nginx
+      - equal:
+          path: spec.template.spec.initContainers[0].args[0]
+          value: -v
+      - equal:
+          path: spec.template.spec.initContainers[0].imagePullPolicy
+          value: Always
+      - isSubset:
+          path: spec.template.spec.initContainers[0].resources
+          content:
+            requests:
+              cpu: 2
+              memory: 512Mi
+
+  - it: test initContainers global resources on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      initContainers:
+        enabled: true
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+    asserts:
+      - isSubset:
+          path: spec.template.spec.initContainers[0].resources
+          content:
+            requests:
+              cpu: 1
+              memory: 128Mi
+
+  ## Testing on jobs
+
+  - it: test default sample values for initContainers on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      initContainers:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.initContainers
+      - lengthEqual:
+          path: spec.template.spec.initContainers
+          count: 1
+
+  # env, envFrom, configMaps mounts, securityContext
+  - it: test initContainers shared values on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      initContainers:
+        enabled: true
+      env:
+        - name: "ENV1"
+          value: "value1"
+      envFrom:
+        - configMapRef:
+           name: "value"
+      securityContext:
+        fsGroup: 2000
+      configMaps:
+        - name: kubedeploy-configmap
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          mount: False
+          data:
+            config: |+
+              config2
+    asserts:
+      - isSubset:
+          path: spec.template.spec.initContainers[0].securityContext
+          content:
+            fsGroup: 2000
+      - isSubset:
+          path: spec.template.spec.initContainers[0].env[0]
+          content:
+            name: ENV1
+            value: value1
+      - isSubset:
+          path: spec.template.spec.initContainers[0].envFrom[0]
+          content:
+            configMapRef:
+              name: value
+      - isSubset:
+          path: spec.template.spec.initContainers[0].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+
+  - it: test initContainers custom values on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      initContainers:
+        enabled: true
+        pullPolicy: Always
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+        containers:
+          - name: "nginx-init"
+            repository: nginx
+            tag: "latest"
+            command: [ "nginx"]
+            args: ["-v"]
+            resources:
+              requests:
+                cpu: 2
+                memory: 512Mi
+    asserts:
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: nginx-init
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: nginx:latest
+      - equal:
+          path: spec.template.spec.initContainers[0].command[0]
+          value: nginx
+      - equal:
+          path: spec.template.spec.initContainers[0].args[0]
+          value: -v
+      - equal:
+          path: spec.template.spec.initContainers[0].imagePullPolicy
+          value: Always
+      - isSubset:
+          path: spec.template.spec.initContainers[0].resources
+          content:
+            requests:
+              cpu: 2
+              memory: 512Mi
+
+  - it: test initContainers global resources on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      initContainers:
+        enabled: true
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+    asserts:
+      - isSubset:
+          path: spec.template.spec.initContainers[0].resources
+          content:
+            requests:
+              cpu: 1
+              memory: 128Mi
+
+  ## Testing on cronjobs
+
+  - it: test default sample values for initContainers on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      initContainers:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.initContainers
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.initContainers
+          count: 1
+
+  # env, envFrom, configMaps mounts, securityContext
+  - it: test initContainers shared values on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      initContainers:
+        enabled: true
+      env:
+        - name: "ENV1"
+          value: "value1"
+      envFrom:
+        - configMapRef:
+           name: "value"
+      securityContext:
+        fsGroup: 2000
+      configMaps:
+        - name: kubedeploy-configmap
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          mount: False
+          data:
+            config: |+
+              config2
+    asserts:
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].securityContext
+          content:
+            fsGroup: 2000
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].env[0]
+          content:
+            name: ENV1
+            value: value1
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].envFrom[0]
+          content:
+            configMapRef:
+              name: value
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+
+  - it: test initContainers custom values on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      initContainers:
+        enabled: true
+        pullPolicy: Always
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+        containers:
+          - name: "nginx-init"
+            repository: nginx
+            tag: "latest"
+            command: [ "nginx"]
+            args: ["-v"]
+            resources:
+              requests:
+                cpu: 2
+                memory: 512Mi
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].name
+          value: nginx-init
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].image
+          value: nginx:latest
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].command[0]
+          value: nginx
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].args[0]
+          value: -v
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].imagePullPolicy
+          value: Always
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].resources
+          content:
+            requests:
+              cpu: 2
+              memory: 512Mi
+
+  - it: test initContainers global resources on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      initContainers:
+        enabled: true
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+    asserts:
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.initContainers[0].resources
+          content:
+            requests:
+              cpu: 1
+              memory: 128Mi

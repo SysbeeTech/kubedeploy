@@ -1,0 +1,239 @@
+suite: test podAntiAffinityTopologyKey
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test soft podAntiAffinityTopologyKey added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      podAntiAffinity: soft
+      podAntiAffinityTopologyKey: "kubernetes.io/zone"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                        - key: app.kubernetes.io/instance
+                          operator: In
+                          values:
+                            - RELEASE-NAME
+                    topologyKey: kubernetes.io/zone
+                  weight: 100
+
+  - it: test hard podAntiAffinityTopologyKey added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      podAntiAffinity: hard
+      podAntiAffinityTopologyKey: "kubernetes.io/zone"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - RELEASE-NAME-kubedeploy
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values:
+                          - RELEASE-NAME
+                  topologyKey: kubernetes.io/zone
+
+  - it: test soft podAntiAffinityTopologyKey added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      podAntiAffinity: soft
+      podAntiAffinityTopologyKey: "kubernetes.io/zone"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                        - key: app.kubernetes.io/instance
+                          operator: In
+                          values:
+                            - RELEASE-NAME
+                    topologyKey: kubernetes.io/zone
+                  weight: 100
+
+  - it: test hard podAntiAffinityTopologyKey added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      podAntiAffinity: hard
+      podAntiAffinityTopologyKey: "kubernetes.io/zone"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - RELEASE-NAME-kubedeploy
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values:
+                          - RELEASE-NAME
+                  topologyKey: kubernetes.io/zone
+
+  - it: test soft podAntiAffinityTopologyKey added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      podAntiAffinity: soft
+      podAntiAffinityTopologyKey: "kubernetes.io/zone"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                        - key: app.kubernetes.io/instance
+                          operator: In
+                          values:
+                            - RELEASE-NAME
+                    topologyKey: kubernetes.io/zone
+                  weight: 100
+
+  - it: test hard podAntiAffinityTopologyKey added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      podAntiAffinity: hard
+      podAntiAffinityTopologyKey: "kubernetes.io/zone"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - RELEASE-NAME-kubedeploy
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values:
+                          - RELEASE-NAME
+                  topologyKey: kubernetes.io/zone
+
+  - it: test soft podAntiAffinityTopologyKey added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      podAntiAffinity: soft
+      podAntiAffinityTopologyKey: "kubernetes.io/zone"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.affinity
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                        - key: app.kubernetes.io/instance
+                          operator: In
+                          values:
+                            - RELEASE-NAME
+                    topologyKey: kubernetes.io/zone
+                  weight: 100
+
+  - it: test hard podAntiAffinityTopologyKey added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      podAntiAffinity: hard
+      podAntiAffinityTopologyKey: "kubernetes.io/zone"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.affinity
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - RELEASE-NAME-kubedeploy
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values:
+                          - RELEASE-NAME
+                  topologyKey: kubernetes.io/zone

@@ -6,8 +6,7 @@ TODO: define port per path
 */}}
 {{- $svcPort := get (.Values.service.ports | first) "port" -}}
 {{- $pathType := .Values.ingress.pathType | default "ImplementationSpecific" }}
-{{- $routePrefix := list "/" }}
-{{- $paths := .Values.ingress.paths | default $routePrefix -}}
+{{- $routePrefix := list (dict "path" "/") }}
 {{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
 {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
 {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
@@ -48,8 +47,9 @@ spec:
     - host: {{ .host | quote }}
       http:
         paths:
+          {{- $paths := .paths |default $routePrefix }}
           {{- range $p := $paths }}
-          - path: {{ $p }}
+          - path: {{ $p.path }}
             {{- if and $pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
             pathType: {{ $pathType }}
             {{- end }}

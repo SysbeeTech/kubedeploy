@@ -1,0 +1,123 @@
+suite: test tolerations
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default tolerations
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.tolerations
+
+  - it: test tolerations added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      tolerations:
+        - key: "example-key"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - operator: "Exists"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.tolerations
+      - lengthEqual:
+          path: spec.template.spec.tolerations
+          count: 2
+      - isSubset:
+          path: spec.template.spec.tolerations[0]
+          content:
+            key: "example-key"
+            operator: "Exists"
+            effect: "NoSchedule"
+      - equal:
+          path: spec.template.spec.tolerations[1].operator
+          value: Exists
+
+  - it: test tolerations added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      tolerations:
+        - key: "example-key"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - operator: "Exists"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.tolerations
+      - lengthEqual:
+          path: spec.template.spec.tolerations
+          count: 2
+      - isSubset:
+          path: spec.template.spec.tolerations[0]
+          content:
+            key: "example-key"
+            operator: "Exists"
+            effect: "NoSchedule"
+      - equal:
+          path: spec.template.spec.tolerations[1].operator
+          value: Exists
+
+  - it: test tolerations added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      tolerations:
+        - key: "example-key"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - operator: "Exists"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.tolerations
+      - lengthEqual:
+          path: spec.template.spec.tolerations
+          count: 2
+      - isSubset:
+          path: spec.template.spec.tolerations[0]
+          content:
+            key: "example-key"
+            operator: "Exists"
+            effect: "NoSchedule"
+      - equal:
+          path: spec.template.spec.tolerations[1].operator
+          value: Exists
+
+  - it: test tolerations added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      tolerations:
+        - key: "example-key"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - operator: "Exists"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.tolerations
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.tolerations
+          count: 2
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.tolerations[0]
+          content:
+            key: "example-key"
+            operator: "Exists"
+            effect: "NoSchedule"
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.tolerations[1].operator
+          value: Exists

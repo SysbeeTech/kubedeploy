@@ -1,0 +1,239 @@
+suite: test podAntiAffinity
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default podAntiAffinity
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.affinity
+
+  - it: test soft podAntiAffinity added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      podAntiAffinity: soft
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                        - key: app.kubernetes.io/instance
+                          operator: In
+                          values:
+                            - RELEASE-NAME
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100
+
+  - it: test hard podAntiAffinity added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      podAntiAffinity: hard
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - RELEASE-NAME-kubedeploy
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values:
+                          - RELEASE-NAME
+                  topologyKey: kubernetes.io/hostname
+
+  - it: test soft podAntiAffinity added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      podAntiAffinity: soft
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                        - key: app.kubernetes.io/instance
+                          operator: In
+                          values:
+                            - RELEASE-NAME
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100
+
+  - it: test hard podAntiAffinity added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      podAntiAffinity: hard
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - RELEASE-NAME-kubedeploy
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values:
+                          - RELEASE-NAME
+                  topologyKey: kubernetes.io/hostname
+
+  - it: test soft podAntiAffinity added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      podAntiAffinity: soft
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                        - key: app.kubernetes.io/instance
+                          operator: In
+                          values:
+                            - RELEASE-NAME
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100
+
+  - it: test hard podAntiAffinity added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      podAntiAffinity: hard
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - RELEASE-NAME-kubedeploy
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values:
+                          - RELEASE-NAME
+                  topologyKey: kubernetes.io/hostname
+
+  - it: test soft podAntiAffinity added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      podAntiAffinity: soft
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.affinity
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                        - key: app.kubernetes.io/instance
+                          operator: In
+                          values:
+                            - RELEASE-NAME
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100
+
+  - it: test hard podAntiAffinity added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      podAntiAffinity: hard
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.affinity
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/name
+                        operator: In
+                        values:
+                          - RELEASE-NAME-kubedeploy
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values:
+                          - RELEASE-NAME
+                  topologyKey: kubernetes.io/hostname

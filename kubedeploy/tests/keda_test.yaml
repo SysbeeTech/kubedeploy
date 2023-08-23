@@ -1,0 +1,132 @@
+suite: test keda
+templates:
+  - keda.yaml
+  - hpa.yaml
+  - deployment.yaml
+
+capabilities:
+  majorVersion: 1
+  minorVersion: 22
+  apiVersions:
+    - autoscaling/v2
+    - keda.sh/v1alpha1
+
+tests:
+  - it: test if keda is disabled by default
+    template: keda.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: test if hpa is disabled when keda is enabled
+    template: hpa.yaml
+    set:
+      keda:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: test if replicas is removed from deployment when keda enabled
+    template: deployment.yaml
+    set:
+      autoscaling:
+        enabled: true
+    asserts:
+      - notExists:
+          path: spec.replicas
+
+  - it: test if keda is enabled with defaults
+    template: keda.yaml
+    set:
+      keda:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ScaledObject
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - isSubset:
+          path: spec.scaleTargetRef
+          content:
+            name: RELEASE-NAME-kubedeploy
+      - equal:
+          path: spec.minReplicaCount
+          value: 1
+      - equal:
+          path: spec.maxReplicaCount
+          value: 10
+      - isNullOrEmpty:
+          path: spec.triggers
+      - equal:
+          path: spec.advanced.restoreToOriginalReplicaCount
+          value: false
+
+  - it: test if keda is enabled with custom values
+    template: keda.yaml
+    set:
+      keda:
+        enabled: true
+        minReplicas: 3
+        maxReplicas: 5
+        pollingInterval: 20
+        cooldownPeriod: 600
+        restoreToOriginalReplicaCount: true
+        scaledObject:
+          annotations:
+            autoscaling.keda.sh/paused-replicas: "0"
+        behavior:
+          scaleDown:
+            stabilizationWindowSeconds: 300
+            policies:
+            - type: Percent
+              value: 100
+              periodSeconds: 15
+        triggers:
+          - type: prometheus
+            metadata:
+              serverAddress: http://<prometheus-host>:9090
+              metricName: haproxy_process_idle_time_percent
+              threshold: '50'
+              query: avg(100-avg_over_time(haproxy_process_idle_time_percent{container="kubernetes-ingress-controller",service="mytest-kubernetes-ingress"}[2m]))
+
+    asserts:
+      - equal:
+          path: spec.minReplicaCount
+          value: 3
+      - equal:
+          path: spec.maxReplicaCount
+          value: 5
+      - equal:
+          path: spec.pollingInterval
+          value: 20
+      - equal:
+          path: spec.cooldownPeriod
+          value: 600
+      - equal:
+          path: spec.advanced.restoreToOriginalReplicaCount
+          value: true
+      - isSubset:
+          path: metadata.annotations
+          content:
+            autoscaling.keda.sh/paused-replicas: "0"
+      - isSubset:
+          path: spec.advanced.horizontalPodAutoscalerConfig.behavior
+          content:
+            scaleDown:
+              stabilizationWindowSeconds: 300
+              policies:
+              - type: Percent
+                value: 100
+                periodSeconds: 15
+      - isSubset:
+          path: spec.triggers[0]
+          content:
+            type: prometheus
+            metadata:
+              serverAddress: http://<prometheus-host>:9090
+              metricName: haproxy_process_idle_time_percent
+              threshold: '50'
+              query: avg(100-avg_over_time(haproxy_process_idle_time_percent{container="kubernetes-ingress-controller",service="mytest-kubernetes-ingress"}[2m]))

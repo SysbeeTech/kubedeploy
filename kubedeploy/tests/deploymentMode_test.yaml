@@ -1,0 +1,127 @@
+suite: test deploymentMode
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+# Only test if each deploymentMode is correctly rendered by dedicated template
+# file, all other files should not produce any output. Path testing inside
+# rendered templates is just to ensure that unique paths for that deployment
+# mode are present. Extensive testing of each deploymentMode is done in other
+# tests
+
+tests:
+  - it: test if deployment by default
+    template: deployment.yaml
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: -kubedeploy$
+      - exists:
+          path: spec.template.spec.containers
+      - isKind:
+          of: Deployment
+      - hasDocuments:
+          count: 0
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 0
+        template: job.yaml
+      - hasDocuments:
+          count: 0
+        template: cronjob.yaml
+
+  - it: test if deployment with setting
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: -kubedeploy$
+      - exists:
+          path: spec.template.spec.containers
+      - isKind:
+          of: Deployment
+      - hasDocuments:
+          count: 0
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 0
+        template: job.yaml
+      - hasDocuments:
+          count: 0
+        template: cronjob.yaml
+
+  - it: test if statefulset with setting
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: -kubedeploy$
+      - exists:
+          path: spec.template.spec.containers
+      - exists:
+          path: spec.serviceName
+      - isKind:
+          of: StatefulSet
+      - hasDocuments:
+          count: 0
+        template: deployment.yaml
+      - hasDocuments:
+          count: 0
+        template: job.yaml
+      - hasDocuments:
+          count: 0
+        template: cronjob.yaml
+
+  - it: test if job with setting
+    template: job.yaml
+    set:
+      deploymentMode: Job
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: -kubedeploy$
+      - exists:
+          path: spec.template.spec.containers
+      - exists:
+          path: spec.parallelism
+      - isKind:
+          of: Job
+      - hasDocuments:
+          count: 0
+        template: deployment.yaml
+      - hasDocuments:
+          count: 0
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 0
+        template: cronjob.yaml
+
+  - it: test if cronjob with setting
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: -kubedeploy$
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.containers
+      - exists:
+          path: spec.schedule
+      - isKind:
+          of: CronJob
+      - hasDocuments:
+          count: 0
+        template: deployment.yaml
+      - hasDocuments:
+          count: 0
+        template: statefulset.yaml
+      - hasDocuments:
+          count: 0
+        template: job.yaml

@@ -1,0 +1,238 @@
+suite: test image
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default image parameters
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "nginx:latest"
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: IfNotPresent
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 30
+      - notExists:
+          path: spec.template.spec.containers[0].command
+      - notExists:
+          path: spec.template.spec.containers[0].args
+      - notExists:
+          path: spec.template.spec.containers[0].lifecycle
+      - notExists:
+          path: spec.template.spec.imagePullSecrets
+
+  - it: test image parameters added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      image:
+        repository: sysbee/kubeci
+        tag: latest
+        pullPolicy: Always
+        command:
+          - echo "test"
+        args:
+          - -n
+        lifecycle:
+          postStart:
+            httpGet:
+              path: /index.html
+              port: 80
+              host: localhost
+              scheme: HTTP
+        terminationGracePeriodSeconds: 60
+      imagePullSecrets:
+        - name: regcreds
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "sysbee/kubeci:latest"
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: Always
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 60
+      - lengthEqual:
+          path: spec.template.spec.containers[0].command
+          count: 1
+      - contains:
+          path: spec.template.spec.containers[0].command
+          content:
+            echo "test"
+      - lengthEqual:
+          path: spec.template.spec.containers[0].args
+          count: 1
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content:
+            -n
+      - exists:
+          path: spec.template.spec.containers[0].lifecycle
+      - exists:
+          path: spec.template.spec.containers[0].lifecycle.postStart
+      - exists:
+          path: spec.template.spec.containers[0].lifecycle.postStart.httpGet
+      - exists:
+          path: spec.template.spec.imagePullSecrets
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: regcreds
+
+  - it: test image parameters added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      image:
+        repository: sysbee/kubeci
+        tag: latest
+        pullPolicy: Always
+        command:
+          - echo "test"
+        args:
+          - -n
+        lifecycle:
+          postStart:
+            httpGet:
+              path: /index.html
+              port: 80
+              host: localhost
+              scheme: HTTP
+        terminationGracePeriodSeconds: 60
+      imagePullSecrets:
+        - name: regcreds
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "sysbee/kubeci:latest"
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: Always
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 60
+      - lengthEqual:
+          path: spec.template.spec.containers[0].command
+          count: 1
+      - contains:
+          path: spec.template.spec.containers[0].command
+          content:
+            echo "test"
+      - lengthEqual:
+          path: spec.template.spec.containers[0].args
+          count: 1
+      - contains:
+          path: spec.template.spec.containers[0].args
+          content:
+            -n
+      - exists:
+          path: spec.template.spec.containers[0].lifecycle
+      - exists:
+          path: spec.template.spec.containers[0].lifecycle.postStart
+      - exists:
+          path: spec.template.spec.containers[0].lifecycle.postStart.httpGet
+      - exists:
+          path: spec.template.spec.imagePullSecrets
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: regcreds
+
+  - it: test image parameters added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      image:
+        repository: sysbee/kubeci
+        tag: latest
+        pullPolicy: Always
+        lifecycle:
+          postStart:
+            httpGet:
+              path: /index.html
+              port: 80
+              host: localhost
+              scheme: HTTP
+        terminationGracePeriodSeconds: 60
+      imagePullSecrets:
+        - name: regcreds
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: "sysbee/kubeci:latest"
+      - equal:
+          path: spec.template.spec.containers[0].imagePullPolicy
+          value: Always
+      - equal:
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 60
+      - exists:
+          path: spec.template.spec.containers[0].lifecycle
+      - exists:
+          path: spec.template.spec.containers[0].lifecycle.postStart
+      - exists:
+          path: spec.template.spec.containers[0].lifecycle.postStart.httpGet
+      - exists:
+          path: spec.template.spec.imagePullSecrets
+      - contains:
+          path: spec.template.spec.imagePullSecrets
+          content:
+            name: regcreds
+
+  - it: test image parameters added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      image:
+        repository: sysbee/kubeci
+        tag: latest
+        pullPolicy: Always
+        lifecycle:
+          postStart:
+            httpGet:
+              path: /index.html
+              port: 80
+              host: localhost
+              scheme: HTTP
+        terminationGracePeriodSeconds: 60
+      imagePullSecrets:
+        - name: regcreds
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: "sysbee/kubeci:latest"
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].imagePullPolicy
+          value: Always
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.terminationGracePeriodSeconds
+          value: 60
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].lifecycle
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].lifecycle.postStart
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].lifecycle.postStart.httpGet
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.imagePullSecrets
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.imagePullSecrets
+          content:
+            name: regcreds

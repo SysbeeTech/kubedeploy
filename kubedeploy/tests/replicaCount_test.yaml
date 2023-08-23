@@ -1,0 +1,46 @@
+suite: test replicaCount
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+
+# Only test if replicaCount is correctly rendered in deployment and
+# statefulset templates
+
+tests:
+  - it: test default replicaCount for deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+
+  - it: test default replicaCount for statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+
+  - it: test custom replicaCount for deployment
+    template: deployment.yaml
+    set:
+      replicaCount: 3
+      deploymentMode: Deployment
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: test custom replicaCount for statefulset
+    template: statefulset.yaml
+    set:
+      replicaCount: 3
+      deploymentMode: Statefulset
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3

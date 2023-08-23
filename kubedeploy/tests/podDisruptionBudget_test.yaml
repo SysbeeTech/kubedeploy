@@ -1,0 +1,93 @@
+suite: test podDisruptionBudget
+templates:
+  - podDisruptionBudget.yaml
+
+tests:
+  - it: test if podDisruptionBudget is disabled by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: test if podDisruptionBudget defaults < 1.21-0
+    set:
+      podDisruptionBudget:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PodDisruptionBudget
+      - isAPIVersion:
+          of: policy/v1beta1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - equal:
+          path: spec.minAvailable
+          value: 1
+      - isSubset:
+          path: spec.selector.matchLabels
+          content:
+            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+            app.kubernetes.io/instance: RELEASE-NAME
+
+  - it: test if podDisruptionBudget defaults >= 1.21-0
+    set:
+      podDisruptionBudget:
+        enabled: true
+    capabilities:
+      majorVersion: 1
+      minorVersion: 21
+      apiVersions:
+        - policy/v1
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PodDisruptionBudget
+      - isAPIVersion:
+          of: policy/v1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - equal:
+          path: spec.minAvailable
+          value: 1
+      - isSubset:
+          path: spec.selector.matchLabels
+          content:
+            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+            app.kubernetes.io/instance: RELEASE-NAME
+
+  - it: test if podDisruptionBudget custom vals >= 1.21-0
+    set:
+      podDisruptionBudget:
+        enabled: true
+        minAvailable: 4
+        maxUnavailable: 2
+    capabilities:
+      majorVersion: 1
+      minorVersion: 21
+      apiVersions:
+        - policy/v1
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PodDisruptionBudget
+      - isAPIVersion:
+          of: policy/v1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - equal:
+          path: spec.minAvailable
+          value: 4
+      - equal:
+          path: spec.maxUnavailable
+          value: 2
+      - isSubset:
+          path: spec.selector.matchLabels
+          content:
+            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+            app.kubernetes.io/instance: RELEASE-NAME

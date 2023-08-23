@@ -1,0 +1,57 @@
+suite: test minReadySeconds
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+
+# Only test if minReadySeconds is correctly rendered in deployment and
+# statefulset templates
+
+tests:
+  - it: test default minReadySeconds for deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+    asserts:
+      - equal:
+          path: spec.minReadySeconds
+          value: 10
+
+  - it: test default minReadySeconds for statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      kubeVersionOverride: "1.23.0"
+    asserts:
+      - equal:
+          path: spec.minReadySeconds
+          value: 10
+
+  - it: test if minRedySeconds is deployed only for 1.22+
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      kubeVersionOverride: "1.21.9"
+    asserts:
+      - notExists:
+          path: spec.minReadySeconds
+
+  - it: test custom minReadySeconds for deployment
+    template: deployment.yaml
+    set:
+      minReadySeconds: 30
+      deploymentMode: Deployment
+    asserts:
+      - equal:
+          path: spec.minReadySeconds
+          value: 30
+
+  - it: test custom minReadySeconds for statefulset
+    template: statefulset.yaml
+    set:
+      minReadySeconds: 30
+      deploymentMode: Statefulset
+      kubeVersionOverride: "1.23.0"
+    asserts:
+      - equal:
+          path: spec.minReadySeconds
+          value: 30

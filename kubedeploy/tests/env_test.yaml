@@ -1,0 +1,103 @@
+suite: test env
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default env
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.containers[0].env
+
+  - it: test env added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      env:
+        - name: ENV1
+          value: "value1"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].env
+      - lengthEqual:
+          path: spec.template.spec.containers[0].env
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: ENV1
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: value1
+
+  - it: test env added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      env:
+        - name: ENV1
+          value: "value1"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].env
+      - lengthEqual:
+          path: spec.template.spec.containers[0].env
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: ENV1
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: value1
+
+  - it: test env added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      env:
+        - name: ENV1
+          value: "value1"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].env
+      - lengthEqual:
+          path: spec.template.spec.containers[0].env
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: ENV1
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: value1
+
+  - it: test env added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      env:
+        - name: ENV1
+          value: "value1"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          count: 1
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[0].name
+          value: ENV1
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env[0].value
+          value: value1

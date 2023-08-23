@@ -1,0 +1,701 @@
+suite: test additionalContainers
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test if additional containers are disabled by default
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 1
+
+  ## check required parameters in additionalContainers.containers
+  - it: test required additionalContainers.containers repository parameter
+    template: deployment.yaml
+    set:
+      additionalContainers:
+        enabled: true
+        containers:
+          - name: test
+            tag: whatever
+    asserts:
+      - failedTemplate:
+          errorMessage: Please define valid additional container repository
+
+  - it: test required additionalContainers.containers name parameter
+    template: deployment.yaml
+    set:
+      additionalContainers:
+        enabled: true
+        containers:
+          - repository: nginx
+            tag: whatever
+    asserts:
+      - failedTemplate:
+          errorMessage: Please define valid additional container name
+
+    ## Testing on deployments
+
+  - it: test default sample values for additionalContainers on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      additionalContainers:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 2
+
+  # env, envFrom, configMaps mounts, securityContext
+  - it: test additionalContainers shared values on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      additionalContainers:
+        enabled: true
+      env:
+        - name: "ENV1"
+          value: "value1"
+      envFrom:
+        - configMapRef:
+           name: "value"
+      securityContext:
+        fsGroup: 2000
+      configMaps:
+        - name: kubedeploy-configmap
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          mount: False
+          data:
+            config: |+
+              config2
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[1].securityContext
+          content:
+            fsGroup: 2000
+      - isSubset:
+          path: spec.template.spec.containers[1].env[0]
+          content:
+            name: ENV1
+            value: value1
+      - isSubset:
+          path: spec.template.spec.containers[1].envFrom[0]
+          content:
+            configMapRef:
+              name: value
+      - isSubset:
+          path: spec.template.spec.containers[1].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+
+  - it: test additionalContainers custom values on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      additionalContainers:
+        enabled: true
+        pullPolicy: Always
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+        containers:
+          - name: "nginx-init"
+            repository: nginx
+            tag: "latest"
+            command: [ "nginx"]
+            args: ["-v"]
+            resources:
+              requests:
+                cpu: 2
+                memory: 512Mi
+            ports:
+              - name: nginx
+                containerPort: 80
+                protocol: TCP
+            healthcheck:
+              enabled: true
+              probes:
+                livenessProbe:
+                  httpGet:
+                    path: /_health
+                    port: http
+                readinessProbe:
+                  httpGet:
+                    path: /_health
+                    port: http
+
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[1].name
+          value: nginx-init
+      - equal:
+          path: spec.template.spec.containers[1].image
+          value: nginx:latest
+      - equal:
+          path: spec.template.spec.containers[1].command[0]
+          value: nginx
+      - equal:
+          path: spec.template.spec.containers[1].args[0]
+          value: -v
+      - equal:
+          path: spec.template.spec.containers[1].imagePullPolicy
+          value: Always
+      - isSubset:
+          path: spec.template.spec.containers[1].resources
+          content:
+            requests:
+              cpu: 2
+              memory: 512Mi
+      - lengthEqual:
+          path: spec.template.spec.containers[1].ports
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[1].ports[0].name
+          value: "nginx"
+      - equal:
+          path: spec.template.spec.containers[1].ports[0].containerPort
+          value: 80
+      - equal:
+          path: spec.template.spec.containers[1].ports[0].protocol
+          value: TCP
+      - isSubset:
+          path: spec.template.spec.containers[1].livenessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+      - isSubset:
+          path: spec.template.spec.containers[1].readinessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+
+  - it: test additionalContainers global resources on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      additionalContainers:
+        enabled: true
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[1].resources
+          content:
+            requests:
+              cpu: 1
+              memory: 128Mi
+
+    ## Testing on statefulsets
+
+  - it: test default sample values for additionalContainers on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      additionalContainers:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 2
+
+  # env, envFrom, configMaps mounts, securityContext
+  - it: test additionalContainers shared values on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      additionalContainers:
+        enabled: true
+      env:
+        - name: "ENV1"
+          value: "value1"
+      envFrom:
+        - configMapRef:
+           name: "value"
+      securityContext:
+        fsGroup: 2000
+      configMaps:
+        - name: kubedeploy-configmap
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          mount: False
+          data:
+            config: |+
+              config2
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[1].securityContext
+          content:
+            fsGroup: 2000
+      - isSubset:
+          path: spec.template.spec.containers[1].env[0]
+          content:
+            name: ENV1
+            value: value1
+      - isSubset:
+          path: spec.template.spec.containers[1].envFrom[0]
+          content:
+            configMapRef:
+              name: value
+      - isSubset:
+          path: spec.template.spec.containers[1].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+
+  - it: test additionalContainers custom values on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      additionalContainers:
+        enabled: true
+        pullPolicy: Always
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+        containers:
+          - name: "nginx-init"
+            repository: nginx
+            tag: "latest"
+            command: [ "nginx"]
+            args: ["-v"]
+            resources:
+              requests:
+                cpu: 2
+                memory: 512Mi
+            ports:
+              - name: nginx
+                containerPort: 80
+                protocol: TCP
+            healthcheck:
+              enabled: true
+              probes:
+                livenessProbe:
+                  httpGet:
+                    path: /_health
+                    port: http
+                readinessProbe:
+                  httpGet:
+                    path: /_health
+                    port: http
+
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[1].name
+          value: nginx-init
+      - equal:
+          path: spec.template.spec.containers[1].image
+          value: nginx:latest
+      - equal:
+          path: spec.template.spec.containers[1].command[0]
+          value: nginx
+      - equal:
+          path: spec.template.spec.containers[1].args[0]
+          value: -v
+      - equal:
+          path: spec.template.spec.containers[1].imagePullPolicy
+          value: Always
+      - isSubset:
+          path: spec.template.spec.containers[1].resources
+          content:
+            requests:
+              cpu: 2
+              memory: 512Mi
+      - lengthEqual:
+          path: spec.template.spec.containers[1].ports
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[1].ports[0].name
+          value: "nginx"
+      - equal:
+          path: spec.template.spec.containers[1].ports[0].containerPort
+          value: 80
+      - equal:
+          path: spec.template.spec.containers[1].ports[0].protocol
+          value: TCP
+      - isSubset:
+          path: spec.template.spec.containers[1].livenessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+      - isSubset:
+          path: spec.template.spec.containers[1].readinessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+
+  - it: test additionalContainers global resources on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      additionalContainers:
+        enabled: true
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[1].resources
+          content:
+            requests:
+              cpu: 1
+              memory: 128Mi
+
+  ## Testing on jobs
+
+  - it: test default sample values for additionalContainers on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      additionalContainers:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 2
+
+  # env, envFrom, configMaps mounts, securityContext
+  - it: test additionalContainers shared values on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      additionalContainers:
+        enabled: true
+      env:
+        - name: "ENV1"
+          value: "value1"
+      envFrom:
+        - configMapRef:
+           name: "value"
+      securityContext:
+        fsGroup: 2000
+      configMaps:
+        - name: kubedeploy-configmap
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          mount: False
+          data:
+            config: |+
+              config2
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[1].securityContext
+          content:
+            fsGroup: 2000
+      - isSubset:
+          path: spec.template.spec.containers[1].env[0]
+          content:
+            name: ENV1
+            value: value1
+      - isSubset:
+          path: spec.template.spec.containers[1].envFrom[0]
+          content:
+            configMapRef:
+              name: value
+      - isSubset:
+          path: spec.template.spec.containers[1].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+
+  - it: test additionalContainers custom values on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      additionalContainers:
+        enabled: true
+        pullPolicy: Always
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+        containers:
+          - name: "nginx-init"
+            repository: nginx
+            tag: "latest"
+            command: [ "nginx"]
+            args: ["-v"]
+            resources:
+              requests:
+                cpu: 2
+                memory: 512Mi
+            ports:
+              - name: nginx
+                containerPort: 80
+                protocol: TCP
+            healthcheck:
+              enabled: true
+              probes:
+                livenessProbe:
+                  httpGet:
+                    path: /_health
+                    port: http
+                readinessProbe:
+                  httpGet:
+                    path: /_health
+                    port: http
+
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[1].name
+          value: nginx-init
+      - equal:
+          path: spec.template.spec.containers[1].image
+          value: nginx:latest
+      - equal:
+          path: spec.template.spec.containers[1].command[0]
+          value: nginx
+      - equal:
+          path: spec.template.spec.containers[1].args[0]
+          value: -v
+      - equal:
+          path: spec.template.spec.containers[1].imagePullPolicy
+          value: Always
+      - isSubset:
+          path: spec.template.spec.containers[1].resources
+          content:
+            requests:
+              cpu: 2
+              memory: 512Mi
+      - lengthEqual:
+          path: spec.template.spec.containers[1].ports
+          count: 1
+      - equal:
+          path: spec.template.spec.containers[1].ports[0].name
+          value: "nginx"
+      - equal:
+          path: spec.template.spec.containers[1].ports[0].containerPort
+          value: 80
+      - equal:
+          path: spec.template.spec.containers[1].ports[0].protocol
+          value: TCP
+      - isSubset:
+          path: spec.template.spec.containers[1].livenessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+      - isSubset:
+          path: spec.template.spec.containers[1].readinessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+
+  - it: test additionalContainers global resources on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      additionalContainers:
+        enabled: true
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[1].resources
+          content:
+            requests:
+              cpu: 1
+              memory: 128Mi
+
+  ## Testing on cronjobs
+
+  - it: test default sample values for additionalContainers on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      additionalContainers:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.containers
+          count: 2
+
+  # env, envFrom, configMaps mounts, securityContext
+  - it: test additionalContainers shared values on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      additionalContainers:
+        enabled: true
+      env:
+        - name: "ENV1"
+          value: "value1"
+      envFrom:
+        - configMapRef:
+           name: "value"
+      securityContext:
+        fsGroup: 2000
+      configMaps:
+        - name: kubedeploy-configmap
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          mount: False
+          data:
+            config: |+
+              config2
+    asserts:
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[1].securityContext
+          content:
+            fsGroup: 2000
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[1].env[0]
+          content:
+            name: ENV1
+            value: value1
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[1].envFrom[0]
+          content:
+            configMapRef:
+              name: value
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[1].volumeMounts[0]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+
+  - it: test additionalContainers custom values on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      additionalContainers:
+        enabled: true
+        pullPolicy: Always
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+        containers:
+          - name: "nginx-init"
+            repository: nginx
+            tag: "latest"
+            command: [ "nginx"]
+            args: ["-v"]
+            resources:
+              requests:
+                cpu: 2
+                memory: 512Mi
+            ports:
+              - name: nginx
+                containerPort: 80
+                protocol: TCP
+            healthcheck:
+              enabled: true
+              probes:
+                livenessProbe:
+                  httpGet:
+                    path: /_health
+                    port: http
+                readinessProbe:
+                  httpGet:
+                    path: /_health
+                    port: http
+
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[1].name
+          value: nginx-init
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[1].image
+          value: nginx:latest
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[1].command[0]
+          value: nginx
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[1].args[0]
+          value: -v
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[1].imagePullPolicy
+          value: Always
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[1].resources
+          content:
+            requests:
+              cpu: 2
+              memory: 512Mi
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.containers[1].ports
+          count: 1
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[1].ports[0].name
+          value: "nginx"
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[1].ports[0].containerPort
+          value: 80
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[1].ports[0].protocol
+          value: TCP
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[1].livenessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[1].readinessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+
+  - it: test additionalContainers global resources on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      additionalContainers:
+        enabled: true
+        resources:
+          requests:
+            cpu: 1
+            memory: 128Mi
+    asserts:
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[1].resources
+          content:
+            requests:
+              cpu: 1
+              memory: 128Mi

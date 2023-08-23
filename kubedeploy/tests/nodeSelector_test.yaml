@@ -1,0 +1,75 @@
+suite: test nodeSelector
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default nodeSelector
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.nodeSelector
+
+  - it: test nodeSelector added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      nodeSelector:
+        systemnode: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.nodeSelector
+      - equal:
+          path: spec.template.spec.nodeSelector.systemnode
+          value: "true"
+
+  - it: test nodeSelector added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      nodeSelector:
+        systemnode: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.nodeSelector
+      - equal:
+          path: spec.template.spec.nodeSelector.systemnode
+          value: "true"
+
+  - it: test nodeSelector added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      nodeSelector:
+        systemnode: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.nodeSelector
+      - equal:
+          path: spec.template.spec.nodeSelector.systemnode
+          value: "true"
+
+  - it: test nodeSelector added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      nodeSelector:
+        systemnode: "true"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.nodeSelector
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.nodeSelector.systemnode
+          value: "true"

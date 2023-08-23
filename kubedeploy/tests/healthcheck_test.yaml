@@ -1,0 +1,458 @@
+suite: test healthcheck
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  # By default healthecks should not be rendered
+  - it: test default healthcheck
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  ## deploymentMode: Deployment testing
+
+  # If ports with name "http" is specified, then automatic healthchecks should
+  # be rendered
+
+  - it: test automatic healthcheck on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[0].livenessProbe
+          content:
+            httpGet:
+              path: /
+              port: http
+      - isSubset:
+          path: spec.template.spec.containers[0].readinessProbe
+          content:
+            httpGet:
+              path: /
+              port: http
+
+  - it: test automatic healthcheck with http2 port name on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      ports:
+        - name: http2
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  # test disabling automatic healthchecks even if port with name http is specified
+  - it: test disabling automatic healthcheck on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      healthcheck:
+        disableAutomatic: true
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  # Enabling the healthcheck without defining probes should have simillar effect
+  # as with disabling the automatic ones
+  - it: test healthcheck with empty custom probes on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      healthcheck:
+        enabled: true
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].livenessProbe
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  - it: test custom healthcheck probes on deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      healthcheck:
+        enabled: true
+        probes:
+          livenessProbe:
+            httpGet:
+              path: /_health
+              port: http
+
+          readinessProbe:
+            httpGet:
+              path: /_health
+              port: http
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[0].livenessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+      - isSubset:
+          path: spec.template.spec.containers[0].readinessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+
+  ## deploymentMode: Statefulset testing
+
+  # If ports with name "http" is specified, then automatic healthchecks should
+  # be rendered
+
+  - it: test automatic healthcheck on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[0].livenessProbe
+          content:
+            httpGet:
+              path: /
+              port: http
+      - isSubset:
+          path: spec.template.spec.containers[0].readinessProbe
+          content:
+            httpGet:
+              path: /
+              port: http
+
+  - it: test automatic healthcheck with http2 port name on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      ports:
+        - name: http2
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  # test disabling automatic healthchecks even if port with name http is specified
+  - it: test disabling automatic healthcheck on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      healthcheck:
+        disableAutomatic: true
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  # Enabling the healthcheck without defining probes should have simillar effect
+  # as with disabling the automatic ones
+  - it: test healthcheck with empty custom probes on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      healthcheck:
+        enabled: true
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].livenessProbe
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  - it: test custom healthcheck probes on statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      healthcheck:
+        enabled: true
+        probes:
+          livenessProbe:
+            httpGet:
+              path: /_health
+              port: http
+
+          readinessProbe:
+            httpGet:
+              path: /_health
+              port: http
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[0].livenessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+      - isSubset:
+          path: spec.template.spec.containers[0].readinessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+
+  ## deploymentMode: Job testing
+
+  # If ports with name "http" is specified, then automatic healthchecks should
+  # be rendered
+
+  - it: test automatic healthcheck on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[0].livenessProbe
+          content:
+            httpGet:
+              path: /
+              port: http
+      - isSubset:
+          path: spec.template.spec.containers[0].readinessProbe
+          content:
+            httpGet:
+              path: /
+              port: http
+
+  - it: test automatic healthcheck with http2 port name on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      ports:
+        - name: http2
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  # test disabling automatic healthchecks even if port with name http is specified
+  - it: test disabling automatic healthcheck on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      healthcheck:
+        disableAutomatic: true
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  # Enabling the healthcheck without defining probes should have simillar effect
+  # as with disabling the automatic ones
+  - it: test healthcheck with empty custom probes on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      healthcheck:
+        enabled: true
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].livenessProbe
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[0].readinessProbe
+
+  - it: test custom healthcheck probes on job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      healthcheck:
+        enabled: true
+        probes:
+          livenessProbe:
+            httpGet:
+              path: /_health
+              port: http
+
+          readinessProbe:
+            httpGet:
+              path: /_health
+              port: http
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isSubset:
+          path: spec.template.spec.containers[0].livenessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+      - isSubset:
+          path: spec.template.spec.containers[0].readinessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+
+  ## deploymentMode: Cronjob testing
+
+  # If ports with name "http" is specified, then automatic healthchecks should
+  # be rendered
+
+  - it: test automatic healthcheck on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[0].livenessProbe
+          content:
+            httpGet:
+              path: /
+              port: http
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[0].readinessProbe
+          content:
+            httpGet:
+              path: /
+              port: http
+
+  - it: test automatic healthcheck with http2 port name on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      ports:
+        - name: http2
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].readinessProbe
+
+  # test disabling automatic healthchecks even if port with name http is specified
+  - it: test disabling automatic healthcheck on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      healthcheck:
+        disableAutomatic: true
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].readinessProbe
+
+  # Enabling the healthcheck without defining probes should have simillar effect
+  # as with disabling the automatic ones
+  - it: test healthcheck with empty custom probes on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      healthcheck:
+        enabled: true
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isNullOrEmpty:
+          path: spec.jobTemplate.spec.template.spec.containers[0].livenessProbe
+      - isNullOrEmpty:
+          path: spec.jobTemplate.spec.template.spec.containers[0].readinessProbe
+
+  - it: test custom healthcheck probes on cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      healthcheck:
+        enabled: true
+        probes:
+          livenessProbe:
+            httpGet:
+              path: /_health
+              port: http
+
+          readinessProbe:
+            httpGet:
+              path: /_health
+              port: http
+      ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+    asserts:
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[0].livenessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.containers[0].readinessProbe
+          content:
+            httpGet:
+              path: /_health
+              port: http

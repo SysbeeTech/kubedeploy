@@ -191,7 +191,7 @@ Kubernetes: `>=1.20.0-0`
 | podDisruptionBudget.minAvailable | int | `1` | Minimum available replicas |
 | podSecurityContext | object | `{}` | Define pod's [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | ports | list | `[]` | Define container ports that will be exposed see: [containerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core) |
-| replicaCount | int | `1` | Number of pods to load balance across |
+| replicaCount | int | `1` | Number of pods to load balance across. Applicable to Deployment and Statefulset deploymentMode |
 | resources | object | `{}` | We usually recommend not to specify default resources and to leave this as a conscious choice for the user. This also increases chances charts run on environments with little resources, such as Minikube. See [resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for syntax |
 | securityContext | object | `{}` | Define container's [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | service.enabled | bool | `true` | Controls if the service should be deployed for this release |

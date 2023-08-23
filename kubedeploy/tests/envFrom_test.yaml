@@ -1,0 +1,99 @@
+suite: test envFrom
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default envFrom
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.containers[0].envFrom
+
+  - it: test envFrom added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      envFrom:
+        - configMapRef:
+            name: "value"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].envFrom
+      - lengthEqual:
+          path: spec.template.spec.containers[0].envFrom
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].envFrom[0].configMapRef
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].configMapRef.name
+          value: value
+
+  - it: test envFrom added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      envFrom:
+        - configMapRef:
+            name: "value"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].envFrom
+      - lengthEqual:
+          path: spec.template.spec.containers[0].envFrom
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].envFrom[0].configMapRef
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].configMapRef.name
+          value: value
+
+  - it: test envFrom added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      envFrom:
+        - configMapRef:
+            name: "value"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].envFrom
+      - lengthEqual:
+          path: spec.template.spec.containers[0].envFrom
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].envFrom[0].configMapRef
+      - equal:
+          path: spec.template.spec.containers[0].envFrom[0].configMapRef.name
+          value: value
+
+  - it: test envFrom added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      envFrom:
+        - configMapRef:
+            name: "value"
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom[0].configMapRef
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].envFrom[0].configMapRef.name
+          value: value

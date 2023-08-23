@@ -1,0 +1,147 @@
+suite: test topologySpreadConstraints
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default topologySpreadConstraints
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.topologySpreadConstraints
+
+  - it: test topologySpreadConstraints added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: foo
+          matchLabelKeys:
+            - pod-template-hash
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.topologySpreadConstraints
+      - lengthEqual:
+          path: spec.template.spec.topologySpreadConstraints
+          count: 1
+      - isSubset:
+          path: spec.template.spec.topologySpreadConstraints[0]
+          content:
+            maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app: foo
+            matchLabelKeys:
+              - pod-template-hash
+
+  - it: test topologySpreadConstraints added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: foo
+          matchLabelKeys:
+            - pod-template-hash
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.topologySpreadConstraints
+      - lengthEqual:
+          path: spec.template.spec.topologySpreadConstraints
+          count: 1
+      - isSubset:
+          path: spec.template.spec.topologySpreadConstraints[0]
+          content:
+            maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app: foo
+            matchLabelKeys:
+              - pod-template-hash
+
+  - it: test topologySpreadConstraints added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: foo
+          matchLabelKeys:
+            - pod-template-hash
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.topologySpreadConstraints
+      - lengthEqual:
+          path: spec.template.spec.topologySpreadConstraints
+          count: 1
+      - isSubset:
+          path: spec.template.spec.topologySpreadConstraints[0]
+          content:
+            maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app: foo
+            matchLabelKeys:
+              - pod-template-hash
+
+  - it: test topologySpreadConstraints added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: foo
+          matchLabelKeys:
+            - pod-template-hash
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.topologySpreadConstraints
+      - lengthEqual:
+          path: spec.jobTemplate.spec.template.spec.topologySpreadConstraints
+          count: 1
+      - isSubset:
+          path: spec.jobTemplate.spec.template.spec.topologySpreadConstraints[0]
+          content:
+            maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app: foo
+            matchLabelKeys:
+              - pod-template-hash

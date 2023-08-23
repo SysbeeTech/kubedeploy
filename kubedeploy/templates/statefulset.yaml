@@ -12,19 +12,19 @@ spec:
     matchLabels:
       {{- include "kubedeploy.selectorLabels" . | nindent 6 }}
   serviceName: {{ include "kubedeploy.fullname" . }}
-  {{- if semverCompare ">=1.22-0" .Capabilities.KubeVersion.GitVersion -}}
+  {{- if semverCompare ">=1.22-0" (include "kubedeploy.kubeVersion" .) -}}
   {{- with .Values.minReadySeconds }}
   minReadySeconds: {{ . }}
   {{- end }}
   {{- end }}
   template:
     metadata:
-      {{- if or .Values.podAnnotations .Values.configMapHash }}
+      {{- if or .Values.podAnnotations .Values.configMapsHash }}
       annotations:
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.configMapHash }}
+      {{- if .Values.configMapsHash }}
         checksum/config: {{ include (print $.Template.BasePath "/configmaps.yaml") . | sha256sum }}
       {{- end }}
       {{- end }}

@@ -102,33 +102,32 @@ configmap name generator
 {{- printf "%s-%s" $fullName $name -}}
 {{- end -}}
 
-
 {{/*
 VolumeMounts for containers
 */}}
 {{- define "kubedeploy.volumeMounts" -}}
 {{- $fullName := include "kubedeploy.fullname" . -}}
-{{- /* Iterate over confiMaps mounts to count how many should be mounted */ -}}
+{{/* Iterate over confiMaps mounts to count how many should be mounted */}}
 {{- $cfgmountcount := 0 -}}
 {{- range .Values.configMaps -}}
 {{- if eq (toString .mount |lower) "true" -}}
 {{- $cfgmountcount = add $cfgmountcount 1 -}}
 {{- end -}}
 {{- end -}}
-{{- /* Define which volumes should be mounted */ -}}
-{{- if and (.Values.persistency.enabled) (eq (toString .Values.deploymentMode) "Statefulset") -}}
+{{/* Define which volumes should be mounted */}}
+{{ if and (.Values.persistency.enabled) (eq (toString .Values.deploymentMode) "Statefulset") -}}
 - mountPath: {{ .Values.persistency.mountPath }}
   name: {{ $fullName }}
-{{- else if gt $cfgmountcount 0 }}
-{{- /* skip adding anything if there are cfgmounts to be added */ -}}
+{{ else if gt $cfgmountcount 0 -}}
+{{/* skip adding anything if there are cfgmounts to be added */}}
 {{- else }}
   []
-{{- end }}
-{{- /* Now process configmap mounts */ -}}
+{{- end -}}
+{{/* Now process configmap mounts */}}
 {{- if gt $cfgmountcount 0 -}}
-{{- range .Values.configMaps }}
+{{- range .Values.configMaps -}}
 {{- $name := include "kubedeploy.cfgmapname" (list $ .) -}}
-{{- if eq (toString .mount | lower) "true" }}
+{{- if eq (toString .mount | lower) "true" -}}
 - mountPath: {{ required "You need to define .Values.configMaps[].mountPath if .Values.configMaps[].mount is set to True" .mountPath }}
   name: {{ $name }}
 {{- end }}
@@ -213,7 +212,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumeMounts:
-        {{- include "kubedeploy.volumeMounts" $ | nindent 6 }}
+        {{- include "kubedeploy.volumeMounts" $ | indent 8 }}
       resources:
         {{- if not .resources }}
         {{- toYaml $.Values.initContainers.resources | nindent 8 -}}
@@ -234,22 +233,38 @@ spec:
       {{- end }}
       image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
       imagePullPolicy: {{ .Values.image.pullPolicy |default "IfNotPresent" }}
+      {{- if eq (toString .Values.deploymentMode) "Job" }}
+      {{- with .Values.jobspec.command }}
       command:
-        {{- if eq (toString .Values.deploymentMode) "Job" }}
-        {{- toYaml .Values.jobspec.command |nindent 8 }}
-        {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
-        {{- toYaml .Values.cronjobspec.command |nindent 8 }}
-        {{- else }}
-        {{- toYaml .Values.image.command |nindent 8 }}
-        {{- end }}
+      {{- toYaml . |nindent 8 }}
+      {{- end }}
+      {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
+      {{- with .Values.cronjobspec.command }}
+      command:
+      {{- toYaml . |nindent 8 }}
+      {{- end }}
+      {{- else }}
+      {{- with .Values.image.command }}
+      command:
+      {{- toYaml . |nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- if eq (toString .Values.deploymentMode) "Job" }}
+      {{- with .Values.jobspec.args}}
       args:
-        {{- if eq (toString .Values.deploymentMode) "Job" }}
-        {{- toYaml .Values.jobspec.args |nindent 8 }}
-        {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
-        {{- toYaml .Values.cronjobspec.args |nindent 8 }}
-        {{- else }}
-        {{- toYaml .Values.image.args |nindent 8 }}
-        {{- end }}
+      {{- toYaml . |nindent 8 }}
+      {{- end }}
+      {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
+      {{- with .Values.cronjobspec.args }}
+      args:
+      {{- toYaml . |nindent 8 }}
+      {{- end }}
+      {{- else }}
+      {{- with .Values.image.args }}
+      args:
+      {{- toYaml . |nindent 8 }}
+      {{- end }}
+      {{- end }}
       {{- with .Values.env }}
       env:
         {{- toYaml . | nindent 8 }}
@@ -285,7 +300,7 @@ spec:
         {{- end }}
       {{- end }}
       volumeMounts:
-        {{- include "kubedeploy.volumeMounts" . | nindent 8 }}
+        {{- include "kubedeploy.volumeMounts" . | indent 8 }}
       {{- with .Values.resources }}
       resources:
         {{- toYaml . | nindent 8 }}
@@ -327,7 +342,7 @@ spec:
       {{- end }}
       {{- end }}
       volumeMounts:
-        {{- include "kubedeploy.volumeMounts" $ | nindent 8 }}
+        {{- include "kubedeploy.volumeMounts" $ | indent 8 }}
       resources:
         {{- if not .resources -}}
         {{- toYaml $.Values.additionalContainers.resources | nindent 8 -}}

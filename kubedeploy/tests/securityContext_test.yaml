@@ -1,0 +1,75 @@
+suite: test securityContext
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+tests:
+  - it: test default securityContext
+    template: deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+      - notExists:
+          path: spec.template.spec.containers[0].securityContext
+
+  - it: test securityContext added to deployment
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      securityContext:
+        fsGroup: 2000
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].securityContext
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.fsGroup
+          value: 2000
+
+  - it: test securityContext added to statefulset
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      securityContext:
+        fsGroup: 2000
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].securityContext
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.fsGroup
+          value: 2000
+
+  - it: test securityContext added to job
+    template: job.yaml
+    set:
+      deploymentMode: Job
+      securityContext:
+        fsGroup: 2000
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.containers[0].securityContext
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.fsGroup
+          value: 2000
+
+  - it: test securityContext added to cronjob
+    template: cronjob.yaml
+    set:
+      deploymentMode: Cronjob
+      securityContext:
+        fsGroup: 2000
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.fsGroup
+          value: 2000
