@@ -163,6 +163,12 @@ releases:
       - ingress:
           enabled: true
           className: haproxy
+          hosts:
+            - host: chart-examlple.local
+              paths:
+                - path: /
+                  svcPort: 8080
+                  pathType: Prefix
       - resources:
           limits:
             cpu: 500m

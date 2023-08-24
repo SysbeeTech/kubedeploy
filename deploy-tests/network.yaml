@@ -69,6 +69,8 @@ releases:
     values:
       - ingress:
           enabled: true
+          hosts:
+            - host: chart-example.local
       - monitoring:
           enabled: true
       - ports:

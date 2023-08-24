@@ -310,6 +310,12 @@ ingress:
   className: "haproxy"
   # -- Default Ingress pathType
   pathType: ImplementationSpecific
+  # -- Deploy ingress object with SSL support. Automatically configures the ingress
+  # tls spec with all the configured ingress.hosts in one secret
+  withSSL: true
+  # -- Define default service port that will be targeted by ingress.
+  # @default -- use first port from service.ports
+  svcPort: ""
   # -- Additional Ingress annotations
   # @default -- defaults to support cert-manager letsencrypt issuer
   annotations:
@@ -318,23 +324,27 @@ ingress:
   # @default -- see ingress.hosts[0] values
   hosts:
       # ingress.hosts[0].host -- (string, required) Define Ingress hostname
-      # @default -- chart-example.local
-    - host: chart-example.local
+    - host: ""
       # -- (list) Ingress host paths
-      paths:
-        - path: /
-  # -- (list) Ingress TLS list
-  # @default -- see ingress.tls[0] values
-  tls:
-    # ingress.tls[0].secretName -- (string, required) Name of the secret to use for storing ssl certificate
-    # @default -- chart-example-tls
-    - secretName: chart-example-tls
-      # -- (list) List of TLS enabled Ingress hosts
-      hosts:
-        - chart-example.local
+      # see values.yaml for example
+      paths: []
+        # - path: / # (optional) defaults to /
+        #   svcPort: 5555 # (optional) custom service port for path
+        #   pathType: Prefix # (optional) custom pathType
+
+  # ingress.tls -- (list) Ingress TLS list
+  # **overrides any auto configured tls config created by withSSL**.
+  #
+  # It allows custom secretName and host list to be defined in case you have
+  # pre-configured SSL stored as Kubernetes secret.
+  # If secret does not exist, new one will be created by cert-manager.
+  # see values for example:
+  tls: []
+    #- hosts: # (required) - list of hosts covered by ssl in secret
+    #    - example-domain.local
+    #  secretName: example-domain-tls # (optional) name of secret with SSL certificate
 
 persistency:
-
   # -- (string) Define custom name for persistent storage class name
   # @default -- uses cluster default storageClassName
   storageClassName:

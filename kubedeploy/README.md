@@ -127,12 +127,12 @@ Kubernetes: `>=1.20.0-0`
 | ingress.className | string | `"haproxy"` | Ingress class name |
 | ingress.enabled | bool | `false` | Enable Ingres for release |
 | ingress.hosts | list | see ingress.hosts[0] values | Ingress host list. |
-| ingress.hosts[0].host | string, required | chart-example.local | Define Ingress hostname |
-| ingress.hosts[0].paths | list | `[{"path":"/"}]` | Ingress host paths |
+| ingress.hosts[0].host | string, required | `""` | Define Ingress hostname |
+| ingress.hosts[0].paths | list | `[]` | Ingress host paths see values.yaml for example |
 | ingress.pathType | string | `"ImplementationSpecific"` | Default Ingress pathType |
-| ingress.tls | list | see ingress.tls[0] values | Ingress TLS list |
-| ingress.tls[0].hosts | list | `["chart-example.local"]` | List of TLS enabled Ingress hosts |
-| ingress.tls[0].secretName | string, required | chart-example-tls | Name of the secret to use for storing ssl certificate |
+| ingress.svcPort | string | use first port from service.ports | Define default service port that will be targeted by ingress. |
+| ingress.tls | list | `[]` | Ingress TLS list **overrides any auto configured tls config created by withSSL**.  It allows custom secretName and host list to be defined in case you have pre-configured SSL stored as Kubernetes secret. If secret does not exist, new one will be created by cert-manager. see values for example: |
+| ingress.withSSL | bool | `true` | Deploy ingress object with SSL support. Automatically configures the ingress tls spec with all the configured ingress.hosts in one secret |
 | initContainers.containers | list | see below | sequential list of init containers. Each init container must complete successfully before the next one starts |
 | initContainers.containers[0].args | list | `[]` | Define custom arguments for initContainer |
 | initContainers.containers[0].command | list | `["sh","-c","exit 0"]` | Define custom command for initContainer to run |
