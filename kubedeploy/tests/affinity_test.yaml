@@ -14,6 +14,48 @@ tests:
       - notExists:
           path: spec.template.spec.affinity
 
+  - it: test if affinity overrides podAntiAffinity
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      podAntiAffinity: soft
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - RELEASE-NAME-kubedeploy
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+
+    asserts:
+      - hasDocuments:
+          count: 1
+      - exists:
+          path: spec.template.spec.affinity
+      - isNotSubset:
+          path: spec.template.spec.affinity
+          content:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values:
+                            - RELEASE-NAME-kubedeploy
+                        - key: app.kubernetes.io/instance
+                          operator: In
+                          values:
+                            - RELEASE-NAME
+                    topologyKey: kubernetes.io/hostname
+                  weight: 100
+
   - it: test affinity added to deployment
     template: deployment.yaml
     set:

@@ -420,9 +420,11 @@ spec:
   {{- if or .Values.affinity .Values.podAntiAffinity }}
   affinity:
   {{- end }}
+  {{- if .Values.affinity }}
   {{- with .Values.affinity }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- else }}
   {{- if eq .Values.podAntiAffinity "hard" }}
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -439,6 +441,7 @@ spec:
             labelSelector:
               matchExpressions:
                 {{- include "kubedeploy.matchExpressions" . | nindent 16 }}
+  {{- end }}
   {{- end }}
   {{- with .Values.image.terminationGracePeriodSeconds }}
   terminationGracePeriodSeconds: {{ . | default 30 }}

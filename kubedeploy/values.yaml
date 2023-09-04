@@ -459,6 +459,7 @@ extraObjects: []
   #     password: t0p-Secret
 
 # -- Define pod [affinity](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/)
+# disables automatic podAntiAffinity rules if defined.
 affinity: {}
 
 podDisruptionBudget:

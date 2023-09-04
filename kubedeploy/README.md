@@ -88,7 +88,7 @@ Kubernetes: `>=1.20.0-0`
 | additionalContainers.enabled | bool | `false` | define if we should deploy additional containers within a pod see https://kubernetes.io/docs/concepts/workloads/pods/ |
 | additionalContainers.pullPolicy | string | `"IfNotPresent"` | default additionalContainers pull policy |
 | additionalContainers.resources | object | `{}` | Define default resources for all additional containers |
-| affinity | object | `{}` | Define pod [affinity](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/) |
+| affinity | object | `{}` | Define pod [affinity](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/) disables automatic podAntiAffinity rules if defined. |
 | autoscaling.enabled | bool | `false` | Enable autoscaling feature. This will only work when deploymentMode is set to **Deployment** |
 | autoscaling.maxReplicas | int | `10` | Number of max replicas for autoscaling |
 | autoscaling.minReplicas | int | `1` | Number of minimum replicas for autoscaling |
