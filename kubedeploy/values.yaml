@@ -219,6 +219,9 @@ serviceAccount:
 # -- Define pod's [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
 podAnnotations: {}
 
+# -- Define pod's extra [labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+podExtraLabels: {}
+
 # -- Define pod's [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
 podSecurityContext: {}
   # fsGroup: 2000

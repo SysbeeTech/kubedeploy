@@ -189,6 +189,7 @@ Kubernetes: `>=1.20.0-0`
 | podDisruptionBudget.enabled | bool | `false` | Enable and define pod disruption budget default (off) see: [podDisruptionBudget](https://kubernetes.io/docs/tasks/run-application/configure-pdb/) |
 | podDisruptionBudget.maxUnavailable | int | `nil` | Maximum unavailable replicas |
 | podDisruptionBudget.minAvailable | int | `1` | Minimum available replicas |
+| podExtraLabels | object | `{}` | Define pod's extra [labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/) |
 | podSecurityContext | object | `{}` | Define pod's [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | ports | list | `[]` | Define container ports that will be exposed see: [containerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#containerport-v1-core) |
 | replicaCount | int | `1` | Number of pods to load balance across. Applicable to Deployment and Statefulset deploymentMode |

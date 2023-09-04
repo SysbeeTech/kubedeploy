@@ -115,6 +115,8 @@ releases:
             service-account-annotation-key: value
       - podAnnotations:
           pod-annotation-key: value
+      - podExtraLabels:
+          environment: dev
       - podSecurityContext:
           fsGroup: 2000
       - securityContext:
