@@ -10,9 +10,28 @@ spec:
   clusterIP: "None"
   {{- end }}
   type: {{ .Values.service.type }}
-  {{- with .Values.service.ports }}
   ports:
+  {{- if .Values.service.ports }}
+  {{- with .Values.service.ports }}
     {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- else if .Values.ports }}
+  {{- range $port := .Values.ports }}
+    - port: {{ required "You must define at least containerPort in .Values.ports[]" $port.containerPort }}
+      {{- with $port.name }}
+      targetPort: {{ . }}
+      name: {{ . }}
+      {{- end }}
+      {{- with $port.protocol }}
+      protocol: {{ . }}
+      {{- end }}
+  {{- end }}
+  {{- else -}}
+  {{/* This is here for legacy reasons TODO: remove in v2.x */}}
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
   {{- end }}
   selector:
     {{- include "kubedeploy.selectorLabels" . | nindent 4 }}

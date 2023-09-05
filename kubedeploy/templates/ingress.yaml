@@ -1,6 +1,6 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "kubedeploy.fullname" . -}}
-{{- $svcPort := .Values.ingress.svcPort | default (get (.Values.service.ports | first) "port") -}}
+{{- $svcPort := include "kubedeploy.ingress.defaultport" . -}}
 {{- $pathType := .Values.ingress.pathType | default "ImplementationSpecific" }}
 {{- $routePrefix := list (dict "path" "/") }}
 apiVersion: {{ include "kubedeploy.ingress.apiVersion" . }}

@@ -74,6 +74,15 @@ tests:
 
   - it: test custom service ports
     set:
+      # this should not be rendered as service ports
+      ports:
+        - containerPort: 9000
+          protocol: TCP
+          name: http
+        - containerPort: 3333
+          protocol: TCP
+          name: prometheus
+      # this should
       service:
         headless: true
         ports:
@@ -116,6 +125,84 @@ tests:
             port: 3333
             protocol: TCP
             targetPort: test
+      - isSubset:
+          path: spec.selector
+          content:
+            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+            app.kubernetes.io/instance: RELEASE-NAME
+
+  - it: test service ports from container ports
+    set:
+      ports:
+        - containerPort: 9000
+          protocol: TCP
+          name: http
+        - containerPort: 3333
+          protocol: TCP
+          name: prometheus
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - lengthEqual:
+          path: spec.ports
+          count: 2
+      - isSubset:
+          path: spec.ports[0]
+          content:
+            name: http
+            port: 9000
+            protocol: TCP
+            targetPort: http
+      - isSubset:
+          path: spec.ports[1]
+          content:
+            name: prometheus
+            port: 3333
+            protocol: TCP
+            targetPort: prometheus
+      - isSubset:
+          path: spec.selector
+          content:
+            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
+            app.kubernetes.io/instance: RELEASE-NAME
+
+  - it: test service ports from container ports with missing info
+    set:
+      ports:
+        - containerPort: 9000
+        - containerPort: 3333
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - lengthEqual:
+          path: spec.ports
+          count: 2
+      - isSubset:
+          path: spec.ports[0]
+          content:
+            port: 9000
+      - isSubset:
+          path: spec.ports[1]
+          content:
+            port: 3333
+      - notExists:
+          path: spec.ports[0].name
+      - notExists:
+          path: spec.ports[0].protocol
+      - notExists:
+          path: spec.ports[0].targetPort
+      - notExists:
+          path: spec.ports[1].name
+      - notExists:
+          path: spec.ports[1].protocol
+      - notExists:
+          path: spec.ports[1].targetPort
       - isSubset:
           path: spec.selector
           content:

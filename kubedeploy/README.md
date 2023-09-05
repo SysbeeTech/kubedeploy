@@ -197,10 +197,7 @@ Kubernetes: `>=1.20.0-0`
 | securityContext | object | `{}` | Define container's [securityContext](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | service.enabled | bool | `true` | Controls if the service should be deployed for this release |
 | service.headless | bool | `false` | Create a headless service see [ref](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services) |
-| service.ports | list | see service.ports[] | Define listening port for service see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core) |
-| service.ports[0].name | string, required | `"http"` | Name of the service port. This should match container's port name |
-| service.ports[0].protocol | required | `"TCP"` | Define service protocol. [Supported protocols](https://kubernetes.io/docs/concepts/services-networking/service/#protocol-support) |
-| service.ports[0].targetPort | string, required | `"http"` | Define name for the exposed container port that the service will target. |
+| service.ports | list | `[]` | Define listening port for service ref: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core) see values.yaml for example |
 | service.type | string | `"ClusterIP"` | Service type see [Reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) for available options. |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |

@@ -291,18 +291,14 @@ service:
   # -- Create a headless service see [ref](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)
   headless: false
   # -- (list) Define listening port for service
-  # see: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core)
-  # @default -- see service.ports[]
-  ports:
-      # service.ports[0].port (int, required) -- Define port number on which service will listen
-      # @default -- 80
-    - port: 80
-      # -- (string, required) Define name for the exposed container port that the service will target.
-      targetPort: http
-      # -- (required) Define service protocol. [Supported protocols](https://kubernetes.io/docs/concepts/services-networking/service/#protocol-support)
-      protocol: TCP
-      # -- (string, required) Name of the service port. This should match container's port name
-      name: http
+  # ref: [servicePort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#serviceport-v1-core)
+  # see values.yaml for example
+  ports: []
+    #- port: 80 # Int, required
+    #  # -- (string, required) Define name for the exposed container port that the service will target.
+    #  targetPort: http # string, requited
+    #  protocol: TCP # required Define service protocol. [Supported protocols](https://kubernetes.io/docs/concepts/services-networking/service/#protocol-support)
+    #  name: http # string, required Name of the service port. This should match container's port name
 
 # -- Define [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object
 # @default -- see ingress object values

@@ -52,6 +52,7 @@ releases:
               ports:
                 - protocol: TCP
                   port: 5978
+
   # headless service test
   - name: {{requiredEnv "RELEASE_NAME"}}-headless-svc
     labels:
@@ -60,6 +61,17 @@ releases:
     values:
       - service:
           headless: true
+
+  # service with container ports
+  - name: {{requiredEnv "RELEASE_NAME"}}-containerport-svc
+    labels:
+      test: netpolicy
+    <<: *default
+    values:
+      - ports:
+          - containerPort: 80
+            name: http
+            protocol: TCP
 
   # net-policy with ingress and monitoring
   - name: {{requiredEnv "RELEASE_NAME"}}-withingress

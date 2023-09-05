@@ -197,6 +197,29 @@ tests:
                       port:
                         number: 8081
 
+  - it: test ingress.svcPort with containerPorts
+    set:
+      ports:
+        - containerPort: 9876
+      ingress:
+        enabled: true
+        hosts:
+          - host: chart-example.local
+    asserts:
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "chart-example.local"
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 9876
+
   - it: test per path svcPort override
     set:
       ingress:

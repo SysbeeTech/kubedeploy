@@ -86,6 +86,24 @@ tls:
 
 {{- end -}}
 
+{{/* Detect default port for ingress */}}
+{{- define "kubedeploy.ingress.defaultport" -}}
+{{- if .Values.ingress.svcPort -}}
+{{- .Values.ingress.svcPort }}
+{{- else if .Values.service.ports -}}
+{{- get (.Values.service.ports | first) "port" }}
+{{- else if .Values.ports -}}
+{{/*
+We don't actually route traffic here. However, service object will use container
+ports as values for service port in case service ports values are not defined
+*/}}
+{{- get (.Values.ports | first ) "containerPort" }}
+{{- else -}}
+{{/* TODO: remove in 2.x legacy chart version support */}}
+{{- print "80" }}
+{{- end -}}
+{{- end -}}
+
 {{/* Allow KubeVersion to be overridden. */}}
 {{- define "kubedeploy.kubeVersion" -}}
   {{- default .Capabilities.KubeVersion.Version .Values.kubeVersionOverride -}}
