@@ -11,7 +11,7 @@ tests:
           count: 1
       - notExists:
           path: spec.volumeClaimTemplates
-      - isNullOrEmpty:
+      - notExists:
           path: spec.template.spec.containers[0].volumeMounts
 
   - it: test enabled persistency with default values

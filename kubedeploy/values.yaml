@@ -283,6 +283,42 @@ envFrom: []
   # - secretRef:
   #     name: test-secret
 
+# -- Defines extra volume mounts for containers
+# see values for examples
+extraVolumeMounts: []
+
+  ## Mount existing volume claim
+  # - name: extra-volume-0
+  #   mountPath: /mnt/volume0
+  #   readOnly: true
+  #   existingClaim: volume-claim
+
+  ## Mount host path
+  # - name: extra-volume-1
+  #   mountPath: /mnt/volume1
+  #   readOnly: true
+  #   hostPath: /usr/shared/
+
+  ## Mount secret from CSI driver
+  # - name: grafana-secrets
+  #   mountPath: /mnt/volume2
+  #   csi: true
+  #   data:
+  #     driver: secrets-store.csi.k8s.io
+  #     readOnly: true
+  #     volumeAttributes:
+  #       secretProviderClass: "secret-provider-name"
+
+  ## Mount emtpyDir
+  # - name: empty-dir-vol
+  #   mountPath: /mnt/volume3
+
+  ## Mount K8s secret
+  # - name: secret-mount
+  #   mountPath: /mnt/volume4
+  #   secretName: my-secret
+  #   optional: true  # If set to true, kubernetes will ignore this mount if secret is not available
+
 service:
   # -- Service type see [Reference](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) for available options.
   type: ClusterIP

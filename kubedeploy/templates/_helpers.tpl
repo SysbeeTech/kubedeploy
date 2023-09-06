@@ -182,6 +182,54 @@ VolumeMounts for containers
 */}}
 {{- define "kubedeploy.volumeMounts" -}}
 {{- $fullName := include "kubedeploy.fullname" . -}}
+
+{{/* Iterate over confiMaps mounts to count how many should be mounted */}}
+
+{{- $cfgmountcount := 0 -}}
+{{- range .Values.configMaps -}}
+{{- if eq (toString .mount |lower) "true" -}}
+{{- $cfgmountcount = add $cfgmountcount 1 -}}
+{{- end -}}
+{{- end -}}
+
+{{/* Define which volumes should be mounted */}}
+{{- if or (gt $cfgmountcount 0) .Values.extraVolumeMounts (and (.Values.persistency.enabled) (eq (toString .Values.deploymentMode) "Statefulset")) }}
+volumeMounts:
+
+{{- if and (.Values.persistency.enabled) (eq (toString .Values.deploymentMode) "Statefulset") }}
+  - mountPath: {{ .Values.persistency.mountPath }}
+    name: {{ $fullName }}
+{{- end -}}
+
+{{/* Now process configmap mounts and extraVolumeMounts */}}
+
+{{- if or (gt $cfgmountcount 0) .Values.extraVolumeMounts -}}
+{{- range .Values.configMaps -}}
+{{- $name := include "kubedeploy.cfgmapname" (list $ .) -}}
+{{- if eq (toString .mount | lower) "true" }}
+  - mountPath: {{ required "You need to define .Values.configMaps[].mountPath if .Values.configMaps[].mount is set to True" .mountPath }}
+    name: {{ $name }}
+{{- end }}
+{{- end }}
+{{- range .Values.extraVolumeMounts }}
+  - mountPath: {{ .mountPath }}
+    name: {{ .name }}
+    {{- if .subPath }}
+    subPath: {{ .subPath }}
+    {{- end }}
+    {{- if .readOnly }}
+    readOnly: {{ .readOnly }}
+    {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Volumes for containers
+*/}}
+{{- define "kubedeploy.volumes" -}}
+{{- $fullName := include "kubedeploy.fullname" . -}}
 {{/* Iterate over confiMaps mounts to count how many should be mounted */}}
 {{- $cfgmountcount := 0 -}}
 {{- range .Values.configMaps -}}
@@ -189,52 +237,42 @@ VolumeMounts for containers
 {{- $cfgmountcount = add $cfgmountcount 1 -}}
 {{- end -}}
 {{- end -}}
-{{/* Define which volumes should be mounted */}}
-{{ if and (.Values.persistency.enabled) (eq (toString .Values.deploymentMode) "Statefulset") -}}
-- mountPath: {{ .Values.persistency.mountPath }}
-  name: {{ $fullName }}
-{{ else if gt $cfgmountcount 0 -}}
-{{/* skip adding anything if there are cfgmounts to be added */}}
-{{- else }}
-  []
-{{- end -}}
-{{/* Now process configmap mounts */}}
-{{- if gt $cfgmountcount 0 -}}
-{{- range .Values.configMaps -}}
-{{- $name := include "kubedeploy.cfgmapname" (list $ .) -}}
-{{- if eq (toString .mount | lower) "true" -}}
-- mountPath: {{ required "You need to define .Values.configMaps[].mountPath if .Values.configMaps[].mount is set to True" .mountPath }}
-  name: {{ $name }}
-{{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
-
-{{/*
-Volumees for containers
-*/}}
-{{- define "kubedeploy.volumes" -}}
-{{- $fullName := include "kubedeploy.fullname" . -}}
-{{- /* Iterate over confiMaps mounts to count how many should be mounted */ -}}
-{{- $cfgmountcount := 0 -}}
-{{- range .Values.configMaps -}}
-{{- if eq (toString .mount |lower) "true" -}}
-{{- $cfgmountcount = add $cfgmountcount 1 -}}
-{{- end -}}
-{{- end -}}
-{{- /* Define volumes */ -}}
-{{- if gt $cfgmountcount 0 }}
+{{/* Define volumes */}}
+{{- if or (gt $cfgmountcount 0) .Values.extraVolumeMounts -}}
 volumes:
-{{- range .Values.configMaps }}
+{{- /* configmap mounts */ -}}
+{{- range .Values.configMaps -}}
 {{- $name := include "kubedeploy.cfgmapname" (list $ .) -}}
 {{- if eq (toString .mount | lower) "true" }}
   - name: {{ $name }}
     configMap:
       name: {{ $name }}
-{{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
+{{- end -}}
+{{- end -}}
+{{- /* extraVolumeMounts */ -}}
+{{- range .Values.extraVolumeMounts }}
+  - name: {{ .name }}
+    {{- if .existingClaim }}
+    persistentVolumeClaim:
+      claimName: {{ .existingClaim }}
+    {{- else if .hostPath }}
+    hostPath:
+      path: {{ .hostPath }}
+    {{- else if .csi }}
+    csi:
+      {{- toYaml .data | nindent 6 }}
+    {{- else if .secretName }}
+    secret:
+      secretName: {{ .secretName }}
+      {{- if .optional }}
+      optional: {{ .optional }}
+      {{- end }}
+    {{- else }}
+    emptyDir: {}
+    {{- end }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Spec: common section helper
@@ -286,8 +324,7 @@ spec:
       envFrom:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumeMounts:
-        {{- include "kubedeploy.volumeMounts" $ | indent 8 }}
+      {{- include "kubedeploy.volumeMounts" $ | indent 6 }}
       resources:
         {{- if not .resources }}
         {{- toYaml $.Values.initContainers.resources | nindent 8 -}}
@@ -374,8 +411,7 @@ spec:
           {{- end }}
         {{- end }}
       {{- end }}
-      volumeMounts:
-        {{- include "kubedeploy.volumeMounts" . | indent 8 }}
+      {{- include "kubedeploy.volumeMounts" . | indent 6 }}
       {{- with .Values.resources }}
       resources:
         {{- toYaml . | nindent 8 }}
@@ -416,8 +452,7 @@ spec:
       {{- end }}
       {{- end }}
       {{- end }}
-      volumeMounts:
-        {{- include "kubedeploy.volumeMounts" $ | indent 8 }}
+      {{- include "kubedeploy.volumeMounts" $ | indent 6 }}
       resources:
         {{- if not .resources -}}
         {{- toYaml $.Values.additionalContainers.resources | nindent 8 -}}

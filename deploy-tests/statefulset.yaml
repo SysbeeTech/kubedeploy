@@ -71,3 +71,58 @@ releases:
           data:
             config: |+
               config2
+
+  # statefulset with configmaps, additional containers and extraVolumeMounts
+  - name: {{requiredEnv "RELEASE_NAME"}}-extravolumemounts
+    labels:
+      test: configmaps
+    <<: *default
+    values:
+      - persistency:
+          enabled: true
+          capacity:
+            storage: {{ .Values.persistency.size }}
+      - additionalContainers:
+          enabled: true
+      - configMapHash: true
+      - configMaps:
+        - name: kubedeploy-configmap
+          mount: true
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |+
+              configmap values
+        - name: kubedeploy2-configmap
+          data:
+            config: |+
+              config2
+      - extraObjects:
+        - apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: volume-claim
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 2Gi
+      - extraVolumeMounts:
+        ## Mount existing volume claim
+        - name: extra-volume-0
+          mountPath: /mnt/volume0
+          readOnly: true
+          existingClaim: volume-claim
+        ## Mount host path
+        - name: extra-volume-1
+          mountPath: /mnt/volume1
+          readOnly: true
+          hostPath: /tmp/
+        ## Mount emtpyDir
+        - name: empty-dir-vol
+          mountPath: /mnt/volume3
+        ## Mount secret
+        - name: my-secret
+          mountPath: /mnt/volume4
+          secretName: my-secret
+          optional: true

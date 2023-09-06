@@ -1,0 +1,360 @@
+suite: test extraVolumeMounts
+templates:
+  - deployment.yaml
+  - statefulset.yaml
+  - job.yaml
+  - cronjob.yaml
+
+
+tests:
+  - it: test extraVolumeMounts on deployments
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      extraVolumeMounts:
+
+        ## Mount existing volume claim
+        - name: extra-volume-0
+          mountPath: /mnt/volume0
+          readOnly: true
+          existingClaim: volume-claim
+
+        ## Mount host path
+        - name: extra-volume-1
+          mountPath: /mnt/volume1
+          readOnly: true
+          hostPath: /usr/shared/
+
+        ## Mount CSI volume
+        - name: secrets
+          mountPath: /mnt/volume2
+          csi: true
+          data:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "secret-provider-name"
+
+        ## Mount emtpyDir
+        - name: empty-dir-vol
+          mountPath: /mnt/volume3
+        ## Mount Secret
+        - name: my-secret
+          mountPath: /mnt/volume4
+          secretName: my-secret
+          optional: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Deployment
+      - lengthEqual:
+          path: spec.template.spec.volumes
+          count: 5
+      - isSubset:
+          path: spec.template.spec.volumes[0]
+          content:
+            name: extra-volume-0
+            persistentVolumeClaim:
+              claimName: volume-claim
+      - isSubset:
+          path: spec.template.spec.volumes[1]
+          content:
+            name: extra-volume-1
+            hostPath:
+              path: /usr/shared/
+      - isSubset:
+          path: spec.template.spec.volumes[2]
+          content:
+            name: secrets
+            csi:
+              driver: secrets-store.csi.k8s.io
+              readOnly: true
+              volumeAttributes:
+                secretProviderClass: secret-provider-name
+      - isSubset:
+          path: spec.template.spec.volumes[3]
+          content:
+            name: empty-dir-vol
+            emptyDir: {}
+      - isSubset:
+          path: spec.template.spec.volumes[4]
+          content:
+            name: my-secret
+            secret:
+              secretName: my-secret
+              optional: true
+      - lengthEqual:
+          path: spec.template.spec.containers[0].volumeMounts
+          count: 5
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[0]
+          content:
+            mountPath: /mnt/volume0
+            name: extra-volume-0
+            readOnly: true
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[1]
+          content:
+            mountPath: /mnt/volume1
+            name: extra-volume-1
+            readOnly: true
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[2]
+          content:
+            mountPath: /mnt/volume2
+            name: secretes
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[3]
+          content:
+            mountPath: /mnt/volume3
+            name: empty-dir-vol
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[4]
+          content:
+            mountPath: /mnt/volume4
+            name: my-secret
+
+  - it: test extraVolumeMounts on statefulsets with persistence
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      persistency:
+        enabled: true
+      extraVolumeMounts:
+
+        ## Mount existing volume claim
+        - name: extra-volume-0
+          mountPath: /mnt/volume0
+          readOnly: true
+          existingClaim: volume-claim
+
+        ## Mount host path
+        - name: extra-volume-1
+          mountPath: /mnt/volume1
+          readOnly: true
+          hostPath: /usr/shared/
+
+        ## Mount CSI volume
+        - name: secrets
+          mountPath: /mnt/volume2
+          csi: true
+          data:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "secret-provider-name"
+
+        ## Mount emtpyDir
+        - name: empty-dir-vol
+          mountPath: /mnt/volume3
+        ## Mount Secret
+        - name: my-secret
+          mountPath: /mnt/volume4
+          secretName: my-secret
+          optional: true
+
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: StatefulSet
+      - lengthEqual:
+          path: spec.template.spec.volumes
+          count: 5
+      - isSubset:
+          path: spec.template.spec.volumes[0]
+          content:
+            name: extra-volume-0
+            persistentVolumeClaim:
+              claimName: volume-claim
+      - isSubset:
+          path: spec.template.spec.volumes[1]
+          content:
+            name: extra-volume-1
+            hostPath:
+              path: /usr/shared/
+      - isSubset:
+          path: spec.template.spec.volumes[2]
+          content:
+            name: secrets
+            csi:
+              driver: secrets-store.csi.k8s.io
+              readOnly: true
+              volumeAttributes:
+                secretProviderClass: secret-provider-name
+      - isSubset:
+          path: spec.template.spec.volumes[3]
+          content:
+            name: empty-dir-vol
+            emptyDir: {}
+      - isSubset:
+          path: spec.template.spec.volumes[4]
+          content:
+            name: my-secret
+            secret:
+              secretName: my-secret
+              optional: true
+      - lengthEqual:
+          path: spec.template.spec.containers[0].volumeMounts
+          count: 6
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[1]
+          content:
+            mountPath: /mnt/volume0
+            name: extra-volume-0
+            readOnly: true
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[2]
+          content:
+            mountPath: /mnt/volume1
+            name: extra-volume-1
+            readOnly: true
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[3]
+          content:
+            mountPath: /mnt/volume2
+            name: secretes
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[4]
+          content:
+            mountPath: /mnt/volume3
+            name: empty-dir-vol
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[5]
+          content:
+            mountPath: /mnt/volume4
+            name: my-secret
+
+  - it: test extraVolumeMounts on statefulsets with persistence and configmaps
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      persistency:
+        enabled: true
+      configMaps:
+        - name: configmap-name
+          mount: True
+          mountPath: /data/confmap
+          data:
+            kubedeploy: |
+              configmap values
+
+        - name: configmap-name2
+          data:
+            config: |
+              config2
+      extraVolumeMounts:
+        ## Mount existing volume claim
+        - name: extra-volume-0
+          mountPath: /mnt/volume0
+          readOnly: true
+          existingClaim: volume-claim
+
+        ## Mount host path
+        - name: extra-volume-1
+          mountPath: /mnt/volume1
+          readOnly: true
+          hostPath: /usr/shared/
+
+        ## Mount CSI volume
+        - name: secrets
+          mountPath: /mnt/volume2
+          csi: true
+          data:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "secret-provider-name"
+
+        ## Mount emtpyDir
+        - name: empty-dir-vol
+          mountPath: /mnt/volume3
+        ## Mount Secret
+        - name: my-secret
+          mountPath: /mnt/volume4
+          secretName: my-secret
+          optional: true
+
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: StatefulSet
+      - lengthEqual:
+          path: spec.template.spec.volumes
+          count: 5
+      - isSubset:
+          path: spec.template.spec.volumes[0]
+          content:
+            name: RELEASE-NAME-kubedeploy-configmap-name
+            configMap:
+              name: RELEASE-NAME-kubedeploy-configmap-name
+      - isSubset:
+          path: spec.template.spec.volumes[1]
+          content:
+            name: extra-volume-0
+            persistentVolumeClaim:
+              claimName: volume-claim
+      - isSubset:
+          path: spec.template.spec.volumes[2]
+          content:
+            name: extra-volume-1
+            hostPath:
+              path: /usr/shared/
+      - isSubset:
+          path: spec.template.spec.volumes[3]
+          content:
+            name: secrets
+            csi:
+              driver: secrets-store.csi.k8s.io
+              readOnly: true
+              volumeAttributes:
+                secretProviderClass: secret-provider-name
+      - isSubset:
+          path: spec.template.spec.volumes[4]
+          content:
+            name: empty-dir-vol
+            emptyDir: {}
+      - isSubset:
+          path: spec.template.spec.volumes[5]
+          content:
+            name: my-secret
+            secret:
+              secretName: my-secret
+              optional: true
+      - lengthEqual:
+          path: spec.template.spec.containers[0].volumeMounts
+          count: 7
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[1]
+          content:
+            mountPath: /data/confmap
+            name: RELEASE-NAME-kubedeploy-configmap-name
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[2]
+          content:
+            mountPath: /mnt/volume0
+            name: extra-volume-0
+            readOnly: true
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[3]
+          content:
+            mountPath: /mnt/volume1
+            name: extra-volume-1
+            readOnly: true
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[4]
+          content:
+            mountPath: /mnt/volume2
+            name: secretes
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[5]
+          content:
+            mountPath: /mnt/volume3
+            name: empty-dir-vol
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[6]
+          content:
+            mountPath: /mnt/volume5
+            name: my-secret

@@ -109,6 +109,7 @@ Kubernetes: `>=1.20.0-0`
 | env | list | `[]` | Define environment variables for containers for reference see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core). Environment variables set will be exposed both to main container and all of the initContainers |
 | envFrom | list | `[]` | Define environment variables for containers from ConfigMap or Secret objects for reference see [envFrom secret example](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables) or [envFrom configmap example](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables) |
 | extraObjects | list | `[]` | Create dynamic manifest via values (templated). See values for example: |
+| extraVolumeMounts | list | `[]` | Defines extra volume mounts for containers see values for examples |
 | fullnameOverride | string | `""` | Override full resource names instead of using calculated "releasename-chartname" default naming convention |
 | healthcheck.disableAutomatic | bool | `false` | Disable automatic healthcheck probes. Automatic probes will always create a http healthcheck probe if there is a port named http |
 | healthcheck.enabled | bool | `false` | Define custom healthcheck probes for container, overriding any automatic probes |
