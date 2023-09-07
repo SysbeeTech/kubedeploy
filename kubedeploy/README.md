@@ -94,7 +94,7 @@ Kubernetes: `>=1.20.0-0`
 | autoscaling.minReplicas | int | `1` | Number of minimum replicas for autoscaling |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` | Target cpu utilization as percentage of resources.requests.cpu |
 | autoscaling.targetMemoryUtilizationPercentage | int | `nil` | Target memory utilization as percentage of resources.requests.mem |
-| configMaps | list | `[]` | Define a list of hashes containing name and data that will be used in generating additional configmaps please see values.yaml for example |
+| configMaps | list | `[]` | Define a list of hashes containing name and data that will be used in generating additional configmaps please see values.yaml for examples |
 | configMapsHash | bool | `false` | Redeploy Deployments and Statefulsets on configmap content change. If set to true, values of configmaps will be calculated as sha256sum and added as annotation to pod. On content change this will trigger pod redeployment/restart |
 | cronjobspec.args | list | `[]` | define args for cronjob |
 | cronjobspec.backoffLimit | int | `3` | define job backoff limit, see: https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy |
@@ -109,6 +109,7 @@ Kubernetes: `>=1.20.0-0`
 | env | list | `[]` | Define environment variables for containers for reference see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core). Environment variables set will be exposed both to main container and all of the initContainers |
 | envFrom | list | `[]` | Define environment variables for containers from ConfigMap or Secret objects for reference see [envFrom secret example](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables) or [envFrom configmap example](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables) |
 | extraObjects | list | `[]` | Create dynamic manifest via values (templated). See values for example: |
+| extraSecrets | list | `[]` | Define a list of hashes containing name and data that will be used in generating Secret objects please see values.yaml for examples |
 | extraVolumeMounts | list | `[]` | Defines extra volume mounts for containers see values for examples |
 | fullnameOverride | string | `""` | Override full resource names instead of using calculated "releasename-chartname" default naming convention |
 | healthcheck.disableAutomatic | bool | `false` | Disable automatic healthcheck probes. Automatic probes will always create a http healthcheck probe if there is a port named http |

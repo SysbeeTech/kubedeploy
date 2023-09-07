@@ -71,6 +71,44 @@ releases:
           data:
             config: |+
               config2
+  # statefulset with extraSecrets and additional containers
+  - name: {{requiredEnv "RELEASE_NAME"}}-extrasecrets
+    labels:
+      test: configmaps
+    <<: *default
+    values:
+      - persistency:
+          enabled: true
+          capacity:
+            storage: {{ .Values.persistency.size }}
+      - additionalContainers:
+          enabled: true
+      - extraSecrets:
+        - name: opaque-secret
+          type: Opaque # Optional - Default: Opaque if unspecified
+          mount: True # Optional - should this sercret be mounted as volume on containers
+          mountPath: /mnt/secret-vol0 # Optional - define mount path for this secret
+          data:
+            key: value # value will be base64 encoded by default
+
+        - name: tls-secret
+          type: kubernetes.io/tls
+          data:
+            tls.crt: |
+              --------BEGIN CERTIFICATE-----
+              MIIC2DCCAcCgAwIBAgIBATANBgkqh ...
+            tls.key: |
+              -----BEGIN RSA PRIVATE KEY-----
+              MIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ ...
+            tls.ca: |
+              --------BEGIN CERTIFICATE-----
+              MIIC2DCCAcCgAwIBAgIBATANBgkqh ...
+
+        - name: ssh-key-secret
+          type: kubernetes.io/ssh-auth
+          data:
+            ssh-privatekey: |
+              MIIEpQIBAAKCAQEAulqb/Y ...
 
   # statefulset with configmaps, additional containers and extraVolumeMounts
   - name: {{requiredEnv "RELEASE_NAME"}}-extravolumemounts

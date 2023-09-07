@@ -60,7 +60,7 @@ jobspec:
   backoffLimit: 3
 
 # -- Define a list of hashes containing name and data that will be used in generating additional configmaps
-# please see values.yaml for example
+# please see values.yaml for examples
 configMaps: []
   # - name: kubedeploy-configmap
   #   mount: True # should this configmap be mounted as volume on containers
@@ -74,6 +74,35 @@ configMaps: []
   #   data:
   #     config: |+
   #       config2
+
+# -- Define a list of hashes containing name and data that will be used in generating Secret objects
+# please see values.yaml for examples
+extraSecrets: []
+  # - name: opaque-secret
+  #   type: Opaque # Optional - Default: Opaque if unspecified
+  #   mount: True # Optional - should this sercret be mounted as volume on containers
+  #   mountPath: /mnt/secret-vol0 # Optional - define mount path for this secret
+  #   data:
+  #     key: value # value will be base64 encoded by default
+
+  # - name: tls-secret
+  #   type: kubernetes.io/tls
+  #   data:
+  #     tls.crt: |
+  #       --------BEGIN CERTIFICATE-----
+  #       MIIC2DCCAcCgAwIBAgIBATANBgkqh ...
+  #     tls.key: |
+  #       -----BEGIN RSA PRIVATE KEY-----
+  #       MIIEpgIBAAKCAQEA7yn3bRHQ5FHMQ ...
+  #     tls.ca: |
+  #       --------BEGIN CERTIFICATE-----
+  #       MIIC2DCCAcCgAwIBAgIBATANBgkqh ...
+
+  # - name: ssh-key-secret
+  #   type: kubernetes.io/ssh-auth
+  #   data:
+  #     ssh-privatekey: |
+  #       MIIEpQIBAAKCAQEAulqb/Y ...
 
 # -- Redeploy Deployments and Statefulsets on configmap content change.
 # If set to true, values of configmaps will be calculated as sha256sum and added
