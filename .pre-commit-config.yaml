@@ -8,10 +8,11 @@ repos:
       - id: end-of-file-fixer
         exclude: README.md
       - id: check-added-large-files
+        exclude: Kubedeploy.png
       - id: detect-aws-credentials
         args: ['--allow-missing-credentials']
       - id: detect-private-key
-        exclude: "(values|lint-test|statefulset).yaml"
+        exclude: "((values|lint-test|statefulset).yaml|(extrasecrets|ingress).md)"
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.1.0
@@ -27,12 +28,25 @@ repos:
     rev: v1.2.0
     hooks:
       - id: helm-docs
-        files: (README\.md\.gotmpl|CHANGELOG.md|(Chart|requirements|values)\.yaml)$
+        files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
         args:
-          # Make the tool search for charts only under the `example-charts` directory
           - --chart-search-root=./
           # The `./` makes it relative to the chart-search-root set above
-          - --template-files=./_templates.gotmpl
-          # Repeating the flag adds this to the list, now [./_templates.gotmpl, README.md.gotmpl]
           # A base filename makes it relative to each chart directory found
-          - --template-files=README.md.gotmpl
+          - --template-files=./_templates.gotmpl
+          - --template-files=./README.md.gotmpl
+          - --output-file=./README.md
+
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.2.0
+    hooks:
+      - id: helm-docs
+        files: (README\.md\.gotmpl|(Chart|requirements|values)\.yaml)$
+        args:
+          - --chart-search-root=./
+          # The `./` makes it relative to the chart-search-root set above
+          # A base filename makes it relative to each chart directory found
+          - --template-files=./_templates.gotmpl
+          - --template-files=./_webtemplate.gotmpl
+          - --template-files=./webvalues.gotmpl
+          - --output-file=../docs/reference/values.md

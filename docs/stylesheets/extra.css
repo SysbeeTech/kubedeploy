@@ -1,0 +1,11 @@
+.value-search__input::placeholder {
+  color: var(--md-default-fg-color);
+}
+.value-search__icon {
+  color: var(--md-default-fg-color);
+}
+
+.rotate-90 {
+  transform: rotate(90deg) scale(1.1);
+  color: var(--md-primary-fg-color);
+}

@@ -58,26 +58,6 @@ verify:
     - kubectl wait --for=condition=available --timeout=300s -n deployment deployment/${RELEASE_NAME}
     - kubectl get deployment ${RELEASE_NAME} -n deployment -o=jsonpath='{.status.replicas}' |grep 1
 
-publish_docs:
-  stage: publish
-  tags:
-    - docker-runner
-  image:
-    name: pandoc/core
-    entrypoint: ["/bin/sh", "-c"]
-  extends: .runner
-  before_script:
-    - apk add aws-cli
-  script:
-    - pandoc -t html5 -f markdown -s --toc --toc-depth 2 --template pandoc/github.html5 --css pandoc/github.css kubedeploy/README.md -o index.html
-    - aws s3 cp index.html s3://${S3_BUCKET}/${CHART_NAME}/index.html
-  only:
-    refs:
-      - main
-      - tags
-    variables:
-      - $PUBLIC_CHART == "true"
-
 public-release:
   tags:
     - docker-runner

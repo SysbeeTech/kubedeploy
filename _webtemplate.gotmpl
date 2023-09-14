@@ -1,0 +1,7 @@
+{{- define "chart.valuesTable" }}
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+{{- range .Values }}
+| {{ if not (contains "." .Key) }}[:fontawesome-solid-book:  {{ .Key }}](../start/values/{{ lower .Key }}.md){{ else }}:fontawesome-solid-arrow-turn-up:{ .rotate-90 } {{ .Key }}{{ end }} | {{ .Type }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} |
+{{- end }}
+{{- end -}}

@@ -1,0 +1,147 @@
+site_name: Kubedeploy
+repo_url: https://github.com/sysbeetech/kubedeploy
+edit_uri: blob/main/docs/
+plugins:
+  - search
+  - glightbox
+  - offline
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - toc:
+      permalink: true
+# Documentation navigation
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Quickstart: start/quickstart.md
+    - Best practices: start/best-practices.md
+    - Changelog: start/changelog.md
+    - Examples by Values:
+      - start/index.md
+      - nameOverride: start/values/nameoverride.md
+      - fullnameOverride: start/values/fullnameoverride.md
+      - kubeVersionOverride: start/values/kubeversionoverride.md
+      - deploymentMode: start/values/deploymentmode.md
+      - replicaCount: start/values/replicacount.md
+      - image: start/values/image.md
+      - imagePullSecrets: start/values/imagepullsecrets.md
+      - resources: start/values/resources.md
+      - ports: start/values/ports.md
+      - env: start/values/env.md
+      - envFrom: start/values/envfrom.md
+      - podAnnotations: start/values/podannotations.md
+      - podExtraLabels: start/values/podextralabels.md
+      - podSecurityContext: start/values/podsecuritycontext.md
+      - securityContext: start/values/securitycontext.md
+      - healthcheck: start/values/healthcheck.md
+      - minReadySeconds: start/values/minreadyseconds.md
+      - configMaps: start/values/configmaps.md
+      - configMapsHash: start/values/configmapshash.md
+      - extraSecrets: start/values/extrasecrets.md
+      - extraVolumeMounts: start/values/extravolumemounts.md
+      - initContainers: start/values/initcontainers.md
+      - additionalContainers: start/values/additionalcontainers.md
+      - serviceAccount: start/values/serviceaccount.md
+      - podAntiAffinity: start/values/podantiaffinity.md
+      - podAntiAffinityTopologyKey: start/values/podantiaffinitytopologykey.md
+      - affinity: start/values/affinity.md
+      - nodeSelector: start/values/nodeselector.md
+      - topologySpreadConstraints: start/values/topologyspreadconstraints.md
+      - tolerations: start/values/tolerations.md
+      - podDisruptionBudget: start/values/poddisruptionbudget.md
+      - networkPolicy: start/values/networkpolicy.md
+      - service: start/values/service.md
+      - ingress: start/values/ingress.md
+      - monitoring: start/values/monitoring.md
+      - autoscaling: start/values/autoscaling.md
+      - keda: start/values/keda.md
+      - cronjobspec: start/values/cronjobspec.md
+      - jobspec: start/values/jobspec.md
+      - persistency: start/values/persistency.md
+      - extraObjects: start/values/extraobjects.md
+  - Examples:
+      - examples/index.md
+      - Helmfile: examples/helmfile.md
+      - Syncthing: examples/apps/syncthing.md
+      - Mealie: examples/apps/mealie.md
+      - Joplin server: examples/apps/joplin.md
+      - Karma: examples/apps/karma.md
+  - Reference:
+    - Values: reference/values.md
+
+# Theme options
+copyright: Copyright &copy; 2021 - 2023 Branko Toic
+theme:
+  name: material
+  logo: img/Kubedeploy.png
+  favicon: img/Kubedeploy.ico
+  palette:
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: amber
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: amber
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.top
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.path
+    - navigation.sections
+    - navigation.footer
+    - navigation.tracking
+    - navigation.indexes
+    - toc.follow
+    - content.code.select
+    - content.code.copy
+    - content.code.annotate
+    - content.action.edit
+  navigation_depth: 5
+  collapse_navigation: true
+extra_javascript:
+  - https://code.jquery.com/jquery-1.7.1.min.js
+  - javascripts/valuesearch.js
+extra_css:
+  - stylesheets/extra.css
+extra:
+  analytics:
+    provider: google
+    property: G-MF9L3KG59D
+  consent:
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/btoic
+    - icon: fontawesome/brands/linkedin
+      link: https://hr.linkedin.com/in/btoic

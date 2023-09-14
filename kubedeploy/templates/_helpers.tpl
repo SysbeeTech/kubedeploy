@@ -358,7 +358,7 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      imagePullPolicy: {{ $.Values.initContainers.pullPolicy }}
+      imagePullPolicy: {{ $.Values.initContainers.pullPolicy | default "IfNotPresent"}}
       {{- with $.Values.env }}
       env:
         {{- toYaml . | nindent 8 }}
@@ -475,7 +475,7 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      imagePullPolicy: {{ $.Values.additionalContainers.pullPolicy }}
+      imagePullPolicy: {{ $.Values.additionalContainers.pullPolicy | default "IfNotPresent" }}
       {{- with $.Values.env }}
       env:
         {{- toYaml . | nindent 8 }}

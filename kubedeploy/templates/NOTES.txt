@@ -3,9 +3,7 @@
 Application will be available on these URLs:
 
 {{- range $host := .Values.ingress.hosts }}
-  {{- range .paths }}
   http{{ if or $.Values.ingress.tls $.Values.ingress.withSSL }}s{{ end }}://{{ $host.host }}{{ .path }}
-  {{- end }}
 {{- end }}
 
 {{- else if contains "NodePort" .Values.service.type }}

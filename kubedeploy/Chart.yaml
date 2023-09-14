@@ -14,7 +14,7 @@ version: 1.1.0
 # As this chart doesn't ship any application this is declared mostly for compatibility
 appVersion: "1.1.0"
 
-home: https://charts.sysbee.io/kubedeploy/
+home: https://kubedeploy.app/
 
 kubeVersion: ">=1.20.0-0"
 
