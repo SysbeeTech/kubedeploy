@@ -1,5 +1,6 @@
 site_name: Kubedeploy
-repo_url: https://github.com/sysbeetech/kubedeploy
+site_url: https://kubedeploy.app/
+repo_url: https://github.com/SysbeeTech/kubedeploy/
 edit_uri: blob/main/docs/
 plugins:
   - search
