@@ -1,0 +1,127 @@
+---
+name: Tests
+
+on:
+  workflow_call:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+    branches:
+      - main
+    paths:
+      - kubedeploy/**
+      - deploy-tests/**
+  workflow_dispatch:
+
+env:
+  CHART_NAME: kubedeploy
+  RELEASE_NAME: test
+  KUBE_VERSION: "1.27.3"
+  HELMFILE_VERSION: "v0.157.0"
+  HELM_VERSION: "3.12.3"
+  HELM_DIFF_COLOR: true
+  HELM_DIFF_OUTPUT_CONTEXT: 5
+
+jobs:
+  required-tools:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+  lint-tests:
+    runs-on: ubuntu-latest
+    needs: required-tools
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Helm lint
+        run: helm lint kubedeploy/
+
+      - name: Helmfile output yaml
+        uses: helmfile/helmfile-action@v1.0.0
+        with:
+          helmfile-version: "${{ env.HELMFILE_VERSION }}"
+          helm-version: "v${{ env.HELM_VERSION }}"
+          helmfile-args: template -f deploy-tests/lint-test.yaml --output-dir ../ --output-dir-template "{{ .OutputDir }}/lint-tests"
+
+      - name: Yamllint Helmfile output
+        uses: karancode/yamllint-github-action@master
+        with:
+          yamllint_file_or_dir: lint-tests
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: required-tools
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Chart unit tests
+        uses: d3adb5/helm-unittest-action@v2
+        with:
+          install-mode: "if-not-present"
+          helm-version: "${{ env.HELM_VERSION }}"
+          charts: "kubedeploy"
+
+  deployment-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version:
+          - 1.27.3
+    needs:
+      - lint-tests
+      - unit-tests
+    steps:
+      - name: Create K8s Kind Cluster
+        uses: helm/kind-action@v1.5.0
+        with:
+          node_image: "kindest/node:v${{ matrix.version }}"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+
+      - name: Deployment tests
+        uses: helmfile/helmfile-action@v1.0.0
+        with:
+          helmfile-version: "${{ env.HELMFILE_VERSION }}"
+          helm-version: "v${{ env.HELM_VERSION }}"
+          helmfile-args: apply -f deploy-tests/deployment.yaml
+
+      - name: Statefulset tests
+        uses: helmfile/helmfile-action@v1.0.0
+        with:
+          helmfile-version: "${{ env.HELMFILE_VERSION }}"
+          helm-version: "v${{ env.HELM_VERSION }}"
+          helmfile-args: apply -f deploy-tests/statefulset.yaml
+
+      - name: Network tests
+        uses: helmfile/helmfile-action@v1.0.0
+        with:
+          helmfile-version: "${{ env.HELMFILE_VERSION }}"
+          helm-version: "v${{ env.HELM_VERSION }}"
+          helmfile-args: apply -f deploy-tests/network.yaml
+
+      - name: Cronjob tests
+        uses: helmfile/helmfile-action@v1.0.0
+        with:
+          helmfile-version: "${{ env.HELMFILE_VERSION }}"
+          helm-version: "v${{ env.HELM_VERSION }}"
+          helmfile-args: apply -f deploy-tests/cronjob.yaml
+
+      - name: Job tests
+        uses: helmfile/helmfile-action@v1.0.0
+        with:
+          helmfile-version: "${{ env.HELMFILE_VERSION }}"
+          helm-version: "v${{ env.HELM_VERSION }}"
+          helmfile-args: apply -f deploy-tests/job.yaml

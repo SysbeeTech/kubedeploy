@@ -6,9 +6,9 @@ helmDefaults:
 
 releases:
   # simple deployment testing
-  - name: {{requiredEnv "RELEASE_NAME"}}
+  - name: test
     namespace: deployment
-    chart: ../{{ requiredEnv "CHART_NAME" }}
+    chart: ../kubedeploy
     installed: true
     values:
       - deploymentMode: Deployment
@@ -135,7 +135,7 @@ releases:
                 command: ["/bin/sh","-c","nginx -s quit; while killall -0 nginx; do sleep 1; done"]
       - imagePullSecrets:
           - name: regcred
-      - fullnameOverride: {{requiredEnv "RELEASE_NAME"}}
+      - fullnameOverride: test
       - minReadySeconds: 30
       - serviceAccount:
           annotations:
@@ -185,7 +185,7 @@ releases:
           value: EnvValue
       - envFrom:
         - configMapRef:
-            name: {{requiredEnv "RELEASE_NAME"}}-envfrom-configmap
+            name: test-envfrom-configmap
       - extraVolumeMounts:
         ## Mount existing volume claim
         - name: extra-volume-0

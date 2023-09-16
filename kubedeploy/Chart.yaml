@@ -1,6 +1,6 @@
 apiVersion: v2
 name: kubedeploy
-description: Generalized chart for deploying single containerized application into Kubernetes clusters
+description: Generalized chart for deploying containerized application to Kubernetes clusters
 
 # A chart can be either an 'application' or a 'library' chart.`
 type: application
