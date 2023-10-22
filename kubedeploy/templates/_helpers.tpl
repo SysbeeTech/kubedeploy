@@ -318,6 +318,30 @@ volumes:
 {{- end -}}
 
 {{/*
+Healthcheck probe helper
+*/}}
+{{- define "kubedeploy.healthchecks" -}}
+{{- $top := index . 0 -}}
+{{- $hc := index . 1 -}}
+{{- if $hc.enabled -}}
+{{- with $hc.probes -}}
+{{- with .livenessProbe }}
+livenessProbe:
+{{ toYaml . |indent 2 -}}
+{{- end -}}
+{{- with .readinessProbe }}
+readinessProbe:
+{{ toYaml . |indent 2 }}
+{{- end -}}
+{{- with .startupProbe }}
+startupProbe:
+{{ toYaml . |indent 2 -}}
+{{- end -}}
+{{- end -}}
+{{- end }}
+{{- end -}}
+
+{{/*
 Spec: common section helper
 */}}
 {{- define "kubedeploy.specSection" -}}
@@ -437,9 +461,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- if .Values.healthcheck.enabled }}
-      {{- with .Values.healthcheck.probes }}
-      {{- toYaml . | nindent 6 }}
-      {{- end }}
+      {{- include "kubedeploy.healthchecks" (list .Values .Values.healthcheck) | indent 6 }}
       {{- else if not .Values.healthcheck.disableAutomatic }}
         {{- range .Values.ports }}
           {{- if eq (toString .name) "http" }}
@@ -488,13 +510,7 @@ spec:
       ports:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .healthcheck }}
-      {{- if .enabled }}
-      {{- with .probes }}
-      {{- toYaml . | nindent 6 }}
-      {{- end }}
-      {{- end }}
-      {{- end }}
+      {{- include "kubedeploy.healthchecks" (list . .healthcheck) | indent 6 }}
       {{- include "kubedeploy.volumeMounts" $ | indent 6 }}
       resources:
         {{- if not .resources -}}
