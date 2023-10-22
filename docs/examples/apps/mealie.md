@@ -58,7 +58,7 @@ releases:
         - name: API_URL
           value: http://localhost:9000
         - name: BASE_URL
-          value: https://{{ requiredEnv "MEALIE_DOMAIN }}
+          value: https://{{ requiredEnv "MEALIE_DOMAIN" }}
         - name: ALLOW_SIGNUP
           value: "false"
         - name: DB_ENGINE
