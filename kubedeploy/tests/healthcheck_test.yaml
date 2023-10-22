@@ -43,6 +43,8 @@ tests:
             httpGet:
               path: /
               port: http
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   - it: test automatic healthcheck with http2 port name on deployment
     template: deployment.yaml
@@ -57,6 +59,8 @@ tests:
           path: spec.template.spec.containers[0].livenessProbe
       - notExists:
           path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   # test disabling automatic healthchecks even if port with name http is specified
   - it: test disabling automatic healthcheck on deployment
@@ -74,6 +78,8 @@ tests:
           path: spec.template.spec.containers[0].livenessProbe
       - notExists:
           path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   # Enabling the healthcheck without defining probes should have simillar effect
   # as with disabling the automatic ones
@@ -88,10 +94,12 @@ tests:
           containerPort: 80
           protocol: TCP
     asserts:
-      - isNullOrEmpty:
+      - notExists:
           path: spec.template.spec.containers[0].livenessProbe
-      - isNullOrEmpty:
+      - notExists:
           path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   - it: test custom healthcheck probes on deployment
     template: deployment.yaml
@@ -104,7 +112,6 @@ tests:
             httpGet:
               path: /_health
               port: http
-
           readinessProbe:
             httpGet:
               path: /_health
@@ -126,6 +133,8 @@ tests:
             httpGet:
               path: /_health
               port: http
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   ## deploymentMode: Statefulset testing
 
@@ -153,6 +162,8 @@ tests:
             httpGet:
               path: /
               port: http
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   - it: test automatic healthcheck with http2 port name on statefulset
     template: statefulset.yaml
@@ -167,6 +178,8 @@ tests:
           path: spec.template.spec.containers[0].livenessProbe
       - notExists:
           path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   # test disabling automatic healthchecks even if port with name http is specified
   - it: test disabling automatic healthcheck on statefulset
@@ -184,6 +197,8 @@ tests:
           path: spec.template.spec.containers[0].livenessProbe
       - notExists:
           path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   # Enabling the healthcheck without defining probes should have simillar effect
   # as with disabling the automatic ones
@@ -198,10 +213,12 @@ tests:
           containerPort: 80
           protocol: TCP
     asserts:
-      - isNullOrEmpty:
+      - notExists:
           path: spec.template.spec.containers[0].livenessProbe
-      - isNullOrEmpty:
+      - notExists:
           path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   - it: test custom healthcheck probes on statefulset
     template: statefulset.yaml
@@ -236,6 +253,8 @@ tests:
             httpGet:
               path: /_health
               port: http
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   ## deploymentMode: Job testing
 
@@ -263,6 +282,8 @@ tests:
             httpGet:
               path: /
               port: http
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   - it: test automatic healthcheck with http2 port name on job
     template: job.yaml
@@ -277,6 +298,8 @@ tests:
           path: spec.template.spec.containers[0].livenessProbe
       - notExists:
           path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   # test disabling automatic healthchecks even if port with name http is specified
   - it: test disabling automatic healthcheck on job
@@ -294,6 +317,8 @@ tests:
           path: spec.template.spec.containers[0].livenessProbe
       - notExists:
           path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   # Enabling the healthcheck without defining probes should have simillar effect
   # as with disabling the automatic ones
@@ -308,10 +333,12 @@ tests:
           containerPort: 80
           protocol: TCP
     asserts:
-      - isNullOrEmpty:
+      - notExists:
           path: spec.template.spec.containers[0].livenessProbe
-      - isNullOrEmpty:
+      - notExists:
           path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   - it: test custom healthcheck probes on job
     template: job.yaml
@@ -346,6 +373,8 @@ tests:
             httpGet:
               path: /_health
               port: http
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
 
   ## deploymentMode: Cronjob testing
 
@@ -373,6 +402,8 @@ tests:
             httpGet:
               path: /
               port: http
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].startupProbe
 
   - it: test automatic healthcheck with http2 port name on cronjob
     template: cronjob.yaml
@@ -387,6 +418,8 @@ tests:
           path: spec.jobTemplate.spec.template.spec.containers[0].livenessProbe
       - notExists:
           path: spec.jobTemplate.spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].startupProbe
 
   # test disabling automatic healthchecks even if port with name http is specified
   - it: test disabling automatic healthcheck on cronjob
@@ -404,6 +437,8 @@ tests:
           path: spec.jobTemplate.spec.template.spec.containers[0].livenessProbe
       - notExists:
           path: spec.jobTemplate.spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].startupProbe
 
   # Enabling the healthcheck without defining probes should have simillar effect
   # as with disabling the automatic ones
@@ -418,10 +453,12 @@ tests:
           containerPort: 80
           protocol: TCP
     asserts:
-      - isNullOrEmpty:
+      - notExists:
           path: spec.jobTemplate.spec.template.spec.containers[0].livenessProbe
-      - isNullOrEmpty:
+      - notExists:
           path: spec.jobTemplate.spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].startupProbe
 
   - it: test custom healthcheck probes on cronjob
     template: cronjob.yaml
@@ -456,3 +493,5 @@ tests:
             httpGet:
               path: /_health
               port: http
+      - notExists:
+          path: spec.jobTemplate.spec.template.spec.containers[0].startupProbe
