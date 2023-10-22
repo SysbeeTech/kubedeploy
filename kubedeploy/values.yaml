@@ -20,7 +20,7 @@ kubeVersionOverride: ""
 #   <ul><li>**Deployment**</li>
 #   <li>**Statefulset**</li>
 #   <li>**Job**</li>
-#   <li>**Cronjob**</li></ul>
+#   <li>**Cronjob**</li>
 #   <li>**None**</li></ul>
 
 deploymentMode: Deployment
