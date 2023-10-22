@@ -5,7 +5,7 @@ hide:
 ---
 # kubedeploy
 
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.1](https://img.shields.io/badge/AppVersion-1.1.1-informational?style=flat-square)
 
 **Homepage:** <https://kubedeploy.app/>
 
@@ -75,7 +75,7 @@ Kubernetes: `>=1.20.0-0`
 | :fontawesome-solid-arrow-turn-up:{ .rotate-90 } cronjobspec.schedule | string | `"0 * * * *"` | Define cronjob schedule, for details see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#writing-a-cronjob-spec) |
 | :fontawesome-solid-arrow-turn-up:{ .rotate-90 } cronjobspec.startingDeadlineSeconds | optional | `180` | Define deadline for starting the job, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#starting-deadline) |
 | :fontawesome-solid-arrow-turn-up:{ .rotate-90 } cronjobspec.successfulJobsHistoryLimit | int | `3` | Define number of successful Job logs to keep |
-| [:fontawesome-solid-book:  deploymentMode](../start/values/deploymentmode.md) | string | `"Deployment"` | Available deployment modes, currently supported:   <ul><li>**Deployment**</li>   <li>**Statefulset**</li>   <li>**Job**</li>   <li>**Cronjob**</li></ul>   <li>**None**</li></ul> |
+| [:fontawesome-solid-book:  deploymentMode](../start/values/deploymentmode.md) | string | `"Deployment"` | Available deployment modes, currently supported:   <ul><li>**Deployment**</li>   <li>**Statefulset**</li>   <li>**Job**</li>   <li>**Cronjob**</li>   <li>**None**</li></ul> |
 | [:fontawesome-solid-book:  env](../start/values/env.md) | list | `[]` | Define environment variables for all containers in Pod. For reference see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core). |
 | [:fontawesome-solid-book:  envFrom](../start/values/envfrom.md) | list | `[]` | Define environment variables from ConfigMap or Secret objects for all containers in Pod. For reference see [envFrom secret example](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables) or [envFrom configmap example](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables) |
 | [:fontawesome-solid-book:  extraObjects](../start/values/extraobjects.md) | list | `[]` | Create dynamic manifest via values (templated). See values.yaml or chart documentation for examples: |

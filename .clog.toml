@@ -1,0 +1,8 @@
+[clog]
+repository = "https://github.com:SysbeeTech/kubedeploy.git"
+link-style = "github"
+changelog = "CHANGELOG.md"
+from-latest-tag = true
+
+[sections]
+Docs = ["docs", "example"]
