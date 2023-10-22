@@ -1,6 +1,5 @@
 [clog]
-repository = "https://github.com:SysbeeTech/kubedeploy.git"
-link-style = "github"
+repository = "https://github.com/SysbeeTech/kubedeploy"
 changelog = "CHANGELOG.md"
 from-latest-tag = true
 
