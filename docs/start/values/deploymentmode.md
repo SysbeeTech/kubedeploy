@@ -8,6 +8,7 @@ You can also specify different `deplyomentMode` per use-case:
 - `Statefulset` - deploy application as [StatefulSets](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)
 - `Job` - deploy application as [Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/job/)
 - `Cronjob` - deploy application as [CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/)
+- `None` - do not deploy application. In this mode Kubedeploy can be used to deploy, ConfigMaps, Secrets, etc.
 
 !!! example "Application as StatefulSets"
 
