@@ -19,18 +19,10 @@ spec:
   {{- end }}
   template:
     metadata:
-      {{- if or .Values.podAnnotations .Values.configMapsHash }}
-      annotations:
-      {{- with .Values.podAnnotations }}
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if .Values.configMapsHash }}
-        checksum/config: {{ include (print $.Template.BasePath "/configmaps.yaml") . | sha256sum }}
-      {{- end }}
-      {{- end }}
+      {{- include "kubedeploy.annotations" . | indent 6 }}
       labels:
         {{- include "kubedeploy.selectorLabels" . | nindent 8 }}
-    {{- include "kubedeploy.specSection" . | nindent 4 }}
+    {{- include "kubedeploy.common.spec" . | nindent 4 }}
 
   {{- if .Values.persistency.enabled }}
   volumeClaimTemplates:
