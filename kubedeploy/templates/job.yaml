@@ -15,11 +15,8 @@ spec:
   {{- end }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "kubedeploy.annotations" . | indent 6 }}
       labels:
         {{- include "kubedeploy.selectorLabels" . | nindent 8 }}
-    {{- include "kubedeploy.specSection" . | nindent 4 }}
+    {{- include "kubedeploy.common.spec" . | nindent 4 }}
 {{- end }}
