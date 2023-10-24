@@ -58,9 +58,9 @@ Kubernetes: `>=1.20.0-0`
 | configMaps | list | `[]` | Define a list of extra ConfigMap objects. See values.yaml or chart documentation for examples on syntax |
 | configMapsHash | bool | `false` | Redeploy Deployments and Statefulsets if deployed ConfigMaps content change. |
 | cronjobspec | object | see subvalues | Cronjobspec settings |
-| cronjobspec.args | list | `[]` | Define args for cronjob |
+| cronjobspec.args | list | `[]` | Define args for cronjob  Starting from Kubedeploy version 1.2 you should start using `image.args` instead of `cronjobspec.args`. Values will be available as failsafe up to Kubedeploy 2.0 when they will be removed. |
 | cronjobspec.backoffLimit | int | `3` | Define job backoff limit, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy) |
-| cronjobspec.command | list | `[]` | Define command for cronjob |
+| cronjobspec.command | list | `[]` | Define command for cronjob  Starting from Kubedeploy version 1.2 you should start using `image.command` instead of `cronjobspec.command`. Values will be available as failsafe up to Kubedeploy 2.0 when they will be removed. |
 | cronjobspec.concurrencyPolicy | string | `""` | Define concurrency policy options: Allow (default), Forbid or Replace, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#concurrency-policy) |
 | cronjobspec.failedJobsHistoryLimit | int | `1` | Define number of failed Job logs to keep |
 | cronjobspec.schedule | string | `"0 * * * *"` | Define cronjob schedule, for details see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#writing-a-cronjob-spec) |
@@ -111,9 +111,9 @@ Kubernetes: `>=1.20.0-0`
 | initContainers.pullPolicy | optional | `"IfNotPresent"` | initContainers image pull policy |
 | initContainers.resources | optional | `{}` | Define initContainers global resource requests and limits. Will be applied to all initContainers if more specific (per container) resource requests and limits are not defined |
 | jobspec | object | see subvalues | jobspec settings |
-| jobspec.args | list | `[]` | Define args for Job |
+| jobspec.args | list | `[]` | Define args for Job  Starting from Kubedeploy version 1.2 you should start using `image.args` instead of `jobspec.args`. Values will be available as failsafe up to Kubedeploy 2.0 when they will be removed. |
 | jobspec.backoffLimit | int | `3` | Define Job backoff limit, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy) |
-| jobspec.command | list | `[]` | Define command for Job |
+| jobspec.command | list | `[]` | Define command for Job  Starting from Kubedeploy version 1.2 you should start using `image.command` instead of `jobspec.command`. Values will be available as failsafe up to Kubedeploy 2.0 when they will be removed. |
 | jobspec.parallelism | int | `1` | Define Job paralelisam, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism) |
 | jobspec.restartPolicy | string | `"OnFailure"` | Define restart policy for jobs if deploymentMode=**Job**, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures) |
 | keda | object | see subvalues | Keda settings |

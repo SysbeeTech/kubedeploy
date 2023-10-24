@@ -564,8 +564,10 @@ cronjobspec:
   # Define restart policy for cronjob if deploymentMode=**Cronjob**.
   restartPolicy: OnFailure
   # -- Define command for cronjob
+  #  Starting from Kubedeploy version 1.2 you should start using `image.command` instead of `cronjobspec.command`. Values will be available as failsafe up to Kubedeploy 2.0 when they will be removed.
   command: []
   # -- Define args for cronjob
+  #  Starting from Kubedeploy version 1.2 you should start using `image.args` instead of `cronjobspec.args`. Values will be available as failsafe up to Kubedeploy 2.0 when they will be removed.
   args: []
   # -- Define job backoff limit, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy)
   backoffLimit: 3
@@ -585,8 +587,10 @@ jobspec:
   # -- Define restart policy for jobs if deploymentMode=**Job**, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures)
   restartPolicy: OnFailure
   # -- Define command for Job
+  #  Starting from Kubedeploy version 1.2 you should start using `image.command` instead of `jobspec.command`. Values will be available as failsafe up to Kubedeploy 2.0 when they will be removed.
   command: []
   # -- Define args for Job
+  #  Starting from Kubedeploy version 1.2 you should start using `image.args` instead of `jobspec.args`. Values will be available as failsafe up to Kubedeploy 2.0 when they will be removed.
   args: []
   # -- Define Job paralelisam, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism)
   parallelism: 1

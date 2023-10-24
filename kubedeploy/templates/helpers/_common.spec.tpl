@@ -27,14 +27,8 @@ spec:
     {{- range .Values.initContainers.containers }}
     - name: {{ required "Please define valid init container name" .name }}
       image: "{{ required "Please define valid init container repository" .repository }}:{{ .tag | default "latest" }}"
-      {{- with .command }}
-      command:
-        {{- toYaml . |nindent 8 }}
-      {{- end }}
-      {{- with .args }}
-      args:
-        {{- toYaml . |nindent 8 }}
-      {{- end }}
+      {{- include "kubedeploy.common.command" (list $ .) | indent 6 }}
+      {{- include "kubedeploy.common.args" (list $ .) | indent 6 }}
       {{- with $.Values.securityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -63,38 +57,8 @@ spec:
       {{- end }}
       image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}"
       imagePullPolicy: {{ .Values.image.pullPolicy |default "IfNotPresent" }}
-      {{- if eq (toString .Values.deploymentMode) "Job" }}
-      {{- with .Values.jobspec.command }}
-      command:
-      {{- toYaml . |nindent 8 }}
-      {{- end }}
-      {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
-      {{- with .Values.cronjobspec.command }}
-      command:
-      {{- toYaml . |nindent 8 }}
-      {{- end }}
-      {{- else }}
-      {{- with .Values.image.command }}
-      command:
-      {{- toYaml . |nindent 8 }}
-      {{- end }}
-      {{- end }}
-      {{- if eq (toString .Values.deploymentMode) "Job" }}
-      {{- with .Values.jobspec.args}}
-      args:
-      {{- toYaml . |nindent 8 }}
-      {{- end }}
-      {{- else if eq (toString .Values.deploymentMode) "Cronjob"}}
-      {{- with .Values.cronjobspec.args }}
-      args:
-      {{- toYaml . |nindent 8 }}
-      {{- end }}
-      {{- else }}
-      {{- with .Values.image.args }}
-      args:
-      {{- toYaml . |nindent 8 }}
-      {{- end }}
-      {{- end }}
+      {{- include "kubedeploy.common.command" (list $ .Values) | indent 6 }}
+      {{- include "kubedeploy.common.args" (list $ .Values) | indent 6 }}
       {{- include "kubedeploy.common.env" . | indent 6 }}
       {{- include "kubedeploy.common.envFrom" . | indent 6 }}
       {{- with .Values.ports }}
@@ -130,14 +94,8 @@ spec:
     {{- range .Values.additionalContainers.containers }}
     - name: {{ required "Please define valid additional container name" .name }}
       image: "{{ required "Please define valid additional container repository" .repository }}:{{ .tag | default "latest" }}"
-      {{- with .command }}
-      command:
-        {{- toYaml . |nindent 8 }}
-      {{- end }}
-      {{- with .args }}
-      args:
-        {{- toYaml . |nindent 8 }}
-      {{- end }}
+      {{- include "kubedeploy.common.command" (list $ .) | indent 6 }}
+      {{- include "kubedeploy.common.args" (list $ .) | indent 6 }}
       {{- with $.Values.securityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
