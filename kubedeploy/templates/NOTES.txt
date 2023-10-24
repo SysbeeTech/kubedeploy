@@ -1,4 +1,3 @@
-
 {{- if .Values.ingress.enabled }}
 Application will be available on these URLs:
 
@@ -30,7 +29,30 @@ Get the application URL by running these commands:
 
 {{- if $.Values.service.enabled }}
 {{- if and (not $.Values.service.ports) (not $.Values.ports) }}
-
 DEPRECATION WARNING: Service is enabled but no container or service ports are defined. This setup will stop working in kubedeploy 2.x
 {{- end }}
+{{- end }}
+
+{{ if and
+        (eq (toString $.Values.deploymentMode) "Cronjob")
+        $.Values.cronjobspec.command
+-}}
+DEPRECATION WARNING: Cronjob deployment mode using cronjobpsec.command will stop working in Kubedeploy 2.x. Please use image.command instead
+{{ else if and
+            (eq (toString $.Values.deploymentMode) "Job")
+            $.Values.jobspec.command
+-}}
+DEPRECATION WARNING: Job deployment mode using jobpsec.command will stop working in Kubedeploy 2.x. Please use image.command instead
+{{- end }}
+
+{{ if and
+        (eq (toString $.Values.deploymentMode) "Cronjob")
+        $.Values.cronjobspec.args
+-}}
+DEPRECATION WARNING: Cronjob deployment mode using cronjobpsec.args will stop working in Kubedeploy 2.x. Please use image.args instead
+{{ else if and
+            (eq (toString $.Values.deploymentMode) "Job")
+            $.Values.jobspec.args
+-}}
+DEPRECATION WARNING: Job deployment mode using jobpsec.args will stop working in Kubedeploy 2.x. Please use image.args instead
 {{- end }}

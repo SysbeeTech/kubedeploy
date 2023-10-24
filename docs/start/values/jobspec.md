@@ -24,6 +24,9 @@ jobspec:
 4. Define Job paralelisam, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism)
 5. Define Job backoff limit, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy)
 
+!!! danger "Deprecation Warning"
+
+    Starting from Kubedeploy version 1.2, you should begin using image.command and image.args instead of cronjobspec.command and cronjobspec.args. These values will remain available as failsafe options until Kubedeploy 2.0, at which point they will be removed.
 
 !!! example "Define job"
 

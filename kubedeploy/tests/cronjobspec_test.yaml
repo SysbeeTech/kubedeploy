@@ -44,6 +44,59 @@ tests:
         successfulJobsHistoryLimit: 1
         failedJobsHistoryLimit: 3
         concurrencyPolicy: "Forbid"
+      # TODO: remove in version 2.x
+      # testing backwards compatibility with image.command and args
+      image:
+        command: ['not-here']
+        args: ['-not-here']
+
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: CronJob
+      - equal:
+          path: spec.schedule
+          value: "*/5 * * * *"
+      - equal:
+          path: spec.startingDeadlineSeconds
+          value: 60
+      - equal:
+          path: spec.successfulJobsHistoryLimit
+          value: 1
+      - equal:
+          path: spec.failedJobsHistoryLimit
+          value: 3
+      - equal:
+          path: spec.concurrencyPolicy
+          value: Forbid
+      - equal:
+          path: spec.jobTemplate.spec.backoffLimit
+          value: 2
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.restartPolicy
+          value: Never
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].command[0]
+          value: nginx
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          value: -v
+
+  - it: test custom cronjobspec with image commands and args
+    set:
+      deploymentMode: Cronjob
+      cronjobspec:
+        schedule: "*/5 * * * *"
+        restartPolicy: Never
+        backoffLimit: 2
+        startingDeadlineSeconds: 60
+        successfulJobsHistoryLimit: 1
+        failedJobsHistoryLimit: 3
+        concurrencyPolicy: "Forbid"
+      image:
+        command: ["nginx"]
+        args: ["-v"]
 
     asserts:
       - hasDocuments:

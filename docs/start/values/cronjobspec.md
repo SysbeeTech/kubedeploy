@@ -33,6 +33,11 @@ cronjobspec:
 9. Define concurrency policy options: Allow (default), Forbid or Replace, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/#concurrency-policy)
 
 
+!!! danger "Deprecation Warning"
+
+    Starting from Kubedeploy version 1.2, you should begin using image.command and image.args instead of cronjobspec.command and cronjobspec.args. These values will remain available as failsafe options until Kubedeploy 2.0, at which point they will be removed.
+
+
 !!! example "Define cronjob"
 
     ```yaml title="values.yaml" linenums="1" hl_lines="7-9"
