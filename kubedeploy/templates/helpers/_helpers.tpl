@@ -74,6 +74,17 @@ configmap name generator
 {{- end -}}
 
 {{/*
+extraIngress name generator
+*/}}
+{{- define "kubedeploy.extraIngressName" -}}
+{{- $top := index . 0 -}}
+{{- $local := index . 1 -}}
+{{- $name := required "Please define valid Ingress name" $local.name -}}
+{{- $fullName := include "kubedeploy.fullname" $top -}}
+{{- printf "%s-%s" $fullName $name -}}
+{{- end -}}
+
+{{/*
 secret name generator
 */}}
 {{- define "kubedeploy.secretname" -}}

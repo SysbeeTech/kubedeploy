@@ -461,6 +461,41 @@ ingress:
     #    - example-domain.local
     #  secretName: example-domain-tls # (optional) name of secret with SSL certificate
 
+extraIngress:
+  - name: ingres2
+    className: "haproxy-pub"
+    pathType: ImplementationSpecific
+    withSSL: true
+    svcPort: ""
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+    hosts:
+      - host: "test.com"
+        paths:
+          - path: /
+            svcPort: 5555
+            pathType: Prefix
+    tls:
+      - hosts:
+          - example-domain.local
+        secretName: example-domain-tls
+  - name: ingres3
+    #className: "haproxy-pub"
+    #pathType: ImplementationSpecific
+    #withSSL: true
+    #svcPort: ""
+    #annotations:
+    #  cert-manager.io/cluster-issuer: letsencrypt
+    hosts:
+      - host: "test2.com"
+        #paths:
+        #  - path: /
+        #    svcPort: 5555
+        #    pathType: Prefix
+              #tls:
+              #  - hosts:
+              #      - example-domain.local
+              #    secretName: example-domain-tls
 
 ## Monitoring and scaling
 
