@@ -1,22 +1,30 @@
-{{- if .Values.ingress.enabled -}}
-{{- $fullName := include "kubedeploy.fullname" . -}}
-{{- $svcPort := include "kubedeploy.ingress.defaultport" (list $ .Values.ingress) -}}
-{{- $pathType := .Values.ingress.pathType | default "ImplementationSpecific" }}
+{{- $labels := include "kubedeploy.labels" . -}}
 {{- $routePrefix := list (dict "path" "/") }}
-apiVersion: {{ include "kubedeploy.ingress.apiVersion" . }}
+{{- $fullName := include "kubedeploy.fullname" . -}}
+{{- if gt (len .Values.extraIngress) 0 -}}
+{{- range $index, $ingress := .Values.extraIngress }}
+{{- $name := include "kubedeploy.extraIngressName" (list $ $ingress) -}}
+{{- $pathType := $ingress.pathType | default "ImplementationSpecific" }}
+{{- $svcPort := include "kubedeploy.ingress.defaultport" (list $ $ingress) -}}
+{{- if not $ingress.withSSL -}}
+{{- $_ := set $ingress "withSSL" "true" -}}
+{{- end -}}
+{{- if $index }}
+---
+{{- end }}
+apiVersion: {{ include "kubedeploy.ingress.apiVersion" $ }}
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $name }}
   labels:
-    {{- include "kubedeploy.labels" . | nindent 4 }}
-  {{- include "kubedeploy.ingress.annotations" (list $ .Values.ingress) }}
+    {{- $labels | nindent 4 }}
 spec:
-  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" (include "kubedeploy.kubeVersion" .)) }}
-  ingressClassName: {{ .Values.ingress.className }}
+  {{- if and $ingress.className (semverCompare ">=1.18-0" (include "kubedeploy.kubeVersion" $)) }}
+  ingressClassName: {{ $ingress.className }}
   {{- end }}
-  {{ include "kubedeploy.ingress.tls" (list $ .Values.ingress) }}
+  {{ include "kubedeploy.ingress.tls" (list $ $ingress) }}
   rules:
-    {{- range .Values.ingress.hosts }}
+    {{- range $ingress.hosts }}
     - host: {{ required "host is required at ingress.hosts[].host" .host | quote }}
       http:
         paths:
@@ -38,4 +46,6 @@ spec:
               {{- end }}
           {{- end }}
     {{- end }}
+
+{{ end }}
 {{- end }}

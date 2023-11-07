@@ -78,6 +78,20 @@ Kubernetes: `>=1.20.0-0`
 | [:fontawesome-solid-book:  deploymentMode](../start/values/deploymentmode.md) | string | `"Deployment"` | Available deployment modes, currently supported:   <ul><li>**Deployment**</li>   <li>**Statefulset**</li>   <li>**Job**</li>   <li>**Cronjob**</li>   <li>**None**</li></ul> |
 | [:fontawesome-solid-book:  env](../start/values/env.md) | list | `[]` | Define environment variables for all containers in Pod. For reference see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core). |
 | [:fontawesome-solid-book:  envFrom](../start/values/envfrom.md) | list | `[]` | Define environment variables from ConfigMap or Secret objects for all containers in Pod. For reference see [envFrom secret example](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables) or [envFrom configmap example](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables) |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt"` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].className | string | `"haproxy-pub"` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].hosts[0].host | string | `"test.com"` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].hosts[0].paths[0].path | string | `"/"` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].hosts[0].paths[0].pathType | string | `"Prefix"` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].hosts[0].paths[0].svcPort | int | `5555` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].name | string | `"ingres2"` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].pathType | string | `"ImplementationSpecific"` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].svcPort | string | `""` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].tls[0].hosts[0] | string | `"example-domain.local"` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].tls[0].secretName | string | `"example-domain-tls"` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[0].withSSL | bool | `true` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[1].hosts[0].host | string | `"test2.com"` |  |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } extraIngress[1].name | string | `"ingres3"` |  |
 | [:fontawesome-solid-book:  extraObjects](../start/values/extraobjects.md) | list | `[]` | Create dynamic manifest via values (templated). See values.yaml or chart documentation for examples: |
 | [:fontawesome-solid-book:  extraSecrets](../start/values/extrasecrets.md) | list | `[]` | Define a list of extra Secrets objects. See values.yaml or chart documentation for examples on syntax |
 | [:fontawesome-solid-book:  extraVolumeMounts](../start/values/extravolumemounts.md) | list | `[]` | Define extra volume mounts for containers See values.yaml or chart documentation for examples on syntax |
