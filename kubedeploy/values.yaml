@@ -461,41 +461,27 @@ ingress:
     #    - example-domain.local
     #  secretName: example-domain-tls # (optional) name of secret with SSL certificate
 
-extraIngress:
-  - name: ingres2
-    className: "haproxy-pub"
-    pathType: ImplementationSpecific
-    withSSL: true
-    svcPort: ""
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt
-    hosts:
-      - host: "test.com"
-        paths:
-          - path: /
-            svcPort: 5555
-            pathType: Prefix
-    tls:
-      - hosts:
-          - example-domain.local
-        secretName: example-domain-tls
-  - name: ingres3
-    #className: "haproxy-pub"
-    #pathType: ImplementationSpecific
-    #withSSL: true
-    #svcPort: ""
-    #annotations:
-    #  cert-manager.io/cluster-issuer: letsencrypt
-    hosts:
-      - host: "test2.com"
-        #paths:
-        #  - path: /
-        #    svcPort: 5555
-        #    pathType: Prefix
-              #tls:
-              #  - hosts:
-              #      - example-domain.local
-              #    secretName: example-domain-tls
+# extraIngress -- (list) list of extra Ingress objects to deploy.
+# extraIngress requires additional name: parametar.
+# see ingress values for required spec or values example.
+extraIngress: []
+  #- name: ingres2 # (string, required) - name of extra ingress object
+  #  className: "haproxy-pub" # (optional) - defaults to haproxy
+  #  pathType: ImplementationSpecific # (optional) - defaults to ImplementationSpecific
+  #  withSSL: true # (optional) - defaults to true
+  #  svcPort: "" # (optional) - defaults to first port from service.ports
+  #  annotations: #(optional)
+  #    cert-manager.io/cluster-issuer: letsencrypt # (optional)
+  #  hosts:
+  #    - host: "test.com" # (required) - Define Ingress hostname
+  #      paths:
+  #        - path: / # (optional) defaults to /
+  #          svcPort: 5555 # (optional) - defaults to svcPort if undefined
+  #          pathType: Prefix # (optional) - defaults to pathType
+  #  tls: # (optional)
+  #    - hosts:  # (required) - list of hosts covered by ssl
+  #        - example-domain.local
+  #      secretName: example-domain-tls # (optional) name of secret with SSL certificate
 
 ## Monitoring and scaling
 

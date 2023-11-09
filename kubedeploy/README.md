@@ -5,7 +5,7 @@ hide:
 ---
 # kubedeploy
 
-![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.1](https://img.shields.io/badge/AppVersion-1.1.1-informational?style=flat-square)
+![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
 
 **Homepage:** <https://kubedeploy.app/>
 
@@ -69,20 +69,7 @@ Kubernetes: `>=1.20.0-0`
 | deploymentMode | string | `"Deployment"` | Available deployment modes, currently supported:   <ul><li>**Deployment**</li>   <li>**Statefulset**</li>   <li>**Job**</li>   <li>**Cronjob**</li>   <li>**None**</li></ul> |
 | env | list | `[]` | Define environment variables for all containers in Pod. For reference see: [env](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#envvar-v1-core). |
 | envFrom | list | `[]` | Define environment variables from ConfigMap or Secret objects for all containers in Pod. For reference see [envFrom secret example](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/#configure-all-key-value-pairs-in-a-secret-as-container-environment-variables) or [envFrom configmap example](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables) |
-| extraIngress[0].annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt"` |  |
-| extraIngress[0].className | string | `"haproxy-pub"` |  |
-| extraIngress[0].hosts[0].host | string | `"test.com"` |  |
-| extraIngress[0].hosts[0].paths[0].path | string | `"/"` |  |
-| extraIngress[0].hosts[0].paths[0].pathType | string | `"Prefix"` |  |
-| extraIngress[0].hosts[0].paths[0].svcPort | int | `5555` |  |
-| extraIngress[0].name | string | `"ingres2"` |  |
-| extraIngress[0].pathType | string | `"ImplementationSpecific"` |  |
-| extraIngress[0].svcPort | string | `""` |  |
-| extraIngress[0].tls[0].hosts[0] | string | `"example-domain.local"` |  |
-| extraIngress[0].tls[0].secretName | string | `"example-domain-tls"` |  |
-| extraIngress[0].withSSL | bool | `true` |  |
-| extraIngress[1].hosts[0].host | string | `"test2.com"` |  |
-| extraIngress[1].name | string | `"ingres3"` |  |
+| extraIngress | list | `[]` | list of extra Ingress objects to deploy. extraIngress requires additional name: parametar. see ingress values for required spec or values example. |
 | extraObjects | list | `[]` | Create dynamic manifest via values (templated). See values.yaml or chart documentation for examples: |
 | extraSecrets | list | `[]` | Define a list of extra Secrets objects. See values.yaml or chart documentation for examples on syntax |
 | extraVolumeMounts | list | `[]` | Define extra volume mounts for containers See values.yaml or chart documentation for examples on syntax |
