@@ -48,7 +48,7 @@ tests:
           path: spec.template.metadata.annotations
       - equal:
           path: spec.template.metadata.annotations['checksum/config']
-          value: d31275c6bf90a45ad9aaeabb2fa2744126dcc3aa672d72124ed3605d1c4a7b1c
+          value: da1ca95b0c6e85bf9c683bc4294dc26d191f6cf815ed5d7a9d34fa01c4022897
 
   - it: test enabled configmaphash on statefulset
     template: statefulset.yaml
@@ -84,4 +84,4 @@ tests:
           path: spec.template.metadata.annotations
       - equal:
           path: spec.template.metadata.annotations['checksum/config']
-          value: d31275c6bf90a45ad9aaeabb2fa2744126dcc3aa672d72124ed3605d1c4a7b1c
+          value: da1ca95b0c6e85bf9c683bc4294dc26d191f6cf815ed5d7a9d34fa01c4022897
