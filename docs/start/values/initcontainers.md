@@ -1,5 +1,7 @@
 # initContainers
 
+Feature state: [:material-tag-outline: 0.5.0](../changelog.md#050 "Minimum version")
+
 `initContainers` value in Kubedeploy allow for defining one or more [initContainers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/).
 
 Init containers are specialized containers that run before app containers in a Pod. Init containers can contain utilities or setup scripts not present in an app image.
@@ -39,7 +41,7 @@ initContainers:
 
 1. Define if initContainers are enabled.
 2. initContainers image pull policy
-3. (optional) Define initContainers global resource requests and limits. Will be applied to all initContainers if more specific (per container) resource requests and limits are not defined.
+3. (Feature state: [:material-tag-outline: 1.0.0](../changelog.md#100 "Minimum version")) (optional) Define initContainers global resource requests and limits. Will be applied to all initContainers if more specific (per container) resource requests and limits are not defined.
 
     !!! example
 
@@ -60,7 +62,7 @@ initContainers:
 7. (optional) Define initContainer image tag, defaults to `latest` if unspecified
 8. (optional) Define custom command for initContainer
 9. (optional) Define custom arguments for initContainer
-10. (optional) Define custom resources for this specific initContainer
+10. (Feature state: [:material-tag-outline: 1.0.0](../changelog.md#100 "Minimum version")) (optional) Define custom resources for this specific initContainer
 
 
 Init containers can be used to delay application startup until external resource is ready, initialize the application, or run database migrations if nececary.

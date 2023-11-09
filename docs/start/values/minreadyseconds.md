@@ -1,5 +1,7 @@
 # minReadySeconds
 
+Feature state: [:material-tag-outline: 1.0.0](../changelog.md#100 "Minimum version")
+
 `minReadySeconds` value in Kubedeploy can be used to define custom [minReadySeconds](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#min-ready-seconds) for deployments and statefulsets.
 
 !!! note

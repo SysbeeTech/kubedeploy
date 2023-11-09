@@ -1,5 +1,7 @@
 # extraObjects
 
+Feature state: [:material-tag-outline: 1.1.0](../changelog.md#110 "Minimum version")
+
 `extraObjects` value in Kubedeploy accepts a list of raw Kubernetes manifests to be deployed.
 
 !!! note

@@ -1,5 +1,7 @@
 # monitoring
 
+Feature state: [:material-tag-outline: 0.7.0](../changelog.md#070 "Minimum version")
+
 `monitoring` value in Kubedeploy allows controlling the parameters for deploying [ServiceMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.ServiceMonitor) or [PodMonitor](https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#monitoring.coreos.com/v1.PodMonitor) objects.
 
 !!! note

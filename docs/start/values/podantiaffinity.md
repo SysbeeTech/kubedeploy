@@ -1,5 +1,6 @@
 # podAntiAffinity
 
+Feature state: [:material-tag-outline: 1.0.0](../changelog.md#100 "Minimum version")
 
 `podAntiAffinity` can prevent the scheduler from placing application replicas on the same node.
 

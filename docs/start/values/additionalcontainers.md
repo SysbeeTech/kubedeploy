@@ -1,5 +1,7 @@
 # additionalContainers
 
+Feature state: [:material-tag-outline: 1.0.0](../changelog.md#100 "Minimum version")
+
 A Pod can have multiple containers running apps within it.
 
 Pods are designed to support multiple cooperating processes (as containers) that form a cohesive unit of service. The containers in a Pod are automatically co-located and co-scheduled on the same physical or virtual machine in the cluster. The containers can share resources and dependencies, communicate with one another, and coordinate when and how they are terminated.

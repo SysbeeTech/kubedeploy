@@ -1,5 +1,6 @@
 # podAntiAffinityTopologyKey
 
+Feature state: [:material-tag-outline: 1.0.0](../changelog.md#100 "Minimum version")
 
 `podAntiAffinityToplologyKey` sets the TopologyKey to use for automatic `podAntiAffinity` rules.
 
