@@ -13,17 +13,27 @@
 {{- define "kubedeploy.ingress.annotations" -}}
 {{- $top := index . 0 -}}
 {{- $ingress := index . 1 -}}
+{{/* Ensure that we always have empty annotations dict ready */}}
+{{- if not (hasKey $ingress "annotations") -}}
+{{- $_ := set $ingress "annotations" dict -}}
+{{- end -}}
 {{/* set the default kubernets.io/ingress.class annotation on old kube versions */}}
 {{- if and $ingress.className (not (semverCompare ">=1.18-0" (include "kubedeploy.kubeVersion" $top))) }}
 {{- if not (hasKey $ingress.annotations "kubernetes.io/ingress.class") }}
-{{- $_ := set $ingress.annotations "kubernetes.io/ingress.class" $ingress.className}}
-{{- end }}
+{{- $_ := set $ingress.annotations "kubernetes.io/ingress.class" $ingress.className }}
+{{- end -}}
+{{- end -}}
+{{/* Add cert-manager annotation if withSSL is enabled and annotation is not found */}}
+{{- if $ingress.withSSL -}}
+{{- if not (hasKey $ingress.annotations "cert-manager.io/cluster-issuer") }}
+{{- $_ := set $ingress.annotations "cert-manager.io/cluster-issuer" "letsencrypt"}}
+{{- end -}}
 {{- end -}}
 {{- with $ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
-{{- end }}
 {{- end -}}
+{{- end }}
 
 {{/* Ingress tls secret name */}}
 {{- define "kubedeploy.ingress.tlsSecretName" -}}
@@ -43,12 +53,12 @@ tls:
         - {{ . | quote }}
     {{- end }}
       secretName: {{ .secretName | default (include "kubedeploy.ingress.tlsSecretName" $top) }}
-  {{- end }}
+  {{- end -}}
 {{- else }}
     - hosts:
     {{- range $ingress.hosts }}
         - {{ .host |quote }}
-    {{- end }}
+    {{- end -}}
     {{- if $ingress.name }}
       secretName: {{ printf "%s-%s-ingress-tls" (include "kubedeploy.fullname" $top) $ingress.name }}
     {{- else }}
@@ -56,7 +66,6 @@ tls:
     {{- end -}}
 {{- end -}}
 {{- end -}}
-
 {{- end -}}
 
 {{/* Detect default port for ingress */}}

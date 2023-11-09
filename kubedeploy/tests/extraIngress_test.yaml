@@ -1,0 +1,604 @@
+suite: test extraIngress
+templates:
+  - extraIngress.yaml
+
+tests:
+  - it: test if extraIngress is disabled by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: test required name parametar in extraIngress
+    set:
+      extraIngress:
+        - withSSL: true
+    asserts:
+      - failedTemplate:
+          errorMessage: Please define valid Ingress name
+
+  - it: test required hosts list parametar in extraIngress
+    set:
+      extraIngress:
+        - name: ingress2
+    asserts:
+      - failedTemplate:
+          errorMessage: hosts list is required for extraIngress
+
+  - it: test empty hosts list in extraIngress
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts: []
+    asserts:
+      - failedTemplate:
+          errorMessage: hosts list in extraIngress is empty
+
+  - it: test required host parametar in extraIngress
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - paths:
+                - path: /
+    asserts:
+      - failedTemplate:
+          errorMessage: host is required at ingress.hosts[].host
+
+  - it: test minimal extraIngress config
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: chart-example.local
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - isAPIVersion:
+          of: networking.k8s.io/v1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy-ingress2
+      - isSubset:
+          path: metadata.annotations
+          content:
+            cert-manager.io/cluster-issuer: letsencrypt
+      - isSubset:
+          path: spec.tls[0]
+          content:
+            hosts:
+              - "chart-example.local"
+            secretName: RELEASE-NAME-kubedeploy-ingress2-ingress-tls
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "chart-example.local"
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 80
+
+  - it: test multiple extraIngress config
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: chart-example.local
+        - name: ingress3
+          hosts:
+            - host: chart-example.local
+    asserts:
+      - hasDocuments:
+          count: 2
+
+  # withSSL testing
+
+  - it: test extraIngress withSSL auto tls config
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: test.com
+            - host: test2.com
+    asserts:
+      - exists:
+          path: spec.tls
+      - lengthEqual:
+          path: spec.tls
+          count: 1
+      - lengthEqual:
+          path: spec.tls[0].hosts
+          count: 2
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: test.com
+      - equal:
+          path: spec.tls[0].hosts[1]
+          value: test2.com
+      - equal:
+          path: spec.tls[0].secretName
+          value: RELEASE-NAME-kubedeploy-ingress2-ingress-tls
+
+  - it: test extraIngress withSSL generated secret name if omitted in tls
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: test.com
+            - host: test2.com
+          tls:
+            - hosts:
+              - test.com
+              - test2.com
+    asserts:
+      - exists:
+          path: spec.tls
+      - lengthEqual:
+          path: spec.tls
+          count: 1
+      - lengthEqual:
+          path: spec.tls[0].hosts
+          count: 2
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: test.com
+      - equal:
+          path: spec.tls[0].hosts[1]
+          value: test2.com
+      - equal:
+          path: spec.tls[0].secretName
+          value: RELEASE-NAME-kubedeploy-ingress-tls
+
+  # Test pathType overrides
+
+  - it: test per path pathType override
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: chart-example.local
+              paths:
+                - path: /
+                - path: /custom
+                  pathType: Prefix
+    asserts:
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "chart-example.local"
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 80
+                - path: /custom
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 80
+  - it: test pathType override without path
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: chart-example.local
+              paths:
+                - pathType: Prefix
+    asserts:
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "chart-example.local"
+            http:
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 80
+
+  # Test svcport overrides
+
+  - it: test extraIngress[].svcPort default
+    set:
+      extraIngress:
+        - name: ingress2
+          svcPort: 8081
+          hosts:
+            - host: chart-example.local
+    asserts:
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "chart-example.local"
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 8081
+
+  - it: test extraIngress[]svcPort with containerPorts
+    set:
+      ports:
+        - containerPort: 9876
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: chart-example.local
+    asserts:
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "chart-example.local"
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 9876
+
+  - it: test per path svcPort override
+    set:
+      extraIngress:
+        - name: ingress2
+          svcPort: 8081
+          hosts:
+            - host: chart-example.local
+              paths:
+                - path: /
+                - path: /custom
+                  svcPort: 5555
+    asserts:
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "chart-example.local"
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 8081
+                - path: /custom
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 5555
+
+  - it: test per path svcPort override without path
+    set:
+      extraIngress:
+        - name: ingress2
+          svcPort: 8081
+          hosts:
+            - host: chart-example.local
+              paths:
+                - svcPort: 5555
+    asserts:
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "chart-example.local"
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 5555
+
+  # Test older kube version apiVersion
+  - it: test extraIngress apiversion prior to 1.19
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: chart-example.local
+      kubeVersionOverride: "1.18.2"
+    asserts:
+      - isKind:
+          of: Ingress
+      - isAPIVersion:
+          of: networking.k8s.io/v1beta1
+
+  - it: test extraIngress apiversion  prior to 1.18
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: chart-example.local
+      kubeVersionOverride: "1.17.2"
+    asserts:
+      - isKind:
+          of: Ingress
+      - isAPIVersion:
+          of: networking.k8s.io/v1beta1
+
+  - it: test extraIngress apiversion prior to 1.14
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: chart-example.local
+      kubeVersionOverride: "1.13.2"
+    asserts:
+      - isKind:
+          of: Ingress
+      - isAPIVersion:
+          of: extensions/v1beta1
+
+  # Ingress will always follow the first service port defined in service
+  - it: test extraIngress defaults with changed service port
+    set:
+      extraIngress:
+        - name: ingress2
+          hosts:
+            - host: chart-example.local
+      service:
+        ports:
+          - name: whatever
+            targetPort: http
+            port: 8080
+            protocol: TCP
+          - name: http
+            targetPort: http
+            port: 80
+            protocol: TCP
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - isAPIVersion:
+          of: networking.k8s.io/v1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy-ingress2
+      - isSubset:
+          path: metadata.annotations
+          content:
+            cert-manager.io/cluster-issuer: letsencrypt
+      - isSubset:
+          path: spec.tls[0]
+          content:
+            hosts:
+              - "chart-example.local"
+            secretName: RELEASE-NAME-kubedeploy-ingress2-ingress-tls
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "chart-example.local"
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 8080
+
+  - it: test extraIngress with single host and path and changed service port
+    set:
+      extraIngress:
+        - name: ingress2
+          pathType: Prefix
+          annotations:
+            haproxy.org/deny-list: "192.168.1.0/24, 192.168.2.100"
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+          hosts:
+            - host: domain1.tld
+              paths:
+                - path: /custom-path
+          tls:
+            - secretName: domain1-tls
+              hosts:
+                - domain1.tld
+      service:
+        ports:
+          - name: whatever
+            targetPort: http
+            port: 8080
+            protocol: TCP
+          - name: http
+            targetPort: http
+            port: 80
+            protocol: TCP
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - isAPIVersion:
+          of: networking.k8s.io/v1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy-ingress2
+      - isSubset:
+          path: metadata.annotations
+          content:
+            haproxy.org/deny-list: "192.168.1.0/24, 192.168.2.100"
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+      - isSubset:
+          path: spec.tls[0]
+          content:
+            hosts:
+              - "domain1.tld"
+            secretName: domain1-tls
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "domain1.tld"
+            http:
+              paths:
+                - path: /custom-path
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 8080
+
+  - it: test extraIngress with multiple hosts and paths and changed service port
+    set:
+      extraIngress:
+        - name: ingress2
+          pathType: Prefix
+          annotations:
+            haproxy.org/deny-list: "192.168.1.0/24, 192.168.2.100"
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+          hosts:
+            - host: domain1.tld
+              paths:
+                - path: /custom-path
+            - host: domain2.tld
+              paths:
+                - path: /
+                - path: /subdomain
+          tls:
+            - secretName: domain1-tls
+              hosts:
+                - domain1.tld
+            - secretName: domain2-tls
+              hosts:
+                - domain2.tld
+      service:
+        ports:
+          - name: whatever
+            targetPort: http
+            port: 8080
+            protocol: TCP
+          - name: http
+            targetPort: http
+            port: 80
+            protocol: TCP
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - isAPIVersion:
+          of: networking.k8s.io/v1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy-ingress2
+      - isSubset:
+          path: metadata.annotations
+          content:
+            haproxy.org/deny-list: "192.168.1.0/24, 192.168.2.100"
+            cert-manager.io/cluster-issuer: letsencrypt-prod
+      - lengthEqual:
+          path: spec.tls
+          count: 2
+      - isSubset:
+          path: spec.tls[0]
+          content:
+            hosts:
+              - "domain1.tld"
+            secretName: domain1-tls
+      - isSubset:
+          path: spec.tls[1]
+          content:
+            hosts:
+              - "domain2.tld"
+            secretName: domain2-tls
+      - lengthEqual:
+          path: spec.rules
+          count: 2
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "domain1.tld"
+            http:
+              paths:
+                - path: /custom-path
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 8080
+      - isSubset:
+          path: spec.rules[1]
+          content:
+            host: "domain2.tld"
+            http:
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 8080
+                - path: /subdomain
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 8080
+
+  # some values are optional
+  - it: test extraIngress with missing values
+    set:
+      extraIngress:
+        - name: ingress2
+          # pathType empty should default to ImplementationSpecific
+          pathType: ""
+          hosts:
+            # host without path should default to / path
+            - host: chart-example.local
+          # should result in no tls config
+          withSSL: false
+          # this should skip defining ingressClassName
+          className: ""
+    asserts:
+      - notExists:
+          path: spec.ingressClassName
+      - notExists:
+          path: spec.tls
+      - lengthEqual:
+          path: spec.rules
+          count: 1
+      - isSubset:
+          path: spec.rules[0]
+          content:
+            host: "chart-example.local"
+            http:
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+                  backend:
+                    service:
+                      name: RELEASE-NAME-kubedeploy
+                      port:
+                        number: 80

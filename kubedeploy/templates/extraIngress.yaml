@@ -6,8 +6,17 @@
 {{- $name := include "kubedeploy.extraIngressName" (list $ $ingress) -}}
 {{- $pathType := $ingress.pathType | default "ImplementationSpecific" }}
 {{- $svcPort := include "kubedeploy.ingress.defaultport" (list $ $ingress) -}}
-{{- if not $ingress.withSSL -}}
+{{- if not (hasKey $ingress "withSSL") -}}
 {{- $_ := set $ingress "withSSL" "true" -}}
+{{- end -}}
+{{- if not (hasKey $ingress "tls") -}}
+{{- $_ := set $ingress "tls" list -}}
+{{- end -}}
+{{- if not (hasKey $ingress "hosts") -}}
+{{- fail "hosts list is required for extraIngress" -}}
+{{- end -}}
+{{- if lt (len $ingress.hosts) 1 -}}
+{{- fail "hosts list in extraIngress is empty" -}}
 {{- end -}}
 {{- if $index }}
 ---
@@ -18,6 +27,7 @@ metadata:
   name: {{ $name }}
   labels:
     {{- $labels | nindent 4 }}
+  {{- include "kubedeploy.ingress.annotations" (list $ $ingress) }}
 spec:
   {{- if and $ingress.className (semverCompare ">=1.18-0" (include "kubedeploy.kubeVersion" $)) }}
   ingressClassName: {{ $ingress.className }}
