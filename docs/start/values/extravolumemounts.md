@@ -1,5 +1,7 @@
 # extraVolumeMounts
 
+Feature state: [:material-tag-outline: 1.1.0](../changelog.md#110 "Minimum version")
+
 `extraVolumeMounts` value in Kubedeploy allow for defining additional mounted volumes for all containers in a Pod.
 
 

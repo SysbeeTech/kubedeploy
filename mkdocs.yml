@@ -70,6 +70,7 @@ nav:
       - networkPolicy: start/values/networkpolicy.md
       - service: start/values/service.md
       - ingress: start/values/ingress.md
+      - extraIngress: start/values/extraingress.md
       - monitoring: start/values/monitoring.md
       - autoscaling: start/values/autoscaling.md
       - keda: start/values/keda.md

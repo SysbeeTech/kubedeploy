@@ -1,5 +1,7 @@
 # extraSecrets
 
+Feature state: [:material-tag-outline: 1.1.0](../changelog.md#110 "Minimum version")
+
 `extraSecrets` value in Kubedeploy allow for deploying multiple custom [Secretes](https://kubernetes.io/docs/concepts/configuration/secret/) objects.
 
 It also allows automatic mounting of Secretes in all containers of a Pod by definig cusom mount parametars.

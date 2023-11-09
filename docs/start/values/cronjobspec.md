@@ -1,5 +1,7 @@
 # cronjobspec
 
+Feature state: [:material-tag-outline: 1.0.0](../changelog.md#100 "Minimum version")
+
 `cronjobspec` value in Kubedeploy defines [CronJob](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) specific parameters.
 
 !!! note

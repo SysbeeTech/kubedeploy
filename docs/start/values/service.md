@@ -28,7 +28,7 @@ service:
 
 1. Set Service type. See [Service](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) for available options.
 2. Enable Service provisioning for release.
-3. Create a headless service. See [reference](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)
+3. (Feature state: [:material-tag-outline: 1.1.0](../changelog.md#110 "Minimum version")) Create a headless service. See [reference](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)
 
 4. (list) Define listening ports for Service.
     If unspecified, chart will automatically generate ports list based on main container exposed ports.

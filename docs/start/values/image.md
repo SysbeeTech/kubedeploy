@@ -20,7 +20,7 @@ image:
 3. Defines container image tag
 4. Defines container custom command. [Reference](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/)
 5. Define container custom arguments. [Reference](https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/)
-6. Define container custom [lifecycle hooks](https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/). [More info](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
+6. (Feature state: [:material-tag-outline: 1.0.0](../changelog.md#100 "Minimum version")) Define container custom [lifecycle hooks](https://kubernetes.io/docs/tasks/configure-pod-container/attach-handler-lifecycle-event/). [More info](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/)
 7. Define Pod [terminationGracePeriodSeconds](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/#hook-handler-execution).
 
 If we wish to deploy different webserver we can do this by simply changing the image repository.

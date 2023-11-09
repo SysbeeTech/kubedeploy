@@ -1,5 +1,7 @@
 # envFrom
 
+Feature state: [:material-tag-outline: 1.1.0](../changelog.md#110 "Minimum version")
+
 `envFrom` value in Kubedeploy can be used to define environment variables that will be configured on all containers in a Pod.
 
 

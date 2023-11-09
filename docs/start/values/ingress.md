@@ -32,13 +32,14 @@ ingress:
 1. Enable Ingres object
 2. Ingress class name. In case you have multiple Ingress controllers you can specifically target desired one. Defaults to "haproxy"
 3. Default Ingress [pathType](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types)
-4. Deploy Ingress object with SSL support. Automatically configures the Ingress `tls` spec.
-5. Define default Service port that will be targeted by Ingress. If left undefined Ingress will use first port from `service.ports` (or first port from `ports`) to route traffic to.
+4. (Feature state: [:material-tag-outline: 1.1.0](../changelog.md#110 "Minimum version")) Deploy Ingress object with SSL support. Automatically configures the Ingress `tls` spec.
+5. (Feature state: [:material-tag-outline: 1.1.0](../changelog.md#110 "Minimum version")) Define default Service port that will be targeted by Ingress. If left undefined Ingress will use first port from `service.ports` (or first port from `ports`) to route traffic to.
 6. Additional Ingress annotations, can be used to define custom Ingress controller configuration. By default, it sets the cert-manager annotation to use `letsencrypt` cluster-issuer for issuing SSL certificates for configured ingress domain.
 7. (list) Ingress host list.
 8. (string, required) Define Ingress hostname
 9. (list, optional) Ingress host paths.
     example usage:
+    (Feature state: [:material-tag-outline: 1.1.0](../changelog.md#110 "Minimum version"))
 
     !!! example
 
@@ -188,9 +189,12 @@ We will also configure our `ingress` to use custom SSL certificate installed as 
     helm install webapp sysbee/kubedeploy -f values.yaml
     ```
 
+If you require more than one Ingress object per deployment, for example targeting different ingressClasses, please see [extraIngress](extraingress.md) configuration options
+
 
 See also:
 
+- [extraIngress](extraingress.md)
 - [ports](ports.md)
 - [service](service.md)
 - [additionalContainers](additionalcontainers.md)

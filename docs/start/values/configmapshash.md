@@ -1,5 +1,8 @@
 # configMapsHash
 
+Feature state: [:material-tag-outline: 1.1.0](../changelog.md#110 "Minimum version")
+
+
 `configMapsHash` value in Kubedeploy enables custom annotation on Deployment and Statefulsets. Hash is automatically calculated based on the contents of deployed ConfigMaps.
 
 !!! note

@@ -1,5 +1,7 @@
 # networkPolicy
 
+Feature state: [:material-tag-outline: 1.0.0](../changelog.md#100 "Minimum version")
+
 `networkPolicy` value enables defining of raw [NetworkPolicy](https://kubernetes.io/docs/concepts/services-networking/network-policies/) rules.
 
 In addition, Kubedeploy will create automatic Network Policy rules when `ingress` or `monitoring` values are enabled.

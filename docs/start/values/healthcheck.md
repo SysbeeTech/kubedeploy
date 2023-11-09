@@ -1,5 +1,7 @@
 # healthcheck
 
+Feature state: [:material-tag-outline: 0.6.0](../changelog.md#060 "Minimum version")
+
 `healthcheck` value in Kubedeploy can be used to define custom [liveness, readiness and startup Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) for main container.
 
 !!! note
@@ -62,7 +64,7 @@ When defining custom `healthcheck` probes any automatic probes will be disabled.
     helm install webapp sysbee/kubedeploy -f values.yaml
     ```
 
-If you wish to disable automatic probes without configuring custom probes:
+If you wish to disable automatic probes without configuring custom probes (Feature state: [:material-tag-outline: 0.8.2](../changelog.md#082 "Minimum version")):
 
 !!! example "Disable automatic healthcheck probes"
 

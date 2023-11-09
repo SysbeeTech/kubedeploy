@@ -1,5 +1,7 @@
 # podExtraLabels
 
+Feature state: [:material-tag-outline: 1.1.0](../changelog.md#110 "Minimum version")
+
 `podExtraLabels` value in Kubedeploy can be used to define additional Pod [labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
 
 !!! note

@@ -1,8 +1,11 @@
 # configMaps
 
+Feature state: [:material-tag-outline: 0.8.0](../changelog.md#080 "Minimum version")
+
 `configMaps` value in Kubedeploy allow for deploying multiple custom [configMaps](https://kubernetes.io/docs/concepts/configuration/configmap/) objects.
 
-It also allows automatic mounting of ConfigMaps in all containers of a Pod by definig cusom mount parametars.
+It is also possible to automatically mount ConfigMaps in all containers of a Pod by definig custom mount parametars. (Feature state: [:material-tag-outline: 1.0.0](../changelog.md#100 "Minimum version"))
+
 
 !!! note
 

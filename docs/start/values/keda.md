@@ -1,5 +1,7 @@
 # keda
 
+Feature state: [:material-tag-outline: 0.9.0](../changelog.md#090 "Minimum version")
+
 `keda` value in Kubedeploy allows controlling the parameters for [Kubernetes Event-driven Autoscaling: KEDA 2.x](https://keda.sh/docs/2.3/concepts/scaling-deployments/)
 
 !!! note
