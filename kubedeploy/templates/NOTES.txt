@@ -26,6 +26,10 @@ Get the application URL by running these commands:
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
 {{- end }}
 
+{{- if and (not (.Capabilities.APIVersions.Has "keda.sh/v1alpha1")) .Values.keda.enabled -}}
+WARNING: Keda scaling is enabled but cluster has no support for it. Ensure Keda is installed in the cluster.
+{{- end -}}
+
 
 {{- if $.Values.service.enabled }}
 {{- if and (not $.Values.service.ports) (not $.Values.ports) }}
