@@ -2,6 +2,7 @@ suite: test autoscaling
 templates:
   - hpa.yaml
   - deployment.yaml
+  - statefulset.yaml
 
 capabilities:
   majorVersion: 1
@@ -34,6 +35,42 @@ tests:
           content:
             apiVersion: apps/v1
             kind: Deployment
+            name: RELEASE-NAME-kubedeploy
+      - equal:
+          path: spec.minReplicas
+          value: 1
+      - equal:
+          path: spec.maxReplicas
+          value: 10
+      - isSubset:
+          path: spec.metrics[0]
+          content:
+            type: Resource
+            resource:
+              name: cpu
+              target:
+                type: Utilization
+                averageUtilization: 80
+
+  - it: test if autoscaling enabled with statefulset
+    template: hpa.yaml
+    set:
+      deploymentMode: Statefulset
+      autoscaling:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: HorizontalPodAutoscaler
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - isSubset:
+          path: spec.scaleTargetRef
+          content:
+            apiVersion: apps/v1
+            kind: StatefulSet
             name: RELEASE-NAME-kubedeploy
       - equal:
           path: spec.minReplicas
@@ -102,6 +139,16 @@ tests:
   - it: test if replicas is removed from deployment when hpa enabled
     template: deployment.yaml
     set:
+      autoscaling:
+        enabled: true
+    asserts:
+      - notExists:
+          path: spec.replicas
+
+  - it: test if replicas is removed from Statefulset when hpa enabled
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
       autoscaling:
         enabled: true
     asserts:
