@@ -625,6 +625,8 @@ jobspec:
   parallelism: 1
   # -- Define Job backoff limit, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy)
   backoffLimit: 3
+  # -- Define [Automatic Cleanup for Finished Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/)
+  ttlSecondsAfterFinished: "300"
 
 
 # -- persistency settings

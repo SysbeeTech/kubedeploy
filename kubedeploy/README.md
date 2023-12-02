@@ -118,6 +118,7 @@ Kubernetes: `>=1.20.0-0`
 | jobspec.command | list | `[]` | Define command for Job  Starting from Kubedeploy version 1.2 you should start using `image.command` instead of `jobspec.command`. Values will be available as failsafe up to Kubedeploy 2.0 when they will be removed. |
 | jobspec.parallelism | int | `1` | Define Job paralelisam, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism) |
 | jobspec.restartPolicy | string | `"OnFailure"` | Define restart policy for jobs if deploymentMode=**Job**, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#handling-pod-and-container-failures) |
+| jobspec.ttlSecondsAfterFinished | string | `"300"` | Define [Automatic Cleanup for Finished Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/) |
 | keda | object | see subvalues | Keda settings |
 | keda.behavior | object | `{}` | HPA configurable scaling behavior see [ref](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior) |
 | keda.cooldownPeriod | int | `300` | The period to wait after the last trigger reported active before scaling the resource back to 0 [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#cooldownperiod) |
