@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## 1.1.1 (2023-10-22)
+## 1.1.1
+
+(2023-10-22)
 
 ### Bug Fixes
 
@@ -11,6 +13,8 @@
 *   minor documentation updates ([e732452b](https://github.com/SysbeeTech/kubedeploy/commit/e732452b1afc21dabac486b982e30d539a8d7970))
 
 ## 1.1.0
+
+(2023-09-16)
 
 Public [chart documentation](https://kubedeploy.app) is now available, featuring Quickstart guide, full documentation per each configuration value,  as well as deployment examples.
 
