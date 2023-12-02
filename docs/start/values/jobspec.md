@@ -15,6 +15,7 @@ jobspec:
   args: [] # (3)
   parallelism: 1 # (4)
   backoffLimit: 3 # (5)
+  ttlSecondsAfterFinished: 300 # (6)
 
 ```
 
@@ -23,6 +24,7 @@ jobspec:
 3. Define args for Job
 4. Define Job paralelisam, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#controlling-parallelism)
 5. Define Job backoff limit, see [reference](https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy)
+6. (Feature state: [:material-tag-outline: 1.2.0](../changelog.md#110 "Minimum version")) Define [Automatic Cleanup for Finished Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/)
 
 !!! danger "Deprecation Warning"
 

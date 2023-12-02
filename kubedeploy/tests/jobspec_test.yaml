@@ -2,6 +2,10 @@ suite: test jobspec
 templates:
   - job.yaml
 
+capabilities:
+  majorVersion: 1
+  minorVersion: 23
+
 tests:
 
   - it: test default job
@@ -19,6 +23,32 @@ tests:
           path: spec.backoffLimit
           value: 3
       - equal:
+          path: spec.ttlSecondsAfterFinished
+          value: 300
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: OnFailure
+
+  - it: test default job on 1.22
+    set:
+      deploymentMode: Job
+    capabilities:
+      majorVersion: 1
+      minorVersion: 22
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Job
+      - equal:
+          path: spec.parallelism
+          value: 1
+      - equal:
+          path: spec.backoffLimit
+          value: 3
+      - notExists:
+          path: spec.ttlSecondsAfterFinished
+      - equal:
           path: spec.template.spec.restartPolicy
           value: OnFailure
 
@@ -31,6 +61,7 @@ tests:
         args: ["-v"]
         backoffLimit: 2
         parallelism: 2
+        ttlSecondsAfterFinished: 500
       # TODO: remove in version 2.x
       # testing backwards compatibility with image.command and args
       image:
@@ -48,6 +79,9 @@ tests:
       - equal:
           path: spec.parallelism
           value: 2
+      - equal:
+          path: spec.ttlSecondsAfterFinished
+          value: 500
       - equal:
           path: spec.template.spec.restartPolicy
           value: Never
@@ -82,6 +116,9 @@ tests:
       - equal:
           path: spec.parallelism
           value: 2
+      - equal:
+          path: spec.ttlSecondsAfterFinished
+          value: 300
       - equal:
           path: spec.template.spec.restartPolicy
           value: Never

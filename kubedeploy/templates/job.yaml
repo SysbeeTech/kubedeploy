@@ -13,6 +13,9 @@ spec:
   {{- with .Values.jobspec.parallelism }}
   parallelism: {{ . }}
   {{- end }}
+  {{- if semverCompare ">=1.23-0" (include "kubedeploy.kubeVersion" .) }}
+  ttlSecondsAfterFinished: {{ .Values.jobspec.ttlSecondsAfterFinished | default "300" }}
+  {{- end }}
   template:
     metadata:
       {{- include "kubedeploy.annotations" . | indent 6 }}
