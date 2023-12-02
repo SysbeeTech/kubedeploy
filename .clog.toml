@@ -5,3 +5,4 @@ from-latest-tag = true
 
 [sections]
 Docs = ["docs", "example"]
+Features = ["feat", "feature"]
