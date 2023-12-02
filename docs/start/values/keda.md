@@ -33,7 +33,7 @@ keda:
 1. enables keda, **Note:** mutually exclusive with HPA, enabling KEDA disables HPA
 2. Number of minimum replicas for KEDA autoscaling
 3. Number of maximum replicas for KEDA autoscaling
-4.Interval for checking each trigger [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#pollinginterval)
+4. Interval for checking each trigger [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#pollinginterval)
 5. The period to wait after the last trigger reported active before scaling the resource back to 0 [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#cooldownperiod)
 6. After scaled object is deleted return workload to initial replica count [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#advanced)
 7. Scaled object annotations, can be used to pause scaling [ref](https://keda.sh/docs/2.10/concepts/scaling-deployments/#pause-autoscaling)

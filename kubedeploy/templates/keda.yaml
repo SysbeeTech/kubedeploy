@@ -1,4 +1,4 @@
-{{- if and (eq .Values.deploymentMode "Deployment") .Values.keda.enabled }}
+{{- if and (or (eq .Values.deploymentMode "Deployment") (eq .Values.deploymentMode "Statefulset") ) .Values.keda.enabled }}
 {{- if .Capabilities.APIVersions.Has "keda.sh/v1alpha1" -}}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
@@ -14,6 +14,9 @@ metadata:
 spec:
   scaleTargetRef:
     name: {{ include "kubedeploy.fullname" . }}
+    {{- if eq .Values.deploymentMode "Statefulset" }}
+    kind: StatefulSet
+    {{- end }}
   pollingInterval: {{ .Values.keda.pollingInterval | default 30 }}
   cooldownPeriod: {{ .Values.keda.cooldownPeriod | default 300 }}
   minReplicaCount: {{ .Values.keda.minReplicas | default 1 }}

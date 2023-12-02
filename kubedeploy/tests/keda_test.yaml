@@ -3,6 +3,7 @@ templates:
   - keda.yaml
   - hpa.yaml
   - deployment.yaml
+  - statefulset.yaml
 
 capabilities:
   majorVersion: 1
@@ -38,7 +39,17 @@ tests:
   - it: test if replicas is removed from deployment when keda enabled
     template: deployment.yaml
     set:
-      autoscaling:
+      keda:
+        enabled: true
+    asserts:
+      - notExists:
+          path: spec.replicas
+
+  - it: test if replicas is removed from statefulset when keda enabled
+    template: statefulset.yaml
+    set:
+      deploymentMode: Statefulset
+      keda:
         enabled: true
     asserts:
       - notExists:
@@ -64,6 +75,40 @@ tests:
           path: spec.scaleTargetRef
           content:
             name: RELEASE-NAME-kubedeploy
+      - equal:
+          path: spec.minReplicaCount
+          value: 1
+      - equal:
+          path: spec.maxReplicaCount
+          value: 10
+      - isNullOrEmpty:
+          path: spec.triggers
+      - equal:
+          path: spec.advanced.restoreToOriginalReplicaCount
+          value: false
+
+  - it: test if keda is enabled with defaults for statefulset
+    capabilities:
+      apiVersions:
+        - keda.sh/v1alpha1
+    template: keda.yaml
+    set:
+      deploymentMode: Statefulset
+      keda:
+        enabled: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: ScaledObject
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-kubedeploy
+      - isSubset:
+          path: spec.scaleTargetRef
+          content:
+            name: RELEASE-NAME-kubedeploy
+            kind: StatefulSet
       - equal:
           path: spec.minReplicaCount
           value: 1
