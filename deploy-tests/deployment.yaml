@@ -45,6 +45,20 @@ releases:
             matchLabels:
               app.kubernetes.io/instance: testing-replicas
 
+  # deployment with autoscaling
+  - name: {{requiredEnv "RELEASE_NAME"}}-autoscaling
+    labels:
+      test: autoscaling
+    <<: *default
+    values:
+      - autoscaling:
+          enabled: true
+          minReplicas: 3
+          maxReplicas: 5
+          targetCPUUtilizationPercentage: 60
+          behavior:
+            scaleDown:
+              stabilizationWindowSeconds: 300
 
   # deployment with init and additional containers
   - name: {{requiredEnv "RELEASE_NAME"}}-multi-container
