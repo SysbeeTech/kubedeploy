@@ -50,6 +50,7 @@ Kubernetes: `>=1.20.0-0`
 | additionalContainers.resources | optional | `{}` | Define additionalContainers global resource requests and limits. Will be applied to all additionalContainers if more specific (per container) resource requests and limits are not defined |
 | affinity | object | `{}` | Define Pod [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) disables automatic podAntiAffinity rules if defined. |
 | autoscaling | object | see subvalues | Autoscaling settings |
+| autoscaling.behavior | object | `{}` | HPA configurable scaling behavior see [ref](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior) |
 | autoscaling.enabled | bool | `false` | Enable autoscaling. Works only with deploymentMode=**Deployment** |
 | autoscaling.maxReplicas | int | `10` | Maximum number of Pod replicas |
 | autoscaling.minReplicas | int | `1` | Minimum number of Pod replicas |

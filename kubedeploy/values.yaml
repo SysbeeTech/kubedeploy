@@ -526,6 +526,14 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # -- (int) Scaling target memory utilization as percentage of resources.requests.mem
   targetMemoryUtilizationPercentage:
+  # -- HPA configurable scaling behavior see [ref](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior)
+  behavior: {}
+  #  scaleDown:
+  #    stabilizationWindowSeconds: 300
+  #    policies:
+  #    - type: Percent
+  #      value: 100
+  #      periodSeconds: 15
 
 
 # -- Keda settings
