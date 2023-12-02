@@ -9,7 +9,7 @@ extraIngress allows defining a list of one or multiple Ingress API objects, when
 
     If you require just one Ingress object please see [ingress](ingress.md) configuration option.
 
-    extraIngress mostly follows the confifg options present in [ingress](ingress.md) config with exception of name/enabled parametar as showcased below.
+    extraIngress mostly follows the config options present in [ingress](ingress.md) config with exception of name/enabled parametar as showcased below.
 
 `extraIngress` value in Kubedeploy allows you to control parameters for [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) object that would be created by the chart.
 
