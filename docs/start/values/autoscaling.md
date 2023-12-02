@@ -18,13 +18,15 @@ autoscaling:
   maxReplicas: 10 # (3)
   targetCPUUtilizationPercentage: 80 # (4)
   targetMemoryUtilizationPercentage: # (5)
+  behavior: {} # (6)
 ```
 
-1. Enable autoscaling. Works only with deploymentMode=**Deployment**
+1. Enable autoscaling. Works only with **Deployment** and **Statefulset** deploymentMode
 2. Minimum number of Pod replicas
 3. Maximum number of Pod replicas
 4. (int) Scaling target CPU utilization as percentage of resources.requests.cpu
 5. (int) Scaling target memory utilization as percentage of resources.requests.mem
+6. (Feature state: [:material-tag-outline: 1.2.0](../changelog.md#110 "Minimum version")) (map) Define custom scaling [behavior](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior)
 
 !!! example "Define simple autoscaling policy"
 

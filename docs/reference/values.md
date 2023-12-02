@@ -59,6 +59,7 @@ Kubernetes: `>=1.20.0-0`
 | :fontawesome-solid-arrow-turn-up:{ .rotate-90 } additionalContainers.resources | optional | `{}` | Define additionalContainers global resource requests and limits. Will be applied to all additionalContainers if more specific (per container) resource requests and limits are not defined |
 | [:fontawesome-solid-book:  affinity](../start/values/affinity.md) | object | `{}` | Define Pod [affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) disables automatic podAntiAffinity rules if defined. |
 | [:fontawesome-solid-book:  autoscaling](../start/values/autoscaling.md) | object | see subvalues | Autoscaling settings |
+| :fontawesome-solid-arrow-turn-up:{ .rotate-90 } autoscaling.behavior | object | `{}` | HPA configurable scaling behavior see [ref](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior) |
 | :fontawesome-solid-arrow-turn-up:{ .rotate-90 } autoscaling.enabled | bool | `false` | Enable autoscaling. Works only with deploymentMode=**Deployment** |
 | :fontawesome-solid-arrow-turn-up:{ .rotate-90 } autoscaling.maxReplicas | int | `10` | Maximum number of Pod replicas |
 | :fontawesome-solid-arrow-turn-up:{ .rotate-90 } autoscaling.minReplicas | int | `1` | Minimum number of Pod replicas |

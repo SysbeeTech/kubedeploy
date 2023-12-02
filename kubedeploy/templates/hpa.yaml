@@ -39,4 +39,8 @@ spec:
           type: Utilization
           averageUtilization: {{ . }}
     {{- end }}
+  {{- with .Values.autoscaling.behavior }}
+  behavior:
+    {{ toYaml . | nindent 4 }}
+  {{- end }}
 {{- end }}
