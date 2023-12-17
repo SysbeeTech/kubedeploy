@@ -24,6 +24,9 @@ spec:
       {{- include "kubedeploy.annotations" . | indent 6 }}
       labels:
         {{- include "kubedeploy.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podExtraLabels }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
     {{- include "kubedeploy.common.spec" . | nindent 4 }}
 
   {{- if .Values.persistency.enabled }}

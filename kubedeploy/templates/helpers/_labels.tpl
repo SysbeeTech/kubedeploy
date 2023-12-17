@@ -18,9 +18,6 @@ Selector labels
 {{- define "kubedeploy.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "kubedeploy.fullname" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- with .Values.podExtraLabels }}
-{{ toYaml .}}
-{{- end }}
 {{- end }}
 
 {{/*
