@@ -33,5 +33,8 @@ spec:
         {{- end }}
           labels:
             {{- include "kubedeploy.selectorLabels" . | nindent 12 }}
+            {{- with .Values.podExtraLabels }}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
     {{- include "kubedeploy.common.spec" . | nindent 8 }}
 {{- end }}

@@ -40,15 +40,8 @@ tests:
       podExtraLabels:
         environment: dev
     asserts:
-      - exists:
+      - notExists:
           path: metadata.labels.environment
-
-      - isSubset:
-          path: spec.selector.matchLabels
-          content:
-            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
-            app.kubernetes.io/instance: RELEASE-NAME
-            environment: dev
       - isSubset:
           path: spec.template.metadata.labels
           content:
@@ -63,15 +56,9 @@ tests:
       podExtraLabels:
         environment: dev
     asserts:
-      - exists:
+      - notExists:
           path: metadata.labels.environment
 
-      - isSubset:
-          path: spec.selector.matchLabels
-          content:
-            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
-            app.kubernetes.io/instance: RELEASE-NAME
-            environment: dev
       - isSubset:
           path: spec.template.metadata.labels
           content:
@@ -86,7 +73,7 @@ tests:
       podExtraLabels:
         environment: dev
     asserts:
-      - exists:
+      - notExists:
           path: metadata.labels.environment
 
       - isSubset:
@@ -103,28 +90,11 @@ tests:
       podExtraLabels:
         environment: dev
     asserts:
-      - exists:
+      - notExists:
           path: metadata.labels.environment
 
       - isSubset:
           path: spec.jobTemplate.spec.template.metadata.labels
-          content:
-            app.kubernetes.io/name: RELEASE-NAME-kubedeploy
-            app.kubernetes.io/instance: RELEASE-NAME
-            environment: dev
-
-  - it: test podExtraLabels added to podDisruptionBudget
-    template: podDisruptionBudget.yaml
-    set:
-      podExtraLabels:
-        environment: dev
-      podDisruptionBudget:
-        enabled: true
-    asserts:
-      - exists:
-          path: metadata.labels.environment
-      - isSubset:
-          path: spec.selector.matchLabels
           content:
             app.kubernetes.io/name: RELEASE-NAME-kubedeploy
             app.kubernetes.io/instance: RELEASE-NAME
