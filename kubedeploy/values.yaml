@@ -159,10 +159,18 @@ configMaps: []
   #       configmap values
   #
   # - name: kubedeploy2-configmap
+  #   mount: True
+  #   mountPath: /data/confmap/kubedeploy2 # Define single-file mount path for this configmap
+  #   subPath: kubedeploy2 # Define a configmap data key to mount to a single-file mount path
+  #   data:
+  #     kubedeploy2: |+
+  #       configmap values
+  #
+  # - name: kubedeploy3-configmap
   #   mount: False
   #   data:
   #     config: |+
-  #       config2
+  #       config3
 
 
 # -- Redeploy Deployments and Statefulsets if deployed ConfigMaps content change.

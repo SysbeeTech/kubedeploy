@@ -30,24 +30,35 @@ It is also possible to automatically mount ConfigMaps in all containers of a Pod
           kubedeploy.txt: |+
             configmap values
 
-      - name: configmap2
+      - name: configmap1
+        mount: True
+        mountPath: /data/confmap/kubedeploy2.txt # (required if mount=True) Define single-file mount path for this configmap
+        subPath: kubedeploy2.txt # (required if mountPath is a file path) Define which configmap data key to use to mount a single file
+        data:
+          kubedeploy2.txt: |+
+            configmap values
+
+      - name: configmap3
         data:
           config: |+
-            config2
+            config3
     ```
 
     ```bash title="Deploy command"
     helm install webapp sysbee/kubedeploy -f values.yaml
     ```
 
-As a result of the above example, Kubdeploy will create two extra ConfigMap objects named:
-`webapp-my-app-configmap1` and `webapp-my-app-configmap2`.
+As a result of the above example, Kubdeploy will create three extra ConfigMap objects named:
+`webapp-my-app-configmap1`, `webapp-my-app-configmap2` and `webapp-my-app-configmap3`.
 
 First configmap will also be mounted inside all of the Pod's containers at `/data/configmap` path exposing `kubedeploy.txt` as file on `/data/configmap/kubedeploy.txt`.
+Similarly, second configmap will be mounted inside all of the Pod's containers at `/data/configmap/kubedeploy2.txt` path. However, only `kubedeploy2.txt` file will be mounted, while existing directory contents will be preserved.
 
 !!! tip
 
     Common usecase in the above scenario would be creating and automatically mounting any configuration files your application might need during its runtime.
+
+    `subPath` is useful when a single file needs to be modified. For example, a default configuration file might reside inside a directory which contains multiple files and subdirectories. If the configmap is defined without a single-file `mountPath` and `subPath` fields, the entire directory will be cleared before mounting, which is undesirable.
 
 See also:
 
