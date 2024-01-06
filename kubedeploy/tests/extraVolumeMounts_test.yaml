@@ -43,6 +43,40 @@ tests:
           mountPath: /mnt/volume4
           secretName: my-secret
           optional: true
+        ## Mount Secret with subPath
+        - name: my-secret-subpath
+          mountPath: /mnt/volume5/subpath.txt
+          secretName: my-secret-subpath
+          subPath: subpath.txt
+          optional: true
+        ## Mount Secret with items
+        - name: my-secret-items
+          mountPath: /mnt/volume6
+          secretName: my-secret-items
+          items:
+            - key: secret-key
+              path: remapped-key
+          optional: true
+
+        ## Mount configMap
+        - name: my-configmap
+          mountPath: /mnt/volume7
+          configMapName: my-configmap
+          optional: true
+        ## Mount configMap with subPath
+        - name: my-configmap-subpath
+          mountPath: /mnt/volume8
+          configMapName: my-configmap-subpath
+          subPath: subpath.txt
+          optional: true
+        ## Mount configMap with items
+        - name: my-configmap-items
+          mountPath: /mnt/volume9
+          configMapName: my-configmap-items
+          items:
+            - key: configmap-key
+              path: remapped-key
+          optional: true
     asserts:
       - hasDocuments:
           count: 1
@@ -50,7 +84,7 @@ tests:
           of: Deployment
       - lengthEqual:
           path: spec.template.spec.volumes
-          count: 5
+          count: 10
       - isSubset:
           path: spec.template.spec.volumes[0]
           content:
@@ -84,9 +118,50 @@ tests:
             secret:
               secretName: my-secret
               optional: true
+      - isSubset:
+          path: spec.template.spec.volumes[5]
+          content:
+            name: my-secret-subpath
+            secret:
+              secretName: my-secret-subpath
+              optional: true
+      - isSubset:
+          path: spec.template.spec.volumes[6]
+          content:
+            name: my-secret-items
+            secret:
+              secretName: my-secret-items
+              items:
+                - key: secret-key
+                  path: remapped-key
+              optional: true
+      - isSubset:
+          path: spec.template.spec.volumes[7]
+          content:
+            name: my-configmap
+            configMap:
+              name: my-configmap
+              optional: true
+      - isSubset:
+          path: spec.template.spec.volumes[8]
+          content:
+            name: my-configmap-subpath
+            configMap:
+              name: my-configmap-subpath
+              optional: true
+      - isSubset:
+          path: spec.template.spec.volumes[9]
+          content:
+            name: my-configmap-items
+            configMap:
+              name: RELEASE-NAME-kubedeploy-my-configmap-items
+              items:
+                - key: configmap-key
+                  path: remapped-key
+              optional: true
       - lengthEqual:
           path: spec.template.spec.containers[0].volumeMounts
-          count: 5
+          count: 10
       - isSubset:
           path: spec.template.spec.containers[0].volumeMounts[0]
           content:
@@ -103,7 +178,7 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts[2]
           content:
             mountPath: /mnt/volume2
-            name: secretes
+            name: secrets
       - isSubset:
           path: spec.template.spec.containers[0].volumeMounts[3]
           content:
@@ -114,6 +189,33 @@ tests:
           content:
             mountPath: /mnt/volume4
             name: my-secret
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[5]
+          content:
+            mountPath: /mnt/volume5/subpath.txt
+            name: my-secret-subpath
+            subPath: subpath.txt
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[6]
+          content:
+            mountPath: /mnt/volume6
+            name: my-secret-items
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[7]
+          content:
+            mountPath: /mnt/volume7
+            name: my-configmap
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[8]
+          content:
+            mountPath: /mnt/volume8
+            name: my-configmap-subpath
+            subPath: subpath.txt
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[9]
+          content:
+            mountPath: /mnt/volume9
+            name: my-configmap-items
 
   - it: test extraVolumeMounts on statefulsets with persistence
     template: statefulset.yaml
@@ -214,7 +316,7 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts[3]
           content:
             mountPath: /mnt/volume2
-            name: secretes
+            name: secrets
       - isSubset:
           path: spec.template.spec.containers[0].volumeMounts[4]
           content:
@@ -283,7 +385,7 @@ tests:
           of: StatefulSet
       - lengthEqual:
           path: spec.template.spec.volumes
-          count: 5
+          count: 6
       - isSubset:
           path: spec.template.spec.volumes[0]
           content:
@@ -347,7 +449,7 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts[4]
           content:
             mountPath: /mnt/volume2
-            name: secretes
+            name: secrets
       - isSubset:
           path: spec.template.spec.containers[0].volumeMounts[5]
           content:
@@ -356,5 +458,5 @@ tests:
       - isSubset:
           path: spec.template.spec.containers[0].volumeMounts[6]
           content:
-            mountPath: /mnt/volume5
+            mountPath: /mnt/volume4
             name: my-secret

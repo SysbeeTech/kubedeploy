@@ -164,3 +164,12 @@ releases:
           mountPath: /mnt/volume4
           secretName: my-secret
           optional: true
+        # Mount configmap with subPath
+        - name: subpath-configmap
+          mountPath: /mnt/volume5/configmap.cfg
+          subPath: configmap.cfg
+          chartName: true
+          configMapName: kubedeploy2-configmap
+          items:
+            - key: config
+              path: configmap.cfg
