@@ -233,7 +233,20 @@ extraVolumeMounts: []
   # - name: secret-mount
   #   mountPath: /mnt/volume4
   #   secretName: my-secret
+  #   items:
+  #     - key: secret-key
+  #       path: path-in-volume4
   #   optional: true  # If set to true, kubernetes will ignore this mount if secret is not available
+
+  ## Mount K8s ConfigMap
+  # - name: configMap-mount
+  #   mountPath: /mnt/volume5/subpath.cfg
+  #   configMaptName: my-configmap
+  #   items:
+  #     - key: configMap-key
+  #       path: path-in-volume5
+  #   subPath: subpath.cfg
+  #   optional: true  # If set to true, kubernetes will ignore this mount if configMap is not available
 
 # --  [initContainers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/) settings
 # @default -- see subvalues

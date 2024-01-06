@@ -117,6 +117,24 @@ volumes:
     {{- else if .secretName }}
     secret:
       secretName: {{ .secretName }}
+      {{- with .items }}
+      items:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .optional }}
+      optional: {{ .optional }}
+      {{- end }}
+    {{- else if .configMapName }}
+    configMap:
+      {{- if .chartName }}
+      name: {{ printf "%s-%s" $fullName .configMapName }}
+      {{- else }}
+      name: {{ .configMapName }}
+      {{- end }}
+      {{- with .items }}
+      items:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .optional }}
       optional: {{ .optional }}
       {{- end }}
