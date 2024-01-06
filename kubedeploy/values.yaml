@@ -233,6 +233,7 @@ extraVolumeMounts: []
   # - name: secret-mount
   #   mountPath: /mnt/volume4
   #   secretName: my-secret
+  #   chartName: false # If set true, chart will automatically prefix the secretName with chart generated fullname. Handy when the secret is also deployed with this chart
   #   items:
   #     - key: secret-key
   #       path: path-in-volume4
@@ -241,7 +242,8 @@ extraVolumeMounts: []
   ## Mount K8s ConfigMap
   # - name: configMap-mount
   #   mountPath: /mnt/volume5/subpath.cfg
-  #   configMaptName: my-configmap
+  #   configMapName: my-configmap
+  #   chartName: false # If set true, chart will automatically prefix the confgMapName with chart generated fullname. Handy when the configMap is also deployed with this chart
   #   items:
   #     - key: configMap-key
   #       path: path-in-volume5

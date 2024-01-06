@@ -116,7 +116,11 @@ volumes:
       {{- toYaml .data | nindent 6 }}
     {{- else if .secretName }}
     secret:
+      {{- if .chartName }}
+      secretName: {{ printf "%s-%s" $fullName .secretName }}
+      {{- else }}
       secretName: {{ .secretName }}
+      {{- end }}
       {{- with .items }}
       items:
         {{- toYaml . | nindent 8 }}
