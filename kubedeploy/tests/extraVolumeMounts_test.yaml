@@ -52,12 +52,12 @@ tests:
         ## Mount Secret with items
         - name: my-secret-items
           mountPath: /mnt/volume6
+          chartName: true
           secretName: my-secret-items
           items:
             - key: secret-key
               path: remapped-key
           optional: true
-
         ## Mount configMap
         - name: my-configmap
           mountPath: /mnt/volume7
@@ -72,6 +72,7 @@ tests:
         ## Mount configMap with items
         - name: my-configmap-items
           mountPath: /mnt/volume9
+          chartName: true
           configMapName: my-configmap-items
           items:
             - key: configmap-key
@@ -130,7 +131,7 @@ tests:
           content:
             name: my-secret-items
             secret:
-              secretName: my-secret-items
+              secretName: RELEASE-NAME-kubedeploy-my-secret-items
               items:
                 - key: secret-key
                   path: remapped-key
