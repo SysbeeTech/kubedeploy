@@ -70,18 +70,24 @@ tests:
            name: "value"
       securityContext:
         fsGroup: 2000
-      configMaps:
+      - configMaps:
         - name: kubedeploy-configmap
-          mount: True
+          mount: true
           mountPath: /data/confmap
           data:
             kubedeploy: |+
               configmap values
         - name: kubedeploy2-configmap
-          mount: False
+          mount: true
+          mountPath: /data/confmap/kubedeploy2
+          subPath: kubedeploy2
+          data:
+            kubedeploy2: |+
+              configmap values
+        - name: kubedeploy3-configmap
           data:
             config: |+
-              config2
+              config3
     asserts:
       - isSubset:
           path: spec.template.spec.containers[1].securityContext
@@ -102,6 +108,11 @@ tests:
           content:
             mountPath: /data/confmap
             name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+      - isSubset:
+          path: spec.template.spec.containers[1].volumeMounts[1]
+          content:
+            mountPath: /data/confmap/kubedeploy2
+            name: RELEASE-NAME-kubedeploy-kubedeploy2-configmap
 
   - it: test additionalContainers custom values on deployment
     template: deployment.yaml
@@ -235,18 +246,24 @@ tests:
            name: "value"
       securityContext:
         fsGroup: 2000
-      configMaps:
+      - configMaps:
         - name: kubedeploy-configmap
-          mount: True
+          mount: true
           mountPath: /data/confmap
           data:
             kubedeploy: |+
               configmap values
         - name: kubedeploy2-configmap
-          mount: False
+          mount: true
+          mountPath: /data/confmap/kubedeploy2
+          subPath: kubedeploy2
+          data:
+            kubedeploy2: |+
+              configmap values
+        - name: kubedeploy3-configmap
           data:
             config: |+
-              config2
+              config3
     asserts:
       - isSubset:
           path: spec.template.spec.containers[1].securityContext
@@ -267,6 +284,11 @@ tests:
           content:
             mountPath: /data/confmap
             name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+      - isSubset:
+          path: spec.template.spec.containers[1].volumeMounts[1]
+          content:
+            mountPath: /data/confmap/kubedeploy2
+            name: RELEASE-NAME-kubedeploy-kubedeploy2-configmap
 
   - it: test additionalContainers custom values on statefulset
     template: statefulset.yaml
@@ -400,18 +422,24 @@ tests:
            name: "value"
       securityContext:
         fsGroup: 2000
-      configMaps:
+      - configMaps:
         - name: kubedeploy-configmap
-          mount: True
+          mount: true
           mountPath: /data/confmap
           data:
             kubedeploy: |+
               configmap values
         - name: kubedeploy2-configmap
-          mount: False
+          mount: true
+          mountPath: /data/confmap/kubedeploy2
+          subPath: kubedeploy2
+          data:
+            kubedeploy2: |+
+              configmap values
+        - name: kubedeploy3-configmap
           data:
             config: |+
-              config2
+              config3
     asserts:
       - isSubset:
           path: spec.template.spec.containers[1].securityContext
@@ -432,6 +460,11 @@ tests:
           content:
             mountPath: /data/confmap
             name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+      - isSubset:
+          path: spec.template.spec.containers[1].volumeMounts[1]
+          content:
+            mountPath: /data/confmap/kubedeploy2
+            name: RELEASE-NAME-kubedeploy-kubedeploy2-configmap
 
   - it: test additionalContainers custom values on job
     template: job.yaml
@@ -565,18 +598,24 @@ tests:
            name: "value"
       securityContext:
         fsGroup: 2000
-      configMaps:
+      - configMaps:
         - name: kubedeploy-configmap
-          mount: True
+          mount: true
           mountPath: /data/confmap
           data:
             kubedeploy: |+
               configmap values
         - name: kubedeploy2-configmap
-          mount: False
+          mount: true
+          mountPath: /data/confmap/kubedeploy2
+          subPath: kubedeploy2
+          data:
+            kubedeploy2: |+
+              configmap values
+        - name: kubedeploy3-configmap
           data:
             config: |+
-              config2
+              config3
     asserts:
       - isSubset:
           path: spec.jobTemplate.spec.template.spec.containers[1].securityContext
@@ -597,6 +636,11 @@ tests:
           content:
             mountPath: /data/confmap
             name: RELEASE-NAME-kubedeploy-kubedeploy-configmap
+      - isSubset:
+          path: spec.template.spec.containers[1].volumeMounts[1]
+          content:
+            mountPath: /data/confmap/kubedeploy2
+            name: RELEASE-NAME-kubedeploy-kubedeploy2-configmap
 
   - it: test additionalContainers custom values on cronjob
     template: cronjob.yaml

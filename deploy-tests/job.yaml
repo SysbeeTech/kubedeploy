@@ -55,6 +55,13 @@ releases:
             kubedeploy: |+
               configmap values
         - name: kubedeploy2-configmap
+          mount: true
+          mountPath: /data/confmap/kubedeploy2
+          subPath: kubedeploy2
+          data:
+            kubedeploy2: |+
+              configmap values
+        - name: kubedeploy3-configmap
           data:
             config: |+
-              config2
+              config3

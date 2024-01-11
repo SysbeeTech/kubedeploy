@@ -38,6 +38,9 @@ volumeMounts:
 {{- $name := include "kubedeploy.cfgmapname" (list $ .) -}}
 {{- if eq (toString .mount | lower) "true" }}
   - mountPath: {{ required "You need to define .Values.configMaps[].mountPath if .Values.configMaps[].mount is set to True" .mountPath }}
+    {{- if .subPath }}
+    subPath: {{ .subPath }}
+    {{- end }}
     name: {{ $name }}
 {{- end }}
 {{- end }}

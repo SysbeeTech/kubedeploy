@@ -111,6 +111,46 @@ tests:
             mountPath: /data/confmap
             name: RELEASE-NAME-kubedeploy-configmap-name
 
+  - it: test single-file configmaps mounts on deployments
+    template: deployment.yaml
+    set:
+      deploymentMode: Deployment
+      configMaps:
+        - name: configmap-name
+          mount: True
+          mountPath: /data/confmap/kubedeploy
+          subPath: kubedeploy
+          data:
+            kubedeploy: |
+              configmap values
+
+        - name: configmap-name2
+          data:
+            config: |
+              config2
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Deployment
+      - lengthEqual:
+          path: spec.template.spec.volumes
+          count: 1
+      - isSubset:
+          path: spec.template.spec.volumes[0]
+          content:
+            name: RELEASE-NAME-kubedeploy-configmap-name
+            configMap:
+              name: RELEASE-NAME-kubedeploy-configmap-name
+      - lengthEqual:
+          path: spec.template.spec.containers[0].volumeMounts
+          count: 1
+      - isSubset:
+          path: spec.template.spec.containers[0].volumeMounts[0]
+          content:
+            mountPath: /data/confmap/kubedeploy
+            name: RELEASE-NAME-kubedeploy-configmap-name
+
   - it: test configmaps mounts on statefulsets with persistence
     template: statefulset.yaml
     set:
